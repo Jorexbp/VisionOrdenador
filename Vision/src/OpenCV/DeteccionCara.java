@@ -6,6 +6,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -47,6 +48,15 @@ public class DeteccionCara {
 		for (int i = 0; i < caraArr.length; i++) {
 			// Dibujar
 			Imgproc.rectangle(imagen, caraArr[i], new Scalar(0, 0, 255), 3);
+
+			// Texto al lado del rectangulo
+			String label = "Cara";
+
+			// Posicion debajo del rectangulo
+			Point puntoTexto = new Point(caraArr[i].tl().x, caraArr[i].br().y + 30);
+
+			// Dibujar el texto se puede personalizar mucho pero no se el fontFamily como
+			Imgproc.putText(imagen, label, puntoTexto, 2, 1.1, new Scalar(255, 255, 255), 2);
 
 		}
 
