@@ -18,7 +18,7 @@ public class Positivo_negativo {
 			
 		// C:\Users\Alumno\Desktop\opencv\build\x64\vc16\bin\opencv_annotation.exe --annotations=pos.txt --images=RazaBlanca/
 		// C:\Users\Alumno\Desktop\opencv_3.4.15\build\x64\vc15\bin\opencv_createsamples.exe -info pos.txt -w 24 -h 24 -num 100 -vec pos.vec
-		// es personas>C:\Users\Alumno\Desktop\opencv_3.4.15\build\x64\vc15\bin\opencv_traincascade.exe -data cascade/ -vec pos.vec -bg neg.txt -w 24 -h 24 -numPos 90 -numNeg 100
+		// C:\Users\Alumno\Desktop\opencv_3.4.15\build\x64\vc15\bin\opencv_traincascade.exe -data cascade/ -vec pos.vec -bg neg.txt -w 24 -h 24 -numPos 90 -numNeg 100 -numStages 10
 	}
 
 
