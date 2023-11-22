@@ -29,7 +29,7 @@ public class App_Entrenamiento extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private static JTextArea textareainformativa;
-	private static String carpetaOrigen, carpetaDestino;
+	private static String carpetaOrigen, carpetaDestino, carpetaOriginal;
 	private JButton belegircarpetadestino;
 	private static String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
@@ -38,6 +38,9 @@ public class App_Entrenamiento extends JFrame {
 	private static JButton befotospos;
 	private static JLabel lcargafotosneg;
 	private static JButton bfotosneg;
+	private static JButton bcrearanotacion;
+	private static JLabel lejecutaranotacion;
+	private static boolean anotacionCreada;
 
 	/**
 	 * Launch the application.
@@ -75,6 +78,17 @@ public class App_Entrenamiento extends JFrame {
 			textareainformativa.append(carpetaDestino);
 			cambiarAUsable(lcargafotosneg, bfotosneg);
 		}
+		textareainformativa.append("\nAnotación creada > ");
+
+		if (anotacionCreada) {
+			textareainformativa.append("Sí");
+			textareainformativa.append("\nDirección de la anotación > " + carpetaDestino + "\\pos.txt");
+
+		} else {
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección de la anotación > Nula");
+
+		}
 
 	}
 
@@ -86,15 +100,17 @@ public class App_Entrenamiento extends JFrame {
 	private static void copiarFotosACarpeta(String carpeta, String tipo) {
 
 		File origen = new File(seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES));
-		 File[] archivos = origen.listFiles();
+		File[] archivos = origen.listFiles();
 
 		File destino = new File(carpeta + "\\" + tipo);
 		try {
 			for (File archivo : archivos) {
-                Path origenPath = archivo.toPath();
-                Path destinoPath = new File(destino, archivo.getName()).toPath();
-                Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
-            }
+				Path origenPath = archivo.toPath();
+				Path destinoPath = new File(destino, archivo.getName()).toPath();
+				Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
+			}
+			carpetaOriginal = origen.getAbsolutePath();
+			cambiarAUsable(lejecutaranotacion, bcrearanotacion);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -121,11 +137,9 @@ public class App_Entrenamiento extends JFrame {
 		}
 
 		for (File file : directory.listFiles()) {
-			if (!file.isDirectory()) {
 
-				file.delete();
+			file.delete();
 
-			}
 		}
 
 	}
@@ -143,6 +157,9 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	private static void crearCarpetasPorDefecto(String nombreCarpetaOrigen, String nombreCarpetaDestino) {
+		if (nombreCarpetaOrigen == null || nombreCarpetaDestino == null)
+			return;
+
 		nombreCarpetaOrigen = escritorioUsuario + "\\Carpeta Origen_Destino\\" + nombreCarpetaOrigen;
 		nombreCarpetaDestino = escritorioUsuario + "\\Carpeta Origen_Destino\\" + nombreCarpetaDestino;
 
@@ -169,9 +186,30 @@ public class App_Entrenamiento extends JFrame {
 			File ficheroCarpeta = jfc.getSelectedFile();
 			carpeta = ficheroCarpeta.getAbsolutePath();
 
+		} else {
+			return null;
 		}
 		return carpeta;
 
+	}
+
+	private static void ejecutarOpenCVannotations() {
+		// COMANDO MALO HACER QUE SEA GLOBAL
+		String destinoAnotacion = carpetaDestino + "/pos.txt";
+		String comando1 = "cmd /c start cmd.exe /c \" cd C:/Users/Alumno/git/VisionOrdenador/Vision/lib/annotation && opencv_annotation.exe"
+				+ " --annotations=\"" + destinoAnotacion + "\"" + " --images=\"" + carpetaOrigen+"/pos" + "\""; // COMANDO
+																											// MALO
+
+		// --annotations=pos.txt --images=RazaBlanca/
+		try {
+			Process proceso = Runtime.getRuntime().exec(comando1);
+			if (proceso.waitFor() == 0) {
+				anotacionCreada = true;
+			}
+		} catch (IOException | InterruptedException e) {
+
+		}
+		rellenarTextArea();
 	}
 
 	public App_Entrenamiento() {
@@ -304,6 +342,25 @@ public class App_Entrenamiento extends JFrame {
 		lcargafotosneg.setFont(new Font("Dialog", Font.BOLD, 14));
 		lcargafotosneg.setBounds(646, 114, 117, 24);
 		contentPane.add(lcargafotosneg);
+
+		bcrearanotacion = new JButton("Crear");
+		bcrearanotacion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ejecutarOpenCVannotations();
+			}
+		});
+		bcrearanotacion.setFont(new Font("Dialog", Font.BOLD, 14));
+		bcrearanotacion.setEnabled(false);
+		bcrearanotacion.setBounds(889, 150, 117, 23);
+		contentPane.add(bcrearanotacion);
+
+		lejecutaranotacion = new JLabel("Crear anotacion");
+		lejecutaranotacion.setHorizontalAlignment(SwingConstants.CENTER);
+		lejecutaranotacion.setForeground(new Color(2, 0, 255));
+		lejecutaranotacion.setFont(new Font("Dialog", Font.BOLD, 14));
+		lejecutaranotacion.setEnabled(false);
+		lejecutaranotacion.setBounds(884, 115, 117, 24);
+		contentPane.add(lejecutaranotacion);
 
 		rellenarTextArea();
 	}
