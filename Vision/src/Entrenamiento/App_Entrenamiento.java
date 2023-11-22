@@ -41,6 +41,7 @@ public class App_Entrenamiento extends JFrame {
 
 	/**
 	 * Launch the application.
+	 * 
 	 * @author Jorge Barba Polán
 	 */
 	public static void main(String[] args) {
@@ -83,13 +84,17 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	private static void copiarFotosACarpeta(String carpeta, String tipo) {
-		File origen = new File(carpeta);
+
+		File origen = new File(seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES));
+		 File[] archivos = origen.listFiles();
+
 		File destino = new File(carpeta + "\\" + tipo);
 		try {
-			Path origenPath = origen.toPath();
-			Path destinoPath = new File(destino, origen.getName()).toPath();
-			Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
-
+			for (File archivo : archivos) {
+                Path origenPath = archivo.toPath();
+                Path destinoPath = new File(destino, archivo.getName()).toPath();
+                Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -156,9 +161,9 @@ public class App_Entrenamiento extends JFrame {
 		rellenarTextArea();
 	}
 
-	private static String seleccionarCarpeta() {
+	private static String seleccionarCarpeta(int JFileOpcion) {
 		JFileChooser jfc = new JFileChooser();
-		jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		jfc.setFileSelectionMode(JFileOpcion);
 		String carpeta = "";
 		if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			File ficheroCarpeta = jfc.getSelectedFile();
@@ -201,7 +206,7 @@ public class App_Entrenamiento extends JFrame {
 		JButton belegircarpetaorigen = new JButton("Seleccionar");
 		belegircarpetaorigen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaOrigen = seleccionarCarpeta();
+				carpetaOrigen = seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				rellenarTextArea();
 			}
 		});
@@ -228,7 +233,7 @@ public class App_Entrenamiento extends JFrame {
 		belegircarpetadestino = new JButton("Seleccionar");
 		belegircarpetadestino.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaDestino = seleccionarCarpeta();
+				carpetaDestino = seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				rellenarTextArea();
 			}
 		});
