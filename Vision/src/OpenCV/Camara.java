@@ -27,10 +27,10 @@ public class Camara extends JFrame {
 	private static final long serialVersionUID = 1L;
 	// Pantalla de la camara
 	private JLabel pantallaCamara;
-	private JButton btnCapturar, btnExtremos, btnCamara;
+	private JButton btnCapturar, btnExtremos, btnCamara, btnCaras;
 	private VideoCapture capturaVideo;
 	private Mat imagen;
-	private boolean clicked, camara = true;
+	private boolean clicked, camara = true, soloCaras = false;
 
 	public Camara() {
 		// GUI
@@ -41,7 +41,7 @@ public class Camara extends JFrame {
 		add(pantallaCamara);
 
 		btnCapturar = new JButton("Capturar");
-		btnCapturar.setBounds(250, 480, 120, 40);
+		btnCapturar.setBounds(325, 480, 120, 40);
 		add(btnCapturar);
 
 		btnCapturar.addActionListener(new ActionListener() {
@@ -52,25 +52,37 @@ public class Camara extends JFrame {
 		});
 
 		btnExtremos = new JButton("Ver Extremos");
-		btnExtremos.setBounds(100, 480, 120, 40);
+		btnExtremos.setBounds(175, 480, 120, 40);
 		add(btnExtremos);
 
 		btnExtremos.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				camara = false;
+				soloCaras = false;
+			}
+		});
+		btnCaras = new JButton("Ver Caras");
+		btnCaras.setBounds(0, 480, 120, 40);
+		add(btnCaras);
+
+		btnCaras.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				camara = false;
+				soloCaras = true;
 			}
 		});
 
 		btnCamara = new JButton("Ver Cámara");
-		btnCamara.setBounds(400, 480, 120, 40);
+		btnCamara.setBounds(475, 480, 120, 40);
 		add(btnCamara);
 
 		btnCamara.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				camara = true;
-
+				soloCaras = false;
 			}
 		});
 
@@ -106,7 +118,18 @@ public class Camara extends JFrame {
 
 				icono = new ImageIcon(DeteccionCara.detectarYGuardar(imagen));
 
-			} else {
+			} else if(soloCaras){
+				try {
+					ImageIcon ic =
+							new ImageIcon(DeteccionCara.detecarSoloCara(imagen));
+					icono = ic;
+				}catch (Exception e) {
+					
+				}
+					
+				
+
+			}else {
 				icono = new ImageIcon(Extremos.detectarExtremos(imagen));
 
 			}
