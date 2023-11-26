@@ -29,6 +29,7 @@ public class App_Entrenamiento extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private static JTextArea textareainformativa;
+	@SuppressWarnings("unused")
 	private static String carpetaOrigen, carpetaDestino, carpetaOriginal;
 	private JButton belegircarpetadestino;
 	private static String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");

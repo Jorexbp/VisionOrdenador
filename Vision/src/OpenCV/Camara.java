@@ -116,20 +116,17 @@ public class Camara extends JFrame {
 
 			if (camara) {
 
-				icono = new ImageIcon(DeteccionCara.detectarYGuardar(imagen));
+				icono = new ImageIcon(DeteccionCara.detectarCara(imagen));
 
-			} else if(soloCaras){
+			} else if (soloCaras) {
 				try {
-					ImageIcon ic =
-							new ImageIcon(DeteccionCara.detecarSoloCara(imagen));
+					ImageIcon ic = new ImageIcon(DeteccionCara.detecarSoloCara(imagen));
 					icono = ic;
-				}catch (Exception e) {
-					
-				}
-					
-				
+				} catch (Exception e) {
 
-			}else {
+				}
+
+			} else {
 				icono = new ImageIcon(Extremos.detectarExtremos(imagen));
 
 			}
@@ -141,7 +138,7 @@ public class Camara extends JFrame {
 				}
 				// Escribo a fichero
 				String dir = "imagenes/" + nombre + ".jpg";
-				Imgcodecs.imwrite(dir, imagen);
+				DeteccionCara.guardarImagen(imagen, dir);
 
 				clicked = false;
 				break;

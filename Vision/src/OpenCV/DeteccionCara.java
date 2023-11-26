@@ -17,7 +17,7 @@ import org.opencv.objdetect.Objdetect;
 
 public class DeteccionCara {
 
-	public static byte[] detectarYGuardar(Mat imagen) {
+	public static byte[] detectarCara(Mat imagen) {
 		MatOfRect caras = new MatOfRect();
 		@SuppressWarnings("unused")
 		ImageIcon icono;
@@ -64,14 +64,17 @@ public class DeteccionCara {
 		Point puntoTexto = new Point(20, 50);
 		Imgproc.putText(imagen, nCaras, puntoTexto, 2, 1.1, new Scalar(0, 255, 255), 2);
 
-		Imgcodecs.imwrite("detecciones/deteccion.jpg", imagen);
-
 		final MatOfByte buffer = new MatOfByte();
 		Imgcodecs.imencode(".jpg", imagen, buffer);
 
 		byte[] datosImagen = buffer.toArray();
 
 		return datosImagen;
+	}
+
+	public static void guardarImagen(Mat imagen, String dir) {
+		Imgcodecs.imwrite(dir, imagen);
+
 	}
 
 	public static byte[] detecarSoloCara(Mat imagen) {
@@ -104,7 +107,8 @@ public class DeteccionCara {
 			Mat imagenCara = new Mat(imagen, caraRect);
 
 			// Escribir la nueva imagen a fichero
-			Imgcodecs.imwrite("detecciones/cara_detectada_" + System.currentTimeMillis() + ".jpg", imagenCara);
+			// Imgcodecs.imwrite("detecciones/cara_detectada_" + System.currentTimeMillis()
+			// + ".jpg", imagenCara);
 
 			// Convertir la nueva imagen a bytes
 			Imgcodecs.imencode(".jpg", imagenCara, buffer);
@@ -123,7 +127,6 @@ public class DeteccionCara {
 		// Lea la imagen de la carpeta
 		Mat imagen = Imgcodecs.imread("imagenes/ejemplo2.jpg");
 
-		//
-		detectarYGuardar(imagen);
+		detectarCara(imagen);
 	}
 }
