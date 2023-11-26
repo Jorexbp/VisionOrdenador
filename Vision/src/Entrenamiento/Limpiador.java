@@ -11,6 +11,7 @@ public class Limpiador {
 				foto.delete();
 			}
 		}
+		System.out.println("Limpieza finalizada");
 	}
 	
 	public static void main(String[] args) {

@@ -98,12 +98,11 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	private static void copiarFotosACarpeta(String carpeta, String tipo) {
-
-		File origen = new File(seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES));
-		File[] archivos = origen.listFiles();
-
-		File destino = new File(carpeta + "\\" + tipo);
 		try {
+			File origen = new File(seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES));
+			File[] archivos = origen.listFiles();
+
+			File destino = new File(carpeta + "\\" + tipo);
 			for (File archivo : archivos) {
 				Path origenPath = archivo.toPath();
 				Path destinoPath = new File(destino, archivo.getName()).toPath();
@@ -111,6 +110,8 @@ public class App_Entrenamiento extends JFrame {
 			}
 			carpetaOriginal = origen.getAbsolutePath();
 			cambiarAUsable(lejecutaranotacion, bcrearanotacion);
+			Redimensionador.resizePhotos(destino.getAbsolutePath(), carpetaOrigen + "/pos", 550, 550);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -197,8 +198,8 @@ public class App_Entrenamiento extends JFrame {
 		// COMANDO MALO HACER QUE SEA GLOBAL
 		String destinoAnotacion = carpetaDestino + "/pos.txt";
 		String comando1 = "cmd /c start cmd.exe /c \" cd C:/Users/Alumno/git/VisionOrdenador/Vision/lib/annotation && opencv_annotation.exe"
-				+ " --annotations=\"" + destinoAnotacion + "\"" + " --images=\"" + carpetaOrigen+"/pos" + "\""; // COMANDO
-																											// MALO
+				+ " --annotations=\"" + destinoAnotacion + "\"" + " --images=\"" + carpetaOrigen + "/pos" + "\""; // COMANDO
+		// MALO
 
 		// --annotations=pos.txt --images=RazaBlanca/
 		try {
