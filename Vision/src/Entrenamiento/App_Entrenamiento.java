@@ -95,6 +95,29 @@ public class App_Entrenamiento extends JFrame {
 			textareainformativa.append(carpetaDestino);
 			cambiarAUsable(lcargafotosneg, bfotosneg);
 		}
+		textareainformativa.append("\nFotos positivas > ");
+
+		if (pos) {
+			textareainformativa.append("Sí");
+			textareainformativa.append("\nDirección positiva> " + carpetaOrigen + "\\pos");
+
+		} else {
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección positiva> Nula");
+
+		}
+		textareainformativa.append("\nFotos negativas > ");
+
+		if (neg) {
+			textareainformativa.append("Sí");
+			textareainformativa.append("\nDirección negativa> " + carpetaOrigen + "\\neg");
+
+		} else {
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección negativa> Nula");
+
+		}
+
 		textareainformativa.append("\nAnotación creada > ");
 
 		if (anotacionCreada) {
@@ -145,7 +168,7 @@ public class App_Entrenamiento extends JFrame {
 
 			carpetaOriginal = origen.getAbsolutePath();
 			Redimensionador.resizePhotos(destino.getAbsolutePath(), carpetaOrigen + "/pos", 550, 550);
-
+			rellenarTextArea();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
