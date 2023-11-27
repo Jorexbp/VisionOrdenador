@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -27,9 +26,7 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +35,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 public class App_Entrenamiento extends JFrame {
 
@@ -58,6 +58,10 @@ public class App_Entrenamiento extends JFrame {
 	private static JLabel lejecutaranotacion;
 	private static boolean anotacionCreada, neg, pos;
 	private static String datos = "";
+	private static JLabel lcrearsample;
+	private static JButton bcrearsample;
+	private JMenuItem menuopccargar;
+	private JMenu menuopcpadre;
 
 	/**
 	 * Launch the application.
@@ -137,12 +141,12 @@ public class App_Entrenamiento extends JFrame {
 		befotospos2.setEnabled(true);
 	}
 
-	private static void copiarFotosACarpeta(String carpetaDestino, String tipo) {
+	private static void copiarFotosACarpeta(String carpetaDestino) {
 		try {
 			File origen = new File(seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES));
 			File[] archivos = origen.listFiles();
 
-			File destino = new File(carpetaDestino + "/" + tipo);
+			File destino = new File(carpetaDestino);
 			if (!destino.exists()) {
 				destino.mkdirs();
 			}
@@ -156,7 +160,7 @@ public class App_Entrenamiento extends JFrame {
 				}
 			}
 
-			if (tipo.equals("pos")) {
+			if (carpetaDestino.contains("pos")) {
 				pos = true;
 			} else {
 				neg = true;
@@ -273,7 +277,7 @@ public class App_Entrenamiento extends JFrame {
 			fw.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
@@ -299,7 +303,7 @@ public class App_Entrenamiento extends JFrame {
 					byte[] datosImagen = DeteccionCara.detectarCara(imageMat);
 					imageMat = Imgcodecs.imdecode(new MatOfByte(datosImagen), Imgcodecs.IMREAD_UNCHANGED);
 
-					String ImagenRec = imagen.getAbsolutePath().replace(".png", "_a.png");
+					String ImagenRec = imagen.getAbsolutePath().replace(".jpg", "_a.jpg");
 					Imgcodecs.imwrite(ImagenRec, imageMat);
 					BufferedImage foto = ImageIO.read(new File(ImagenRec));
 
@@ -321,8 +325,10 @@ public class App_Entrenamiento extends JFrame {
 			FileWriter fw = new FileWriter(new File(destinoAnotacion));
 			fw.write(datos);
 			fw.close();
+
+			cambiarAUsable(lcrearsample, bcrearsample);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 
@@ -334,17 +340,66 @@ public class App_Entrenamiento extends JFrame {
 
 	}
 
+	private static void crearSamples() {
+
+		String posTxt = ""+carpetaDestino + "/pos.txt";
+		String posVec = ""+carpetaDestino + "/pos.vec";
+		String nSamples = Integer.toString(1000);
+
+		String cmd = "cmd /c start cmd.exe /k \"";
+		String comandoSamples = cmd + "lib\\samples\\opencv_createsamples.exe\" -info \"" + posTxt + "\" -w 24 -h 24 -num "
+				+ nSamples + " -vec " + posVec+"";
+		try {
+			Runtime.getRuntime().exec(comandoSamples);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void cargarOpciones() {
+		
+		carpetaDestino = "C:\\Users\\Alumno\\Desktop\\Carpeta Origen_Destino\\Destino";
+		carpetaOrigen = "C:/Users/Alumno/Desktop/Carpet Origen_Destino/Origen";
+		carpetaOriginal = "C:/Users/Alumno/Desktop/Fotos";
+
+		copiarFotosACarpeta(carpetaOrigen + "/pos");
+		copiarFotosACarpeta(carpetaOrigen + "/neg");
+
+		pos = true;
+		neg = true;
+		anotacionCreada = true;
+		
+		cambiarAUsable(lcrearsample, bcrearsample);
+		rellenarTextArea();
+	}
+
 	public App_Entrenamiento() {
 		setTitle("Entrenamiento de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1221, 652);
 		setExtendedState(MAXIMIZED_BOTH);
+
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+
+		menuopcpadre = new JMenu("New menu");
+		menuopcpadre.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		menuBar.add(menuopcpadre);
+
+		menuopccargar = new JMenuItem("Cargar opciones");
+		menuopccargar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cargarOpciones();
+			}
+		});
+		menuopccargar.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		menuopccargar.setHorizontalAlignment(SwingConstants.CENTER);
+		menuopcpadre.add(menuopccargar);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-
 		JLabel ltitulo = new JLabel("Entrenamiento de modelos");
 		ltitulo.setHorizontalAlignment(SwingConstants.CENTER);
 		ltitulo.setForeground(new Color(0, 0, 255));
@@ -438,7 +493,7 @@ public class App_Entrenamiento extends JFrame {
 		befotospos = new JButton("Seleccionar");
 		befotospos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				copiarFotosACarpeta(carpetaOrigen, "pos");
+				copiarFotosACarpeta(carpetaOrigen + "/pos");
 			}
 		});
 		befotospos.setEnabled(false);
@@ -449,7 +504,7 @@ public class App_Entrenamiento extends JFrame {
 		bfotosneg = new JButton("Seleccionar");
 		bfotosneg.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				copiarFotosACarpeta(carpetaOrigen, "neg");
+				copiarFotosACarpeta(carpetaOrigen + "/neg");
 			}
 		});
 		bfotosneg.setEnabled(false);
@@ -483,6 +538,25 @@ public class App_Entrenamiento extends JFrame {
 		lejecutaranotacion.setEnabled(false);
 		lejecutaranotacion.setBounds(884, 115, 117, 24);
 		contentPane.add(lejecutaranotacion);
+
+		lcrearsample = new JLabel("Crear samples");
+		lcrearsample.setHorizontalAlignment(SwingConstants.CENTER);
+		lcrearsample.setForeground(new Color(2, 0, 255));
+		lcrearsample.setFont(new Font("Dialog", Font.BOLD, 14));
+		lcrearsample.setEnabled(false);
+		lcrearsample.setBounds(1037, 114, 117, 24);
+		contentPane.add(lcrearsample);
+
+		bcrearsample = new JButton("Crear");
+		bcrearsample.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				crearSamples();
+			}
+		});
+		bcrearsample.setFont(new Font("Dialog", Font.BOLD, 14));
+		bcrearsample.setEnabled(false);
+		bcrearsample.setBounds(1042, 149, 117, 23);
+		contentPane.add(bcrearsample);
 
 		rellenarTextArea();
 	}
