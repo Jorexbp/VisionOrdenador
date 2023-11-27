@@ -17,7 +17,48 @@ import org.opencv.objdetect.Objdetect;
 
 public class DeteccionCara {
 
-	public static byte[] detectarCara(Mat imagen) {
+
+    public static byte[] detectarCara(Mat imagen) {
+        MatOfRect caras = new MatOfRect();
+
+        // Convertir a escala de grises
+        Mat frameGris = new Mat();
+        Imgproc.cvtColor(imagen, frameGris, Imgproc.COLOR_BGR2GRAY);
+
+        // Mejora de contraste para poder tener un mejor resultado
+        Imgproc.equalizeHist(frameGris, frameGris);
+
+        int altura = frameGris.height();
+        int tamañoCara = 0;
+        if (Math.round(altura * 0.2f) > 0) {
+            tamañoCara = Math.round(altura * 0.2f);
+        }
+
+        // Deteccion de caras
+        CascadeClassifier cascadaCara = new CascadeClassifier();
+
+        // Cargar el XML de dataset de caras
+        cascadaCara.load("Datasets/haarcascade_frontalface_alt2.xml");
+        cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
+                new Size(tamañoCara, tamañoCara), new Size());
+
+        // Dibujar rectángulos rojos en la imagen original
+        Rect[] caraArr = caras.toArray();
+        for (int i = 0; i < caraArr.length; i++) {
+            // Dibujar
+            Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 3);
+        }
+
+        // Escribir a fichero
+        final MatOfByte buffer = new MatOfByte();
+        Imgcodecs.imencode(".jpg", imagen, buffer);
+
+        byte[] datosImagen = buffer.toArray();
+
+        return datosImagen;
+    }
+
+	public static byte[] mostrarInfoCara(Mat imagen) {
 		MatOfRect caras = new MatOfRect();
 		@SuppressWarnings("unused")
 		ImageIcon icono;

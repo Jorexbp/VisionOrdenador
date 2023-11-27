@@ -5,6 +5,15 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+
+import OpenCV.DeteccionCara;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -12,14 +21,20 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import java.nio.file.StandardCopyOption;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
@@ -42,6 +57,7 @@ public class App_Entrenamiento extends JFrame {
 	private static JButton bcrearanotacion;
 	private static JLabel lejecutaranotacion;
 	private static boolean anotacionCreada;
+	private static String datos = "";
 
 	/**
 	 * Launch the application.
@@ -98,17 +114,25 @@ public class App_Entrenamiento extends JFrame {
 		befotospos2.setEnabled(true);
 	}
 
-	private static void copiarFotosACarpeta(String carpeta, String tipo) {
+	private static void copiarFotosACarpeta(String carpetaDestino, String tipo) {
 		try {
 			File origen = new File(seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES));
 			File[] archivos = origen.listFiles();
 
-			File destino = new File(carpeta + "\\" + tipo);
-			for (File archivo : archivos) {
-				Path origenPath = archivo.toPath();
-				Path destinoPath = new File(destino, archivo.getName()).toPath();
-				Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
+			File destino = new File(carpetaDestino + "/" + tipo);
+			if (!destino.exists()) {
+				destino.mkdirs();
 			}
+
+			for (File archivo : archivos) {
+				if (esArchivoDeImagen(archivo)) {
+					Path origenPath = archivo.toPath();
+					Path destinoPath = new File(destino, archivo.getName()).toPath();
+					Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
+
+				}
+			}
+
 			carpetaOriginal = origen.getAbsolutePath();
 			cambiarAUsable(lejecutaranotacion, bcrearanotacion);
 			Redimensionador.resizePhotos(destino.getAbsolutePath(), carpetaOrigen + "/pos", 550, 550);
@@ -116,6 +140,13 @@ public class App_Entrenamiento extends JFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static boolean esArchivoDeImagen(File archivo) {
+		String nombreArchivo = archivo.getName().toLowerCase();
+		return nombreArchivo.endsWith(".jpg") || nombreArchivo.endsWith(".jpeg") || nombreArchivo.endsWith(".png")
+				|| nombreArchivo.endsWith(".gif") || nombreArchivo.endsWith(".bmp") || nombreArchivo.endsWith(".tif")
+				|| nombreArchivo.endsWith(".tiff");
 	}
 
 	private static boolean avisarBorrado(String carpeta) {
@@ -136,23 +167,23 @@ public class App_Entrenamiento extends JFrame {
 		File directory = new File(carpeta);
 		if (!directory.exists()) {
 			directory.mkdir();
-		}
-
-		for (File file : directory.listFiles()) {
-
-			file.delete();
-
+		} else {
+			for (File files : directory.listFiles()) {
+				files.delete();
+			}
 		}
 
 	}
 
-	private static void carpetaCrearTipo(String tipo) {
+	private static void carpetaCrearTipo(String dir, String tipo) {
 		File carpetaSubHijo;
 
-		for (int i = 0; i < 2; i++) {
-			carpetaSubHijo = new File(carpetaOrigen + "\\" + tipo);
-			if (!carpetaSubHijo.exists()) {
-				carpetaSubHijo.mkdir();
+		carpetaSubHijo = new File(dir + "\\" + tipo);
+		if (!carpetaSubHijo.exists()) {
+			carpetaSubHijo.mkdir();
+		} else {
+			for (File files : carpetaSubHijo.listFiles()) {
+				files.delete();
 			}
 		}
 
@@ -174,8 +205,8 @@ public class App_Entrenamiento extends JFrame {
 		carpetaOrigen = nombreCarpetaOrigen;
 		carpetaDestino = nombreCarpetaDestino;
 
-		carpetaCrearTipo("pos");
-		carpetaCrearTipo("neg");
+		carpetaCrearTipo(carpetaOrigen, "pos");
+		carpetaCrearTipo(carpetaOrigen, "neg");
 
 		rellenarTextArea();
 	}
@@ -196,22 +227,59 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	private static void ejecutarOpenCVannotations() {
-		// COMANDO MALO HACER QUE SEA GLOBAL
-		String destinoAnotacion = carpetaDestino + "/pos.txt";
-		String comando1 = "cmd /c start cmd.exe /c \" cd C:/Users/Alumno/git/VisionOrdenador/Vision/lib/annotation && opencv_annotation.exe"
-				+ " --annotations=\"" + destinoAnotacion + "\"" + " --images=\"" + carpetaOrigen + "/pos" + "\""; // COMANDO
-		// MALO
+		String fotosPositivas = carpetaOrigen + "/pos";
 
-		// --annotations=pos.txt --images=RazaBlanca/
 		try {
-			Process proceso = Runtime.getRuntime().exec(comando1);
-			if (proceso.waitFor() == 0) {
-				anotacionCreada = true;
-			}
-		} catch (IOException | InterruptedException e) {
+			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
+			File carpetaPos = new File(fotosPositivas);
+			int[] coords = new int[4];
+
+			for (File imagen : carpetaPos.listFiles()) {
+				if (!imagen.isDirectory()) {
+
+					byte[] bytes = Files.readAllBytes(imagen.toPath());
+
+					// Convierte el array de bytes a una matriz OpenCV
+					Mat imageMat = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.IMREAD_UNCHANGED);
+
+					byte[] datosImagen = DeteccionCara.detectarCara(imageMat);
+					imageMat = Imgcodecs.imdecode(new MatOfByte(datosImagen), Imgcodecs.IMREAD_UNCHANGED);
+
+					String ImagenRec = imagen.getAbsolutePath().replace(".png", "_a.png");
+					Imgcodecs.imwrite(ImagenRec, imageMat);
+					BufferedImage foto = ImageIO.read(new File(ImagenRec));
+
+					coords = DetectorAnotations.detectarCoordenadas(foto);
+					System.out.println();
+					escribirAnotation(ImagenRec, coords);
+
+				}
+
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+
 		rellenarTextArea();
+		String destinoAnotacion = carpetaDestino + "/pos.txt";
+
+		try {
+			FileWriter fw = new FileWriter(new File(destinoAnotacion));
+			fw.write(datos);
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private static void escribirAnotation(String dir, int[] coords) {
+		datos += dir + " 1 " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
+		anotacionCreada = true;
+
 	}
 
 	public App_Entrenamiento() {

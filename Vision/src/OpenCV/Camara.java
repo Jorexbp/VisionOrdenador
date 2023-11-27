@@ -116,7 +116,7 @@ public class Camara extends JFrame {
 
 			if (camara) {
 
-				icono = new ImageIcon(DeteccionCara.detectarCara(imagen));
+				icono = new ImageIcon(DeteccionCara.mostrarInfoCara(imagen));
 
 			} else if (soloCaras) {
 				try {
@@ -137,11 +137,11 @@ public class Camara extends JFrame {
 					nombre = new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date());
 				}
 				// Escribo a fichero
-				String dir = "imagenes/" + nombre + ".jpg";
+				String dir = "Detecciones/" + nombre + ".jpg";
 				DeteccionCara.guardarImagen(imagen, dir);
 
 				clicked = false;
-				break;
+			
 			}
 		}
 	}
