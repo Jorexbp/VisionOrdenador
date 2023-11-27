@@ -56,7 +56,7 @@ public class App_Entrenamiento extends JFrame {
 	private static JButton bfotosneg;
 	private static JButton bcrearanotacion;
 	private static JLabel lejecutaranotacion;
-	private static boolean anotacionCreada;
+	private static boolean anotacionCreada, neg, pos;
 	private static String datos = "";
 
 	/**
@@ -133,8 +133,17 @@ public class App_Entrenamiento extends JFrame {
 				}
 			}
 
+			if (tipo.equals("pos")) {
+				pos = true;
+			} else {
+				neg = true;
+			}
+			if (neg && pos) {
+				cambiarAUsable(lejecutaranotacion, bcrearanotacion);
+
+			}
+
 			carpetaOriginal = origen.getAbsolutePath();
-			cambiarAUsable(lejecutaranotacion, bcrearanotacion);
 			Redimensionador.resizePhotos(destino.getAbsolutePath(), carpetaOrigen + "/pos", 550, 550);
 
 		} catch (IOException e) {
@@ -226,9 +235,30 @@ public class App_Entrenamiento extends JFrame {
 
 	}
 
+	private static void crearAnotacionNegativa() {
+		String dirNeg = carpetaOrigen + "/neg";
+		String datos = "";
+
+		File carpeta = new File(dirNeg);
+		for (File fichero : carpeta.listFiles()) {
+			datos += fichero.getAbsolutePath() + "\n";
+		}
+
+		try {
+			FileWriter fw = new FileWriter(carpetaDestino + "/neg.txt");
+			fw.write(datos);
+			fw.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 	private static void ejecutarOpenCVannotations() {
 		String fotosPositivas = carpetaOrigen + "/pos";
-
+		crearAnotacionNegativa();
 		try {
 			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
@@ -251,7 +281,6 @@ public class App_Entrenamiento extends JFrame {
 					BufferedImage foto = ImageIO.read(new File(ImagenRec));
 
 					coords = DetectorAnotations.detectarCoordenadas(foto);
-					System.out.println();
 					escribirAnotation(ImagenRec, coords);
 
 				}

@@ -59,9 +59,9 @@ public class DetectorAnotations {
 		coords[1] = yInicial;
 		coords[2] = anchoRectangulo;
 		coords[3] = altoRectangulo;
-		System.out.println("Rectángulo Rojo encontrado en coordenadas: (" + xInicial + ", " + yInicial + ")");
-		System.out.println("Ancho del rectángulo: " + anchoRectangulo);
-		System.out.println("Alto del rectángulo: " + altoRectangulo);
+//		System.out.println("Rectángulo Rojo encontrado en coordenadas: (" + xInicial + ", " + yInicial + ")");
+//		System.out.println("Ancho del rectángulo: " + anchoRectangulo);
+//		System.out.println("Alto del rectángulo: " + altoRectangulo);
 		return coords;
 	}
 
