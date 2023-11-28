@@ -5,15 +5,15 @@ import java.io.IOException;
 public class borrar {
 
 	private static void crearSamples() {
-		String carpetaDestino = "C:\\Users\\Alumno\\Desktop\\Carpeta Origen_Destino\\Destino";
-		String carpetaOrigen = "C:/Users/Alumno/Desktop/Carpet Origen_Destino/Origen";
-
-		String posTxt = "" + carpetaDestino + "\\pos.txt";
-		String posVec = "" + carpetaDestino + "\\pos.vec";
-		String nSamples = Integer.toString(50);
-
+		String addr = "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/Destino";
+		String addrSample = "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/opencv_createsamples.exe";
+		String posTxt = addr + "/pos.txt";
+		String posVec = addr + "/pos.vec";
+		String nSamples = Integer.toString(100);
+		// SAMPLES.EXE NECESITA SER PADRE DE LAS FOTOS
 		String cmd = "cmd /c start cmd.exe /k ";
-		String comandoSamples = cmd + "lib\\samples\\opencv_createsamples.exe -info \"" + posTxt
+		String comandoSamples = cmd
+				+ "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/opencv_createsamples.exe -info \"" + posTxt
 				+ "\" -w 24 -h 24 -num \"" + nSamples + "\" -vec \"" + posVec + "\"";
 		try {
 			Runtime.getRuntime().exec(comandoSamples);
@@ -23,12 +23,12 @@ public class borrar {
 	}
 
 	private static void crearVec() {
-		String carpetaOrigen = "C:/Users/Alumno/Desktop/Carpet Origen_Destino/Origen/pos";
+		String carpetaOrigen = "C:/Users/Alumno/Desktop/Samples personas/RazaBlanca";
 
-		String carpetaDestino = "C:\\Users\\Alumno\\Desktop\\Carpeta Origen_Destino\\Destino\\pos.txt";
+		String carpetaDestino = "C:/Users/Alumno/Desktop/Carpeta Origen_Destino/Destino/pos3.txt";
 		String cmd = "cmd /c start cmd.exe /k ";
 
-		String comando = cmd + "lib\\annotation\\opencv_annotation.exe --annotations = \"" + carpetaDestino
+		String comando = cmd + "lib/annotation/opencv_annotation.exe --annotations = \"" + carpetaDestino
 				+ "\" --images=\"" + carpetaOrigen + "\"";
 
 		try {

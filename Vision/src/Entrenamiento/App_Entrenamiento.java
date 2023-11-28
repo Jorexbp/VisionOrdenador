@@ -8,7 +8,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import OpenCV.DeteccionCara;
@@ -31,8 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JMenuBar;
@@ -49,7 +47,7 @@ public class App_Entrenamiento extends JFrame {
 	private JButton belegircarpetadestino;
 	private static String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
-	private static File carpetaPadre = new File(escritorioUsuario + "\\Carpeta Origen_Destino");
+	private static File carpetaPadre = new File(escritorioUsuario + "\\Carpeta_Origen_Destino");
 	private static JLabel lcargafotospos;
 	private static JButton befotospos;
 	private static JLabel lcargafotosneg;
@@ -150,13 +148,21 @@ public class App_Entrenamiento extends JFrame {
 			if (!destino.exists()) {
 				destino.mkdirs();
 			}
-
+			int c = 0;
 			for (File archivo : archivos) {
 				if (esArchivoDeImagen(archivo)) {
-					Path origenPath = archivo.toPath();
-					Path destinoPath = new File(destino, archivo.getName()).toPath();
-					Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
 
+					BufferedImage originalImage = ImageIO.read(archivo);
+					// Redimensionao
+					originalImage = Redimensionador.resizeImage(originalImage, 300, 300);
+					// Detectar cara
+					Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
+					byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
+
+					ImageIO.write(Redimensionador.byteArrayToRenderedImage(bytesMat), "jpg",
+							new File(destino + "/foto_res" + c + ".jpg"));
+
+					c++;
 				}
 			}
 
@@ -171,8 +177,39 @@ public class App_Entrenamiento extends JFrame {
 			}
 
 			carpetaOriginal = origen.getAbsolutePath();
-			Redimensionador.resizePhotos(destino.getAbsolutePath(), carpetaOrigen + "/pos", 550, 550);
 			rellenarTextArea();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void copiarSamplesExe() {
+		String dirDestino = carpetaPadre.getAbsolutePath();
+		String dirDestPos = carpetaOrigen;
+
+		String addrP = carpetaDestino + "/pos.txt";
+		String addrS = "lib\\samples\\opencv_createsamples.exe";
+		String addrW = "lib\\samples\\opencv_world3415.dll";
+
+		Path sourceS = Paths.get(addrS);
+		Path sourceW = Paths.get(addrW);
+		Path sourceP = Paths.get(addrP);
+
+		Path destinationDir = Paths.get(dirDestino);
+		Path destDir = Paths.get(dirDestPos);
+
+		try {
+			if (!Files.exists(destinationDir.resolve(sourceS.getFileName()))) {
+				Files.copy(sourceS, destinationDir.resolve(sourceS.getFileName()));
+			}
+			if (!Files.exists(destDir.resolve(sourceP.getFileName()))) {
+				Files.copy(sourceP, destDir.resolve(sourceP.getFileName()));
+			}
+
+			if (!Files.exists(destinationDir.resolve(sourceW.getFileName()))) {
+				Files.copy(sourceW, destinationDir.resolve(sourceW.getFileName()));
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -199,6 +236,12 @@ public class App_Entrenamiento extends JFrame {
 
 		if (!carpetaPadre.exists()) {
 			carpetaPadre.mkdir();
+		} else {
+			for (File f : carpetaPadre.listFiles()) {
+				if (!f.isDirectory()) {
+					f.delete();
+				}
+			}
 		}
 		File directory = new File(carpeta);
 		if (!directory.exists()) {
@@ -229,8 +272,8 @@ public class App_Entrenamiento extends JFrame {
 		if (nombreCarpetaOrigen == null || nombreCarpetaDestino == null)
 			return;
 
-		nombreCarpetaOrigen = escritorioUsuario + "\\Carpeta Origen_Destino\\" + nombreCarpetaOrigen;
-		nombreCarpetaDestino = escritorioUsuario + "\\Carpeta Origen_Destino\\" + nombreCarpetaDestino;
+		nombreCarpetaOrigen = escritorioUsuario + "\\Carpeta_Origen_Destino\\" + nombreCarpetaOrigen;
+		nombreCarpetaDestino = escritorioUsuario + "\\Carpeta_Origen_Destino\\" + nombreCarpetaDestino;
 
 		if (avisarBorrado(nombreCarpetaOrigen))
 			reiniciarCarpetas(nombreCarpetaOrigen);
@@ -285,37 +328,30 @@ public class App_Entrenamiento extends JFrame {
 
 	private static void ejecutarOpenCVannotations() {
 		String fotosPositivas = carpetaOrigen + "/pos";
+
 		crearAnotacionNegativa();
-		try {
-			System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-			File carpetaPos = new File(fotosPositivas);
-			int[] coords = new int[4];
+		File carpetaPos = new File(fotosPositivas);
+		int[] coords = new int[4];
 
-			for (File imagen : carpetaPos.listFiles()) {
-				if (!imagen.isDirectory()) {
+		for (File imagen : carpetaPos.listFiles()) {
+			if (!imagen.isDirectory()) {
+				if (imagen.getAbsolutePath().contains("jpg")) {
 
-					byte[] bytes = Files.readAllBytes(imagen.toPath());
+					Mat imageMat = Imgcodecs.imread(imagen.getAbsolutePath());
+					Imgcodecs.imwrite(imagen.getAbsolutePath(), DetectorAnotations.detectarCara(imageMat));
 
-					// Convierte el array de bytes a una matriz OpenCV
-					Mat imageMat = Imgcodecs.imdecode(new MatOfByte(bytes), Imgcodecs.IMREAD_UNCHANGED);
+//		            String ImagenRec = "foto_res" + c + ".jpg";
+//		            Imgcodecs.imwrite(ImagenRec, imageMat);
 
-					byte[] datosImagen = DeteccionCara.detectarCara(imageMat);
-					imageMat = Imgcodecs.imdecode(new MatOfByte(datosImagen), Imgcodecs.IMREAD_UNCHANGED);
+					coords = DetectorAnotations.detectarCoordenadas(imageMat);
+					System.out.println(
+							"File: " + imagen.getAbsolutePath() + " W: " + imageMat.cols() + " H:" + imageMat.rows());
 
-					String ImagenRec = imagen.getAbsolutePath().replace(".jpg", "_a.jpg");
-					Imgcodecs.imwrite(ImagenRec, imageMat);
-					BufferedImage foto = ImageIO.read(new File(ImagenRec));
-
-					coords = DetectorAnotations.detectarCoordenadas(foto);
-					escribirAnotation(ImagenRec, coords);
-
+					escribirAnotation(imagen.getAbsolutePath(), coords);
 				}
-
 			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 		rellenarTextArea();
@@ -327,6 +363,7 @@ public class App_Entrenamiento extends JFrame {
 			fw.close();
 
 			cambiarAUsable(lcrearsample, bcrearsample);
+			copiarSamplesExe();
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -335,20 +372,29 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	private static void escribirAnotation(String dir, int[] coords) {
-		datos += dir + " 1 " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
+		for (int i = 0; i < coords.length; i++) {
+			if (coords[i] < 0) {
+				return;
+			}
+		}
+		dir = dir.substring(dir.indexOf("Origen\\"));
+
+		datos += dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
 		anotacionCreada = true;
 
 	}
 
 	private static void crearSamples() {
-
-		String posTxt = ""+carpetaDestino + "/pos.txt";
-		String posVec = ""+carpetaDestino + "/pos.vec";
-		String nSamples = Integer.toString(1000);
-
-		String cmd = "cmd /c start cmd.exe /k \"";
-		String comandoSamples = cmd + "lib\\samples\\opencv_createsamples.exe\" -info \"" + posTxt + "\" -w 24 -h 24 -num "
-				+ nSamples + " -vec " + posVec+"";
+		// C:\Users\Alumno\Desktop\Carpeta_Origen_Destino\pos\foto_res0.jpg
+		String addr = carpetaOrigen;
+		String addrSample = carpetaPadre + "/opencv_createsamples.exe";
+		String posTxt = addr + "/pos.txt";
+		String posVec = addr + "/pos.vec";
+		String nSamples = Integer.toString(100);
+		// SAMPLES.EXE NECESITA SER PADRE DE LAS FOTOS
+		String cmd = "cmd /c start cmd.exe /k ";
+		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
+				+ "\" -vec \"" + posVec + "\"";
 		try {
 			Runtime.getRuntime().exec(comandoSamples);
 		} catch (IOException e) {
@@ -357,19 +403,17 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	private static void cargarOpciones() {
-		
-		carpetaDestino = "C:\\Users\\Alumno\\Desktop\\Carpeta Origen_Destino\\Destino";
-		carpetaOrigen = "C:/Users/Alumno/Desktop/Carpet Origen_Destino/Origen";
-		carpetaOriginal = "C:/Users/Alumno/Desktop/Fotos";
 
-		copiarFotosACarpeta(carpetaOrigen + "/pos");
-		copiarFotosACarpeta(carpetaOrigen + "/neg");
+		carpetaDestino = "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/Destino";
+		carpetaOrigen = "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/Origen";
+		carpetaOriginal = "C:/Users/Alumno/Desktop/Fotos";
 
 		pos = true;
 		neg = true;
 		anotacionCreada = true;
-		
 		cambiarAUsable(lcrearsample, bcrearsample);
+		cambiarAUsable(lejecutaranotacion, bcrearanotacion);
+
 		rellenarTextArea();
 	}
 

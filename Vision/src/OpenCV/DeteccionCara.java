@@ -46,7 +46,7 @@ public class DeteccionCara {
         Rect[] caraArr = caras.toArray();
         for (int i = 0; i < caraArr.length; i++) {
             // Dibujar
-            Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 3);
+            Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 5);
         }
 
         // Escribir a fichero
