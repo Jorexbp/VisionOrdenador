@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import Entrenamiento.App_Entrenamiento;
 
 import javax.swing.JLabel;
@@ -24,6 +26,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class PantallaInicial extends JFrame {
 
@@ -41,6 +45,17 @@ public class PantallaInicial extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(new FlatLightLaf());
+		} catch (UnsupportedLookAndFeelException e1) {
+
+		}
+		UIManager.put("Button.arc", 999);
+		UIManager.put("Component.arc", 999);
+		UIManager.put("ProgressBar.arc", 999);
+		UIManager.put("TextComponent.arc", 999);
+		UIManager.put("Component.innerFocusWidth", 1);
+		UIManager.put("Button.innerFocusWidth", 1);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -93,7 +108,7 @@ public class PantallaInicial extends JFrame {
 				"<html>Bienvenido al entrenador de modelos para identificación de objetos a través del procesamiento de imagenes. Lea y confirme si esta de acuerdo con la ley de privacidad y protección de datos</html>");
 		ltit.setHorizontalAlignment(SwingConstants.CENTER);
 		ltit.setForeground(new Color(0, 0, 255));
-		ltit.setFont(new Font("Dialog", Font.PLAIN, 14));
+		ltit.setFont(new Font("Tahoma", Font.BOLD, 14));
 		ltit.setBounds(10, 11, 580, 87);
 		contentPane.add(ltit);
 
@@ -105,7 +120,7 @@ public class PantallaInicial extends JFrame {
 		textArea = new JTextArea();
 		textArea.setLineWrap(true);
 		textArea.setEditable(false);
-		textArea.setFont(new Font("Dialog", Font.PLAIN, 12));
+		textArea.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		scrollPane.setViewportView(textArea);
 
 		cacepta = new JCheckBox("ACEPTAR");

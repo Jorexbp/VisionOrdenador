@@ -30,9 +30,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 public class App_Entrenamiento extends JFrame {
 
@@ -53,8 +50,6 @@ public class App_Entrenamiento extends JFrame {
 	private static String datos = "";
 	private static JLabel lcrearsample;
 	private static JButton bcrearsample;
-	private JMenuItem menuopccargar;
-	private JMenu menuopcpadre;
 	private static JLabel lcrearXML;
 	private static JButton bcrearXML;
 	private static String carpetaOriginalPositiva, carpetaOriginalNegativa;
@@ -269,6 +264,8 @@ public class App_Entrenamiento extends JFrame {
 //	crearAnotacionNegativa(carpetaOriginalNegativa);
 
 	private static void cambiarNombres(String carpetaOriginal) {
+		if (carpetaOriginal == null)
+			return;
 		File origen = new File(carpetaOriginal);
 		File[] archivos = origen.listFiles();
 
@@ -364,20 +361,6 @@ public class App_Entrenamiento extends JFrame {
 		}
 	}
 
-	private static void cargarOpciones() {
-
-		carpetaDestino = "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/Destino";
-		carpetaOrigen = "C:/Users/Alumno/Desktop/Carpeta_Origen_Destino/Origen";
-		carpetaOriginal = "C:/Users/Alumno/Desktop/Fotos";
-
-		pos = true;
-		neg = true;
-		anotacionCreada = true;
-		cambiarAUsable(lcrearsample, bcrearsample);
-		
-		rellenarTextArea();
-	}
-
 	private static void crearXML() {
 
 		int nStages = 10;
@@ -406,23 +389,6 @@ public class App_Entrenamiento extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1221, 652);
 		setExtendedState(MAXIMIZED_BOTH);
-
-		JMenuBar menuBar = new JMenuBar();
-		setJMenuBar(menuBar);
-
-		menuopcpadre = new JMenu("New menu");
-		menuopcpadre.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		menuBar.add(menuopcpadre);
-
-		menuopccargar = new JMenuItem("Cargar opciones");
-		menuopccargar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				cargarOpciones();
-			}
-		});
-		menuopccargar.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		menuopccargar.setHorizontalAlignment(SwingConstants.CENTER);
-		menuopcpadre.add(menuopccargar);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 

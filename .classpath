@@ -12,5 +12,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/imgscalr-lib-4.2.jar"/>
 	<classpathentry excluding="src/Entrenamiento/" kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/flatlaf-3.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
