@@ -22,9 +22,6 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
@@ -51,6 +48,7 @@ public class App_Entrenamiento extends JFrame {
 	private static JButton bcrearXML;
 	private static String carpetaOriginalPositiva, carpetaOriginalNegativa;
 	private JButton bvolver;
+	private JLabel lcargamodelo;
 
 	/**
 	 * Launch the application.
@@ -102,7 +100,6 @@ public class App_Entrenamiento extends JFrame {
 		} else {
 			textareainformativa.append("No");
 			textareainformativa.append("\nDirección positiva> Nula");
-			textareainformativa.append("No");
 			textareainformativa.append("\nDirección de la anotación positiva> Nula");
 
 		}
@@ -120,7 +117,6 @@ public class App_Entrenamiento extends JFrame {
 		} else {
 			textareainformativa.append("No");
 			textareainformativa.append("\nDirección negativa> Nula");
-			textareainformativa.append("No");
 			textareainformativa.append("\nDirección de la anotación negativa> Nula");
 
 		}
@@ -335,7 +331,7 @@ public class App_Entrenamiento extends JFrame {
 				dirMod = Metodos_app.crearXML(carpetaPadre.getAbsolutePath(), carpetaOriginalNegativa);
 				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos");
 				mod = true;
-				
+
 				rellenarTextArea();
 			}
 		});
@@ -367,6 +363,25 @@ public class App_Entrenamiento extends JFrame {
 		bvolver.setBorderPainted(false);
 		bvolver.setFocusPainted(false);
 		contentPane.add(bvolver);
+		
+		JButton btnCargar = new JButton("Cargar");
+		btnCargar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Metodos_app.cargarModelo();
+			}
+		});
+		btnCargar.setFont(new Font("Dialog", Font.BOLD, 14));
+		btnCargar.setEnabled(false);
+		btnCargar.setBounds(541, 233, 162, 34);
+		contentPane.add(btnCargar);
+		
+		lcargamodelo = new JLabel("Cargar pre-modelo");
+		lcargamodelo.setHorizontalAlignment(SwingConstants.CENTER);
+		lcargamodelo.setForeground(new Color(2, 0, 255));
+		lcargamodelo.setFont(new Font("Dialog", Font.BOLD, 14));
+		lcargamodelo.setEnabled(false);
+		lcargamodelo.setBounds(498, 197, 246, 24);
+		contentPane.add(lcargamodelo);
 
 		rellenarTextArea();
 	}

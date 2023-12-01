@@ -10,7 +10,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Vison/lib/x64"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/imgscalr-lib-4.2.jar"/>
 	<classpathentry excluding="src/Entrenamiento/" kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/flatlaf-3.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
