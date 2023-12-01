@@ -69,6 +69,17 @@ public class PantallaInicial extends JFrame {
 	 */
 
 	public PantallaInicial() {
+		iniciarComponentes();
+	}
+
+	public PantallaInicial(int m) {
+		iniciarComponentes();
+		Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
+		Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo);
+	}
+
+	private void iniciarComponentes() {
+
 		setTitle("Entrenador de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 614, 536);

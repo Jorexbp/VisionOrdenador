@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import inicio.PantallaInicial;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -13,11 +15,16 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
@@ -27,7 +34,7 @@ public class App_Entrenamiento extends JFrame {
 	private JPanel contentPane;
 	private static JTextArea textareainformativa;
 	@SuppressWarnings("unused")
-	private static String carpetaOrigen, carpetaDestino, carpetaOriginal;
+	private static String carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod;
 	private JButton belegircarpetadestino;
 	private static String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
@@ -36,13 +43,14 @@ public class App_Entrenamiento extends JFrame {
 	private static JButton befotospos;
 	private static JLabel lcargafotosneg;
 	private static JButton bfotosneg;
-	private static boolean  neg, pos;
+	private static boolean neg, pos, sam, mod;
 	private static String datos = "";
 	private static JLabel lcrearsample;
 	private static JButton bcrearsample;
 	private static JLabel lcrearXML;
 	private static JButton bcrearXML;
 	private static String carpetaOriginalPositiva, carpetaOriginalNegativa;
+	private JButton bvolver;
 
 	/**
 	 * Launch the application.
@@ -85,53 +93,70 @@ public class App_Entrenamiento extends JFrame {
 		if (pos) {
 			textareainformativa.append("Sí");
 			textareainformativa.append("\nDirección positiva> " + carpetaOriginalPositiva);
+			textareainformativa.append("\nAnotación positiva creada > ");
+
+			textareainformativa.append("Sí");
+			textareainformativa
+					.append("\nDirección de la anotación positiva> " + carpetaOriginalPositiva + "\\pos.txt");
 
 		} else {
 			textareainformativa.append("No");
 			textareainformativa.append("\nDirección positiva> Nula");
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección de la anotación positiva> Nula");
 
 		}
+
 		textareainformativa.append("\nFotos negativas > ");
 
 		if (neg) {
 			textareainformativa.append("Sí");
 			textareainformativa.append("\nDirección negativa> " + carpetaOriginalNegativa);
+			textareainformativa.append("\nAnotación negativa creada > ");
+			textareainformativa.append("Sí");
+			textareainformativa
+					.append("\nDirección de la anotación negativa> " + carpetaOriginalNegativa + "\\neg.txt");
 
 		} else {
 			textareainformativa.append("No");
 			textareainformativa.append("\nDirección negativa> Nula");
-
-		}
-
-		textareainformativa.append("\nAnotación positiva creada > ");
-
-		if (pos) {
-			textareainformativa.append("Sí");
-			textareainformativa.append("\nDirección de la anotación positiva> " + carpetaOriginalPositiva + "\\pos.txt");
-
-		} else {
-			textareainformativa.append("No");
-			textareainformativa.append("\nDirección de la anotación positiva> Nula");
-
-		}
-		
-		textareainformativa.append("\nAnotación negativa creada > ");
-
-		if (neg) {
-			textareainformativa.append("Sí");
-			textareainformativa.append("\nDirección de la anotación negativa> " + carpetaOriginalNegativa + "\\neg.txt");
-
-		} else {
 			textareainformativa.append("No");
 			textareainformativa.append("\nDirección de la anotación negativa> Nula");
 
 		}
-		
-		
+
+		textareainformativa.append("\nSamples creadas > ");
+
+		if (sam) {
+			textareainformativa.append("Sí");
+			textareainformativa.append("\nDirección de las samples> " + carpetaDestino + "\\pos.vec");
+
+		} else {
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección de las samples> Nula");
+
+		}
+
+		textareainformativa.append("\nModelo creado > ");
+
+		if (mod) {
+			textareainformativa.append("Sí");
+			textareainformativa.append("\nDirección del modelo> " + dirMod);
+
+		} else {
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección del modelo> Nula");
+
+		}
 
 	}
 
 	public App_Entrenamiento() {
+		iniciarComponentes();
+	}
+
+	private void iniciarComponentes() {
+
 		setTitle("Entrenamiento de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1221, 652);
@@ -211,6 +236,8 @@ public class App_Entrenamiento extends JFrame {
 						JOptionPane.showInputDialog("Introduce el nombre de la carpeta origen: "),
 						JOptionPane.showInputDialog("Introduce el nombre de la carpeta destino: "), escritorioUsuario,
 						carpetaOrigen, carpetaDestino, carpetaPadre);
+				if (carp == null)
+					return;
 				carpetaOrigen = carp[0];
 				carpetaDestino = carp[1];
 				rellenarTextArea();
@@ -239,12 +266,13 @@ public class App_Entrenamiento extends JFrame {
 		befotospos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-				datos ="";
+				datos = "";
 				Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaDestino, datos);
 				pos = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
 				}
+				rellenarTextArea();
 			}
 		});
 		befotospos.setEnabled(false);
@@ -262,6 +290,7 @@ public class App_Entrenamiento extends JFrame {
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
 				}
+				rellenarTextArea();
 			}
 		});
 		bfotosneg.setEnabled(false);
@@ -290,6 +319,8 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaDestino, lcrearXML, bcrearXML);
+				sam = true;
+				rellenarTextArea();
 			}
 		});
 		bcrearsample.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -301,7 +332,11 @@ public class App_Entrenamiento extends JFrame {
 		bcrearXML.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearXML(carpetaPadre.getAbsolutePath(), carpetaOriginalNegativa);
+				dirMod = Metodos_app.crearXML(carpetaPadre.getAbsolutePath(), carpetaOriginalNegativa);
+				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos");
+				mod = true;
+				
+				rellenarTextArea();
 			}
 		});
 		bcrearXML.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -316,6 +351,22 @@ public class App_Entrenamiento extends JFrame {
 		lcrearXML.setEnabled(false);
 		lcrearXML.setBounds(1024, 114, 117, 24);
 		contentPane.add(lcrearXML);
+
+		bvolver = new JButton("");
+		bvolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new PantallaInicial(0).setVisible(true);
+				dispose();
+			}
+		});
+		Icon icon = new ImageIcon("Multimedia\\volver.png");
+		bvolver.setIcon(icon);
+		bvolver.setFont(new Font("Dialog", Font.BOLD, 14));
+		bvolver.setBounds(10, 11, 74, 52);
+		bvolver.setContentAreaFilled(false);
+		bvolver.setBorderPainted(false);
+		bvolver.setFocusPainted(false);
+		contentPane.add(bvolver);
 
 		rellenarTextArea();
 	}

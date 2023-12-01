@@ -7,6 +7,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -78,6 +81,11 @@ public class Metodos_app {
 			for (File files : directory.listFiles()) {
 				files.delete();
 			}
+		}
+		File modelos = new File(carpetaPadre + "/modelos");
+
+		if (!modelos.exists()) {
+			modelos.mkdir();
 		}
 
 	}
@@ -312,7 +320,7 @@ public class Metodos_app {
 		}
 	}
 
-	public static void crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
+	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
 
 		int nStages = 10;
 		int numPos = 20;
@@ -326,12 +334,42 @@ public class Metodos_app {
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
 				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages;
 
-		String cmd = "cmd /c start cmd.exe /k ";
+		String cmd = "cmd /c start cmd.exe /c ";
 		String comandoSamples = cmd + comTR;
+
 		try {
-			Runtime.getRuntime().exec(comandoSamples);
-		} catch (IOException e) {
+			Process creacionModelo = Runtime.getRuntime().exec(comandoSamples);
+			creacionModelo.waitFor();
+
+			File modelo = new File(destino + "/cascade.xml");
+			String nombreModelo = destino + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")
+					+ ".xml";
+
+			if (modelo.renameTo(new File(nombreModelo))) {
+				JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombreModelo);
+				return nombreModelo;
+			} else {
+				JOptionPane.showMessageDialog(null, "No se ha podido cambiar el nombre del modelo");
+				return "";
+
+			}
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
+		}
+		return "";
+	}
+
+	public static String copiarFichero(File archivoOrigen, String dirDestino) {
+
+		Path source = Paths.get(archivoOrigen.toString());
+		Path destination = Paths.get(dirDestino);
+
+		try {
+			Files.copy(source, destination.resolve(source.getFileName()));
+			return destination.toString() + "\\" + archivoOrigen.getName();
+		} catch (IOException e) {
+			System.err.println("Ha ocurrido un error al copiar el archivo: " + e.getMessage());
+			return null;
 		}
 	}
 }
