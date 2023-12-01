@@ -1,33 +1,27 @@
-package visual;
+package inicio;
 
+import java.awt.Color;
 import java.awt.EventQueue;
-
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import com.formdev.flatlaf.FlatLightLaf;
 
 import Entrenamiento.App_Entrenamiento;
-
-import javax.swing.JLabel;
-import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
-import java.util.Scanner;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Color;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 public class PantallaInicial extends JFrame {
 
@@ -52,7 +46,7 @@ public class PantallaInicial extends JFrame {
 		}
 		UIManager.put("Button.arc", 999);
 		UIManager.put("Component.arc", 999);
-		UIManager.put("ProgressBar.arc", 999);
+		UIManager.put("ProgressBar.arc", 50);
 		UIManager.put("TextComponent.arc", 999);
 		UIManager.put("Component.innerFocusWidth", 1);
 		UIManager.put("Button.innerFocusWidth", 1);
@@ -73,28 +67,8 @@ public class PantallaInicial extends JFrame {
 	 * 
 	 * @throws IOException
 	 */
-	private void recogerLeyPrivacidadYLeyProteccionDeDatos() throws IOException {
-		File leyPriv = new File("leyes\\privacidad.txt");
-		File leyProt = new File("leyes\\proteccion.txt");
-		Scanner sc = new Scanner(leyPriv);
 
-		while (sc.hasNextLine())
-			textArea.append(sc.nextLine());
-		sc.close();
-		textArea.append("\n\n");
-		sc = new Scanner(leyProt);
-		while (sc.hasNextLine())
-			textArea.append(sc.nextLine());
-		sc.close();
-	}
-
-	private void visibilidad(boolean bool, javax.swing.JComponent... componente) {
-		for (JComponent jComponent : componente) {
-			jComponent.setVisible(bool);
-		}
-	}
-
-	public PantallaInicial() throws IOException {
+	public PantallaInicial() {
 		setTitle("Entrenador de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 614, 536);
@@ -141,8 +115,8 @@ public class PantallaInicial extends JFrame {
 		bcont.setEnabled(false);
 		bcont.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				visibilidad(false, ltit, scrollPane, cacepta, bcont);
-				visibilidad(true, lseguntit, bentrenador, bcrearpremodelo);
+				Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
+				Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo);
 			}
 		});
 		bcont.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -180,6 +154,6 @@ public class PantallaInicial extends JFrame {
 		bcrearpremodelo.setVisible(false);
 		bcrearpremodelo.setBounds(300, 300, 236, 44);
 		contentPane.add(bcrearpremodelo);
-		recogerLeyPrivacidadYLeyProteccionDeDatos();
+		Metodos_inicio.recogerLeyPrivacidadYLeyProteccionDeDatos(this.textArea);
 	}
 }

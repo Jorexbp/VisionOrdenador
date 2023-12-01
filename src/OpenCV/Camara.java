@@ -126,19 +126,14 @@ public class Camara extends JFrame {
 
 		ImageIcon icono = null;
 		while (true) {
-			// lee la imagen a una matriz
 			capturaVideo.read(imagen);
 
-			// Convierte la matriz a bytes
 			final MatOfByte buffer = new MatOfByte();
 			Imgcodecs.imencode(".jpg", imagen, buffer);
 
 			datosImagen = buffer.toArray();
 
-			// Añadir al JLabel de antes
-//			icono = new ImageIcon(datosImagen);
-//			pantallaCamara.setIcon(icono);
-			// Capturar y guardar al archivo
+
 			if (camara) {
 
 				icono = new ImageIcon(DeteccionCara.mostrarInfoCara(imagen));
@@ -161,7 +156,7 @@ public class Camara extends JFrame {
 				if (nombre == null) {
 					nombre = new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date());
 				}
-				// Escribo a fichero
+
 				String dir = "Detecciones/" + nombre + ".jpg";
 				DeteccionCara.guardarImagen(imagen, dir);
 

@@ -6,12 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.imgcodecs.Imgcodecs;
-
-import OpenCV.DeteccionCara;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -19,15 +13,11 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
@@ -46,7 +36,7 @@ public class App_Entrenamiento extends JFrame {
 	private static JButton befotospos;
 	private static JLabel lcargafotosneg;
 	private static JButton bfotosneg;
-	private static boolean anotacionCreada, neg, pos;
+	private static boolean  neg, pos;
 	private static String datos = "";
 	private static JLabel lcrearsample;
 	private static JButton bcrearsample;
@@ -75,20 +65,20 @@ public class App_Entrenamiento extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	private static void rellenarTextArea() {
+	public static void rellenarTextArea() {
 		textareainformativa.setText("Carpeta origen > ");
 		if (carpetaOrigen == null) {
 			textareainformativa.append("No seleccionada");
 		} else {
 			textareainformativa.append(carpetaOrigen);
-			cambiarAUsable(lcargafotospos, befotospos);
+			Metodos_app.cambiarAUsable(lcargafotospos, befotospos);
 		}
 		textareainformativa.append("\nCarpeta destino > ");
 		if (carpetaDestino == null) {
 			textareainformativa.append("No seleccionada");
 		} else {
 			textareainformativa.append(carpetaDestino);
-			cambiarAUsable(lcargafotosneg, bfotosneg);
+			Metodos_app.cambiarAUsable(lcargafotosneg, bfotosneg);
 		}
 		textareainformativa.append("\nFotos positivas > ");
 
@@ -113,275 +103,32 @@ public class App_Entrenamiento extends JFrame {
 
 		}
 
-		textareainformativa.append("\nAnotación creada > ");
+		textareainformativa.append("\nAnotación positiva creada > ");
 
-		if (anotacionCreada) {
+		if (pos) {
 			textareainformativa.append("Sí");
-			textareainformativa.append("\nDirección de la anotación > " + carpetaDestino + "\\pos.txt");
+			textareainformativa.append("\nDirección de la anotación positiva> " + carpetaOriginalPositiva + "\\pos.txt");
 
 		} else {
 			textareainformativa.append("No");
-			textareainformativa.append("\nDirección de la anotación > Nula");
+			textareainformativa.append("\nDirección de la anotación positiva> Nula");
 
 		}
+		
+		textareainformativa.append("\nAnotación negativa creada > ");
 
-	}
-
-	private static void cambiarAUsable(JLabel lcargafotospos2, JButton befotospos2) {
-		lcargafotospos2.setEnabled(true);
-		befotospos2.setEnabled(true);
-	}
-
-	private static boolean esArchivoDeImagen(File archivo) {
-		String nombreArchivo = archivo.getName().toLowerCase();
-		return nombreArchivo.endsWith(".jpg") || nombreArchivo.endsWith(".jpeg") || nombreArchivo.endsWith(".png")
-				|| nombreArchivo.endsWith(".gif") || nombreArchivo.endsWith(".bmp") || nombreArchivo.endsWith(".tif")
-				|| nombreArchivo.endsWith(".tiff");
-	}
-
-	private static boolean avisarBorrado(String carpeta) {
-		File carpetaNueva = new File(carpeta);
-		if (carpetaNueva.exists()) {
-			return JOptionPane.showConfirmDialog(null,
-					"¿Quiere sobreescribir la carpeta?\n" + carpeta) == JOptionPane.OK_OPTION;
-
-		}
-		return true;
-	}
-
-	private static void reiniciarCarpetas(String carpeta) {
-
-		if (!carpetaPadre.exists()) {
-			carpetaPadre.mkdir();
-		} else {
-			for (File f : carpetaPadre.listFiles()) {
-				if (!f.isDirectory()) {
-					f.delete();
-				}
-			}
-		}
-		File casc = new File(carpetaPadre + "/cascade");
-
-		if (!casc.exists()) {
-			casc.mkdir();
-		} else {
-			for (File f : casc.listFiles()) {
-				if (!f.isDirectory()) {
-					f.delete();
-				}
-			}
-		}
-		File directory = new File(carpeta);
-		if (!directory.exists()) {
-			directory.mkdir();
-		} else {
-			for (File files : directory.listFiles()) {
-				files.delete();
-			}
-		}
-
-	}
-
-	private static void carpetaCrearTipo(String dir, String tipo) {
-		File carpetaSubHijo;
-
-		carpetaSubHijo = new File(dir + "\\" + tipo);
-		if (!carpetaSubHijo.exists()) {
-			carpetaSubHijo.mkdir();
-		} else {
-			for (File files : carpetaSubHijo.listFiles()) {
-				files.delete();
-			}
-		}
-
-	}
-
-	private static void crearCarpetasPorDefecto(String nombreCarpetaOrigen, String nombreCarpetaDestino) {
-		if (nombreCarpetaOrigen == null || nombreCarpetaDestino == null)
-			return;
-
-		nombreCarpetaOrigen = escritorioUsuario + "\\Carpeta_Origen_Destino\\" + nombreCarpetaOrigen;
-		nombreCarpetaDestino = escritorioUsuario + "\\Carpeta_Origen_Destino\\" + nombreCarpetaDestino;
-
-		if (avisarBorrado(nombreCarpetaOrigen))
-			reiniciarCarpetas(nombreCarpetaOrigen);
-
-		if (avisarBorrado(nombreCarpetaDestino))
-			reiniciarCarpetas(nombreCarpetaDestino);
-
-		carpetaOrigen = nombreCarpetaOrigen;
-		carpetaDestino = nombreCarpetaDestino;
-
-		carpetaCrearTipo(carpetaOrigen, "pos");
-		carpetaCrearTipo(carpetaOrigen, "neg");
-
-		rellenarTextArea();
-	}
-
-	private static String seleccionarCarpeta(int JFileOpcion) {
-		JFileChooser jfc = new JFileChooser();
-		jfc.setFileSelectionMode(JFileOpcion);
-		String carpeta = "";
-		if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			File ficheroCarpeta = jfc.getSelectedFile();
-			carpeta = ficheroCarpeta.getAbsolutePath();
+		if (neg) {
+			textareainformativa.append("Sí");
+			textareainformativa.append("\nDirección de la anotación negativa> " + carpetaOriginalNegativa + "\\neg.txt");
 
 		} else {
-			return null;
-		}
-		return carpeta;
-
-	}
-
-	private static void crearAnotacionNegativa(String carpetaOriginal) {
-		File origen = new File(carpetaOriginal);
-
-		String datos = "";
-
-		for (File fichero : origen.listFiles()) {
-			if (esArchivoDeImagen(fichero)) {
-				datos += fichero.getAbsolutePath() + "\n";
-			}
+			textareainformativa.append("No");
+			textareainformativa.append("\nDirección de la anotación negativa> Nula");
 
 		}
+		
+		
 
-		try {
-			FileWriter fw = new FileWriter(carpetaOriginalNegativa + "/neg.txt");
-			fw.write(datos);
-			fw.close();
-			neg = true;
-			if (pos && neg) {
-				cambiarAUsable(lcrearsample, bcrearsample);
-			}
-			rellenarTextArea();
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
-
-	}
-//	crearAnotacionNegativa(carpetaOriginalNegativa);
-
-	private static void cambiarNombres(String carpetaOriginal) {
-		if (carpetaOriginal == null)
-			return;
-		File origen = new File(carpetaOriginal);
-		File[] archivos = origen.listFiles();
-
-		File destino = new File(carpetaDestino);
-		if (!destino.exists()) {
-			destino.mkdirs();
-		}
-
-		int c = 0;
-		for (File archivo : archivos) {
-			if (esArchivoDeImagen(archivo)) {
-				archivo.renameTo(new File(archivo.getAbsolutePath().replace(archivo.getName(), "foto_" + c + ".jpg")));
-				c++;
-			}
-		}
-
-	}
-
-	private static void detectarRectangulos(String carpetaOriginal) { // Fotos aqui
-		try {
-			cambiarNombres(carpetaOriginal);
-			File origen = new File(carpetaOriginal);
-			File[] archivos = origen.listFiles();
-
-			File destino = new File(carpetaDestino);
-			if (!destino.exists()) {
-				destino.mkdirs();
-			}
-
-			int[] coords = new int[4];
-			for (File archivo : archivos) {
-				if (esArchivoDeImagen(archivo)) {
-
-					System.out.println(archivo);
-					BufferedImage originalImage = ImageIO.read(archivo);
-
-					Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
-					byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
-					imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
-					coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
-
-					escribirAnotation(archivo.getName(), coords);
-
-				}
-			}
-
-			try {
-				FileWriter fw = new FileWriter(new File(carpetaOriginal + "/pos.txt"));
-				fw.write(datos);
-				fw.close();
-				// carpetaOriginalNegativa =
-				// seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-
-				pos = true;
-				if (pos && neg) {
-					cambiarAUsable(lcrearsample, bcrearsample);
-				}
-			} catch (IOException e) {
-
-				e.printStackTrace();
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void escribirAnotation(String dir, int[] coords) {
-		for (int i = 0; i < coords.length; i++) {
-			if (coords[i] < 0) {
-				return;
-			}
-		}
-		datos += dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
-		anotacionCreada = true;
-	}
-
-	private static void crearSamples() {
-		String addrSample = "lib\\samples\\opencv_createsamples.exe";
-		String posTxt = carpetaOriginalPositiva + "\\pos.txt";
-		String posVec = carpetaDestino + "\\pos.vec";
-		String nSamples = Integer.toString(100);
-
-		String cmd = "cmd /c start cmd.exe /k ";
-		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
-				+ "\" -vec \"" + posVec + "\"";
-		try {
-			Runtime.getRuntime().exec(comandoSamples);
-			rellenarTextArea();
-			cambiarAUsable(lcrearXML, bcrearXML);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void crearXML() {
-
-		int nStages = 10;
-		int numPos = 20;
-		int numNeg = 15;
-		String destino = carpetaPadre + "/cascade";
-
-		String dirVec = carpetaPadre + "\\Destino\\pos.vec";
-
-		String dirTxtNeg = carpetaOriginalNegativa + "\\neg.txt";
-		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
-		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
-				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages;
-
-		String cmd = "cmd /c start cmd.exe /k ";
-		String comandoSamples = cmd + comTR;
-		try {
-			Runtime.getRuntime().exec(comandoSamples);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public App_Entrenamiento() {
@@ -415,7 +162,7 @@ public class App_Entrenamiento extends JFrame {
 		JButton belegircarpetaorigen = new JButton("Seleccionar");
 		belegircarpetaorigen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaOrigen = seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
+				carpetaOrigen = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				rellenarTextArea();
 			}
 		});
@@ -442,7 +189,7 @@ public class App_Entrenamiento extends JFrame {
 		belegircarpetadestino = new JButton("Seleccionar");
 		belegircarpetadestino.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaDestino = seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
+				carpetaDestino = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				rellenarTextArea();
 			}
 		});
@@ -460,9 +207,13 @@ public class App_Entrenamiento extends JFrame {
 		btncarpetadefecto = new JButton("Nombrar");
 		btncarpetadefecto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				crearCarpetasPorDefecto(JOptionPane.showInputDialog("Introduce el nombre de la carpeta origen: "),
-						JOptionPane.showInputDialog("Introduce el nombre de la carpeta destino: "));
+				String[] carp = Metodos_app.crearCarpetasPorDefecto(
+						JOptionPane.showInputDialog("Introduce el nombre de la carpeta origen: "),
+						JOptionPane.showInputDialog("Introduce el nombre de la carpeta destino: "), escritorioUsuario,
+						carpetaOrigen, carpetaDestino, carpetaPadre);
+				carpetaOrigen = carp[0];
+				carpetaDestino = carp[1];
+				rellenarTextArea();
 			}
 		});
 		btncarpetadefecto.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -487,8 +238,13 @@ public class App_Entrenamiento extends JFrame {
 		befotospos = new JButton("Seleccionar");
 		befotospos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaOriginalPositiva = seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-				detectarRectangulos(carpetaOriginalPositiva);
+				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
+				datos ="";
+				Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaDestino, datos);
+				pos = true;
+				if (pos && neg) {
+					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
+				}
 			}
 		});
 		befotospos.setEnabled(false);
@@ -499,8 +255,13 @@ public class App_Entrenamiento extends JFrame {
 		bfotosneg = new JButton("Seleccionar");
 		bfotosneg.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaOriginalNegativa = seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-				crearAnotacionNegativa(carpetaOriginalNegativa);
+				carpetaOriginalNegativa = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
+
+				Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa, lcrearsample, bcrearsample);
+				neg = true;
+				if (pos && neg) {
+					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
+				}
 			}
 		});
 		bfotosneg.setEnabled(false);
@@ -527,7 +288,8 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample = new JButton("Crear");
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				crearSamples();
+
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaDestino, lcrearXML, bcrearXML);
 			}
 		});
 		bcrearsample.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -538,7 +300,8 @@ public class App_Entrenamiento extends JFrame {
 		bcrearXML = new JButton("Crear");
 		bcrearXML.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				crearXML();
+
+				Metodos_app.crearXML(carpetaPadre.getAbsolutePath(), carpetaOriginalNegativa);
 			}
 		});
 		bcrearXML.setFont(new Font("Dialog", Font.BOLD, 14));

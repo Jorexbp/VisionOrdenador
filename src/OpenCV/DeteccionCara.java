@@ -129,7 +129,6 @@ private static String modelo;
 
 	public static void guardarImagen(Mat imagen, String dir) {
 		Imgcodecs.imwrite(dir, imagen);
-
 	}
 
 	public static byte[] detecarSoloCara(Mat imagen) {
@@ -145,7 +144,6 @@ private static String modelo;
 		int altura = frameGris.height();
 		int tamañoCara = Math.round(altura * 0.2f);
 
-		// Deteccion de caras
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
 		// Cargar el XML de dataset de caras
@@ -153,23 +151,16 @@ private static String modelo;
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
 
-		// Crear una nueva imagen con la posición original de la cara
 		Rect[] caraArr = caras.toArray();
 		final MatOfByte buffer = new MatOfByte();
 
 		for (Rect caraRect : caraArr) {
-			// Crear una nueva imagen para cada cara
+			
 			Mat imagenCara = new Mat(imagen, caraRect);
-
-			// Escribir la nueva imagen a fichero
-			// Imgcodecs.imwrite("detecciones/cara_detectada_" + System.currentTimeMillis()
-			// + ".jpg", imagenCara);
-
-			// Convertir la nueva imagen a bytes
+			
 			Imgcodecs.imencode(".jpg", imagenCara, buffer);
 
-			// Devolver los datos de la nueva imagen
-
+			
 		}
 
 		return buffer.toArray();
