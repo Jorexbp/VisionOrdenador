@@ -300,7 +300,7 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalNegativa = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
 
-				Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa, lcrearsample, bcrearsample);
+				Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
 				neg = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);

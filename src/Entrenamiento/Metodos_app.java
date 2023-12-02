@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -143,9 +144,8 @@ public class Metodos_app {
 		return carpeta;
 
 	}
-	
-	public static void crearAnotacionNegativa(String carpetaOriginalNegativa, javax.swing.JLabel lcrearsample,
-			javax.swing.JButton bcrearsample) {
+
+	public static void crearAnotacionNegativa(String carpetaOriginalNegativa) {
 		File origen = new File(carpetaOriginalNegativa);
 
 		String datos = "";
@@ -162,7 +162,6 @@ public class Metodos_app {
 			fw.write(datos);
 			fw.close();
 
-		
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -283,7 +282,6 @@ public class Metodos_app {
 
 	}
 
-
 	public static void escribirAnotation(String dir, int[] coords, String datos, String carpetaOriginal) {
 		for (int i = 0; i < coords.length; i++) {
 			if (coords[i] < 0) {
@@ -324,7 +322,7 @@ public class Metodos_app {
 				+ "\" -vec \"" + posVec + "\"";
 		try {
 			Runtime.getRuntime().exec(comandoSamples);
-			
+
 			cambiarAUsable(lcrearXML, bcrearXML);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -391,4 +389,25 @@ public class Metodos_app {
 			return null;
 		}
 	}
+
+	public static boolean crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String carpetaDestino) {
+
+		crearAnotacionNegativa(carpetaFotosNeg);
+		JOptionPane.showMessageDialog(null,
+				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
+
+		String ejecutableAnotacion = "lib\\annotation\\opencv_annotation.exe";
+		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaDestino + "/pos.txt" + " --images="
+				+ carpetaFotos;
+
+		try {
+			Process pCrearAnotaciones = Runtime.getRuntime().exec(comandoAnotacion);
+			pCrearAnotaciones.waitFor();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
 }

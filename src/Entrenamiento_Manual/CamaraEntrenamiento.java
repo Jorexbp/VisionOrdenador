@@ -1,11 +1,10 @@
-package OpenCV;
+package Entrenamiento_Manual;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,7 +33,7 @@ public class CamaraEntrenamiento extends JFrame {
 	
 
 	public static void comenzarCamara(String dirCar) {
-		JOptionPane.showMessageDialog(null, "Asegúrese de que la cámara pueda ver el objeto a identificar");
+		JOptionPane.showMessageDialog(null, "Asegúrese de que la cámara pueda ver el objeto a identificar, la toma de captura de pantalla ocurre cada 1.5 segundos");
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -87,6 +86,12 @@ public class CamaraEntrenamiento extends JFrame {
 		int c = 0;
 		ImageIcon icono = null;
 		while (true) {
+			try {
+				Thread.sleep(1500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			capturaVideo.read(imagen);
 
 			final MatOfByte buffer = new MatOfByte();

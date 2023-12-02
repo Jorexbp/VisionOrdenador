@@ -1,9 +1,9 @@
-package Entrenamiento;
+package Entrenamiento_Manual;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import OpenCV.CamaraEntrenamiento;
+import Entrenamiento.Metodos_app;
 
 public class EntrenamientoManual {
 
