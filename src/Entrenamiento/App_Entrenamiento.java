@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import OpenCV.Camara;
+
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
@@ -18,44 +20,52 @@ import javax.swing.JSeparator;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
 public class App_Entrenamiento extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+	private  final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private static JTextArea textareainformativa;
+	private  JTextArea textareainformativa;
 	@SuppressWarnings("unused")
-	private static String carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod;
+	private  String carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod;
 	private JButton belegircarpetadestino;
-	private static String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
+	private  String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
-	private static File carpetaPadre = new File(escritorioUsuario + "\\Carpeta_Origen_Destino");
-	private static JLabel lcargafotospos;
-	private static JButton befotospos;
-	private static JLabel lcargafotosneg;
-	private static JButton bfotosneg;
-	private static boolean neg, pos, sam, mod;
-	private static String datos = "";
-	private static JLabel lcrearsample;
-	private static JButton bcrearsample;
-	private static JLabel lcrearXML;
-	private static JButton bcrearXML;
-	private static String carpetaOriginalPositiva, carpetaOriginalNegativa;
+	private  File carpetaPadre = new File(escritorioUsuario + "\\Carpeta_Origen_Destino");
+	private  JLabel lcargafotospos;
+	private  JButton befotospos;
+	private  JLabel lcargafotosneg;
+	private  JButton bfotosneg;
+	private  boolean neg, pos, sam, mod, premod;
+	private  String datos = "";
+	private  JLabel lcrearsample;
+	private  JButton bcrearsample;
+	private  JLabel lcrearXML;
+	private  JButton bcrearXML;
+	private  String carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod;
 	private JButton bvolver;
 	private JLabel lcargamodelo;
+	private JLabel lprobarmodelo;
+	private JButton btnProbar;
+	private JButton breinicio;
 
 	/**
 	 * Launch the application.
 	 * 
 	 * @author Jorge Barba Polán
 	 */
-	public static void main(String[] args) {
+	public  static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -71,7 +81,7 @@ public class App_Entrenamiento extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public static void rellenarTextArea() {
+	public  void rellenarTextArea() {
 		textareainformativa.setText("Carpeta origen > ");
 		if (carpetaOrigen == null) {
 			textareainformativa.append("No seleccionada");
@@ -144,6 +154,15 @@ public class App_Entrenamiento extends JFrame {
 			textareainformativa.append("\nDirección del modelo> Nula");
 
 		}
+		textareainformativa.append("\nPre-modelo seleccionado > ");
+
+		if (!premod) {
+			textareainformativa.append("Por defecto - Caras Humanas");
+
+		} else {
+			textareainformativa.append("Usuario - " + dirPreMod);
+
+		}
 
 	}
 
@@ -157,6 +176,7 @@ public class App_Entrenamiento extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1221, 652);
 		setExtendedState(MAXIMIZED_BOTH);
+		setAutoRequestFocus(true);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -331,7 +351,7 @@ public class App_Entrenamiento extends JFrame {
 				dirMod = Metodos_app.crearXML(carpetaPadre.getAbsolutePath(), carpetaOriginalNegativa);
 				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos");
 				mod = true;
-
+				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
 				rellenarTextArea();
 			}
 		});
@@ -355,7 +375,8 @@ public class App_Entrenamiento extends JFrame {
 				dispose();
 			}
 		});
-		Icon icon = new ImageIcon("Multimedia\\volver.png");
+		URL url2 = App_Entrenamiento.class.getResource("/volver.png");
+		Icon icon = new ImageIcon(url2);
 		bvolver.setIcon(icon);
 		bvolver.setFont(new Font("Dialog", Font.BOLD, 14));
 		bvolver.setBounds(10, 11, 74, 52);
@@ -363,25 +384,79 @@ public class App_Entrenamiento extends JFrame {
 		bvolver.setBorderPainted(false);
 		bvolver.setFocusPainted(false);
 		contentPane.add(bvolver);
-		
+
 		JButton btnCargar = new JButton("Cargar");
 		btnCargar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Metodos_app.cargarModelo();
+				dirPreMod = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_ONLY);
+				if (dirPreMod == null)
+					return;
+				premod = true;
+
+				DetectorAnotations.cargarModelo(dirPreMod);
+				rellenarTextArea();
 			}
 		});
 		btnCargar.setFont(new Font("Dialog", Font.BOLD, 14));
-		btnCargar.setEnabled(false);
 		btnCargar.setBounds(541, 233, 162, 34);
 		contentPane.add(btnCargar);
-		
+
 		lcargamodelo = new JLabel("Cargar pre-modelo");
 		lcargamodelo.setHorizontalAlignment(SwingConstants.CENTER);
 		lcargamodelo.setForeground(new Color(2, 0, 255));
 		lcargamodelo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcargamodelo.setEnabled(false);
 		lcargamodelo.setBounds(498, 197, 246, 24);
 		contentPane.add(lcargamodelo);
+
+		btnProbar = new JButton("Probar");
+		btnProbar.setEnabled(false);
+		btnProbar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Camara camara = new Camara(dirMod);
+				camara.comenzarCamara();
+			}
+		});
+		btnProbar.setFont(new Font("Dialog", Font.BOLD, 14));
+		btnProbar.setBounds(994, 233, 162, 34);
+		contentPane.add(btnProbar);
+
+		lprobarmodelo = new JLabel("Probar modelo");
+		lprobarmodelo.setEnabled(false);
+		lprobarmodelo.setHorizontalAlignment(SwingConstants.CENTER);
+		lprobarmodelo.setForeground(new Color(2, 0, 255));
+		lprobarmodelo.setFont(new Font("Dialog", Font.BOLD, 14));
+		lprobarmodelo.setBounds(951, 197, 246, 24);
+		contentPane.add(lprobarmodelo);
+
+		breinicio = new JButton("");
+		breinicio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				Metodos_app.reiniciarStrings(carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod,
+						carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod);
+
+				Metodos_app.reiniciarComponentes(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample,
+				bcrearsample, lcrearXML, bcrearXML, btnProbar, lprobarmodelo);
+
+				Metodos_app.reiniciarBooleanos(neg, pos, sam, mod, premod);
+				rellenarTextArea();
+				System.out.println(carpetaOrigen);
+				// TODO NO REINICIA SABE DIOS
+				
+			}
+
+		
+		});
+		URL url = App_Entrenamiento.class.getResource("/rein.png");
+
+		Icon icon2 = new ImageIcon(url);
+		breinicio.setIcon(icon2);
+		breinicio.setFont(new Font("Dialog", Font.BOLD, 14));
+		breinicio.setFocusPainted(false);
+		breinicio.setContentAreaFilled(false);
+		breinicio.setBorderPainted(false);
+		breinicio.setBounds(1096, 15, 74, 52);
+		contentPane.add(breinicio);
 
 		rellenarTextArea();
 	}

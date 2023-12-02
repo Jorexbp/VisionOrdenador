@@ -92,6 +92,7 @@ private static String modelo;
 			cascadaCara.load("Datasets/haarcascade_frontalface_alt2.xml");
 			
 		}else {
+			
 			cascadaCara.load(modelo);
 			
 		}

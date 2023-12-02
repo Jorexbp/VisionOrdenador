@@ -2,16 +2,20 @@ package inicio;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.Scanner;
 
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 
+import Entrenamiento.App_Entrenamiento;
+
 public class Metodos_inicio {
 	public static void recogerLeyPrivacidadYLeyProteccionDeDatos(JTextArea textArea) {
-
-		File leyPriv = new File("leyes\\privacidad.txt");
-		File leyProt = new File("leyes\\proteccion.txt");
+		URL url = App_Entrenamiento.class.getResource("/privacidad.txt");
+		URL url2 = App_Entrenamiento.class.getResource("/proteccion.txt");
+		File leyPriv = new File(url.getFile());
+		File leyProt = new File(url2.getFile());
 		Scanner sc = null;
 
 		try {

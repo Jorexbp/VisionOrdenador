@@ -31,12 +31,17 @@ public class Camara extends JFrame {
 	private VideoCapture capturaVideo;
 	private Mat imagen;
 	private boolean clicked, camara = true, soloCaras = false;
-	
+
 	public Camara(String modelo) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
 		DeteccionCara.setModelo(modelo);
 		// System.out.println(DeteccionCara.getModelo());
+
+	}
+
+	public void comenzarCamara() {
+		JOptionPane.showMessageDialog(null,
+				"Los modelos que no hayan sido entrenados lo suficiente, pueden no funcionar correctamente");
 
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -132,7 +137,6 @@ public class Camara extends JFrame {
 			Imgcodecs.imencode(".jpg", imagen, buffer);
 
 			datosImagen = buffer.toArray();
-
 
 			if (camara) {
 

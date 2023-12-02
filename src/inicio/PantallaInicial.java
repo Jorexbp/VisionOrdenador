@@ -73,15 +73,17 @@ public class PantallaInicial extends JFrame {
 	}
 
 	public PantallaInicial(int m) {
+
 		iniciarComponentes();
 		Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
 		Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo);
+
 	}
 
 	private void iniciarComponentes() {
 
 		setTitle("Entrenador de modelos - Jorge Barba Polán");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 614, 536);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -166,5 +168,6 @@ public class PantallaInicial extends JFrame {
 		bcrearpremodelo.setBounds(300, 300, 236, 44);
 		contentPane.add(bcrearpremodelo);
 		Metodos_inicio.recogerLeyPrivacidadYLeyProteccionDeDatos(this.textArea);
+
 	}
 }

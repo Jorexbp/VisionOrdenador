@@ -15,6 +15,7 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 
 public class DetectorAnotations {
+	private static String modelo;
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
@@ -28,6 +29,10 @@ public class DetectorAnotations {
 			}
 
 		}
+	}
+	
+	public static void cargarModelo(String dirModelo) {
+		modelo = dirModelo;
 	}
 
 	public static Mat detectarCara(Mat imagen) {
@@ -50,7 +55,14 @@ public class DetectorAnotations {
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
 		// Cargar el XML de dataset de caras
-		cascadaCara.load("Datasets/haarcascade_frontalface_alt2.xml");
+		if(modelo == null){
+			cascadaCara.load("Datasets/haarcascade_frontalface_alt2.xml");
+			
+		}else {
+			cascadaCara.load(modelo);
+			
+		}
+			
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
 

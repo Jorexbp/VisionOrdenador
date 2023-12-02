@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,6 +30,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import OpenCV.DeteccionCara;
 
 public class Metodos_app {
+	private static String carpetaPos, carpetaNeg;
 
 	public static void cambiarAUsable(JLabel lcargafotospos2, JButton befotospos2) {
 		lcargafotospos2.setEnabled(true);
@@ -141,13 +143,29 @@ public class Metodos_app {
 		return carpeta;
 
 	}
+	public static void reiniciarStrings(String... rein) {
+		for (String string : rein) {
+			string = "";
+		}
+	}
 
+	public static void reiniciarComponentes( javax.swing.JComponent... componentes) {
+		for (JComponent com : componentes) {
+			com.setEnabled(false);
+		}
+	}
+
+	public static void reiniciarBooleanos(boolean... booleanos) {
+		for (boolean b : booleanos) {
+			b = false;
+		}
+	}
 	public static void crearAnotacionNegativa(String carpetaOriginalNegativa, javax.swing.JLabel lcrearsample,
 			javax.swing.JButton bcrearsample) {
 		File origen = new File(carpetaOriginalNegativa);
 
 		String datos = "";
-
+		carpetaNeg = carpetaOriginalNegativa;
 		for (File fichero : origen.listFiles()) {
 			if (esArchivoDeImagen(fichero)) {
 				datos += fichero.getAbsolutePath() + "\n";
@@ -160,8 +178,7 @@ public class Metodos_app {
 			fw.write(datos);
 			fw.close();
 
-			App_Entrenamiento.rellenarTextArea();
-
+		
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -185,6 +202,7 @@ public class Metodos_app {
 			if (esArchivoDeImagen(archivo)) {
 				archivo.renameTo(new File(archivo.getAbsolutePath().replace(archivo.getName(), "foto_" + c + ".jpg")));
 				c++;
+
 			}
 		}
 
@@ -271,10 +289,16 @@ public class Metodos_app {
 				}
 			}
 		};
+		if (new File(carpetaOriginal).exists()) {
+			new File(carpetaOriginal).delete();
+		}
+
 		worker.execute();
 
 		frame.setVisible(true);
+
 	}
+
 
 	public static void escribirAnotation(String dir, int[] coords, String datos, String carpetaOriginal) {
 		for (int i = 0; i < coords.length; i++) {
@@ -285,7 +309,9 @@ public class Metodos_app {
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(new File(carpetaOriginal + "/pos.txt"), true);
-
+			System.out.println(carpetaOriginal + "\\" + dir);
+			if (!new File(carpetaOriginal + "\\" + dir).exists())
+				return;
 			datos = dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
 			fw.write(datos);
 
@@ -306,25 +332,34 @@ public class Metodos_app {
 		String addrSample = "lib\\samples\\opencv_createsamples.exe";
 		String posTxt = carpetaOriginalPositiva + "\\pos.txt";
 		String posVec = carpetaDestino + "\\pos.vec";
-		String nSamples = Integer.toString(100);
+		int numeroSamples = calcularNumSamples(carpetaOriginalPositiva);
+		String nSamples = Integer.toString(numeroSamples * 10);
 
 		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
 			Runtime.getRuntime().exec(comandoSamples);
-			App_Entrenamiento.rellenarTextArea();
+			
 			cambiarAUsable(lcrearXML, bcrearXML);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	private static int calcularNumSamples(String carpetaOriginalPositiva) {
+		File carpeta = new File(carpetaOriginalPositiva);
+		carpetaPos = carpetaOriginalPositiva;
+		File[] archivos = carpeta.listFiles();
+
+		return archivos.length;
+	}
+
 	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
 
-		int nStages = 10;
-		int numPos = 20;
-		int numNeg = 15;
+		int nStages = calcularNumSamples(carpetaPos) / 8;
+		int numPos = calcularNumSamples(carpetaPos) - (calcularNumSamples(carpetaPos) / 5);
+		int numNeg = calcularNumSamples(carpetaNeg);
 		String destino = carpetaPadre + "/cascade";
 
 		String dirVec = carpetaPadre + "\\Destino\\pos.vec";
