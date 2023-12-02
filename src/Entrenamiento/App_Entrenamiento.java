@@ -25,35 +25,34 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
 public class App_Entrenamiento extends JFrame {
 
-	private  final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private  JTextArea textareainformativa;
-	@SuppressWarnings("unused")
-	private  String carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod;
+	private JTextArea textareainformativa;
+	private String carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod;
 	private JButton belegircarpetadestino;
-	private  String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
+	private String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
-	private  File carpetaPadre = new File(escritorioUsuario + "\\Carpeta_Origen_Destino");
-	private  JLabel lcargafotospos;
-	private  JButton befotospos;
-	private  JLabel lcargafotosneg;
-	private  JButton bfotosneg;
-	private  boolean neg, pos, sam, mod, premod;
-	private  String datos = "";
-	private  JLabel lcrearsample;
-	private  JButton bcrearsample;
-	private  JLabel lcrearXML;
-	private  JButton bcrearXML;
-	private  String carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod;
+	private File carpetaPadre = new File(escritorioUsuario + "\\Carpeta_Origen_Destino");
+	private JLabel lcargafotospos;
+	private JButton befotospos;
+	private JLabel lcargafotosneg;
+	private JButton bfotosneg;
+	private boolean neg, pos, sam, mod, premod;
+	private String datos = "";
+	private JLabel lcrearsample;
+	private JButton bcrearsample;
+	private JLabel lcrearXML;
+	private JButton bcrearXML;
+	private String carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod;
 	private JButton bvolver;
 	private JLabel lcargamodelo;
 	private JLabel lprobarmodelo;
@@ -65,7 +64,7 @@ public class App_Entrenamiento extends JFrame {
 	 * 
 	 * @author Jorge Barba Polán
 	 */
-	public  static void main(String[] args) {
+	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -81,7 +80,7 @@ public class App_Entrenamiento extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public  void rellenarTextArea() {
+	public void rellenarTextArea() {
 		textareainformativa.setText("Carpeta origen > ");
 		if (carpetaOrigen == null) {
 			textareainformativa.append("No seleccionada");
@@ -432,20 +431,36 @@ public class App_Entrenamiento extends JFrame {
 		breinicio.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.reiniciarStrings(carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod,
-						carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod);
+				reiniciarStrings(carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod, carpetaOriginalPositiva,
+						carpetaOriginalNegativa, dirPreMod);
 
-				Metodos_app.reiniciarComponentes(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample,
-				bcrearsample, lcrearXML, bcrearXML, btnProbar, lprobarmodelo);
+				reiniciarComponentes(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample, bcrearsample,
+						lcrearXML, bcrearXML, btnProbar, lprobarmodelo);
 
-				Metodos_app.reiniciarBooleanos(neg, pos, sam, mod, premod);
+				reiniciarBooleanos(neg, pos, sam, mod, premod);
 				rellenarTextArea();
 				System.out.println(carpetaOrigen);
 				// TODO NO REINICIA SABE DIOS
-				
+
 			}
 
-		
+			public void reiniciarStrings(String... rein) {
+				for (String string : rein) {
+					string = "";
+				}
+			}
+
+			public void reiniciarComponentes(javax.swing.JComponent... componentes) {
+				for (JComponent com : componentes) {
+					com.setEnabled(false);
+				}
+			}
+
+			public void reiniciarBooleanos(boolean... booleanos) {
+				for (boolean b : booleanos) {
+					b = false;
+				}
+			}
 		});
 		URL url = App_Entrenamiento.class.getResource("/rein.png");
 

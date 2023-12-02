@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
-import javax.swing.JComponent;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -143,23 +143,7 @@ public class Metodos_app {
 		return carpeta;
 
 	}
-	public static void reiniciarStrings(String... rein) {
-		for (String string : rein) {
-			string = "";
-		}
-	}
-
-	public static void reiniciarComponentes( javax.swing.JComponent... componentes) {
-		for (JComponent com : componentes) {
-			com.setEnabled(false);
-		}
-	}
-
-	public static void reiniciarBooleanos(boolean... booleanos) {
-		for (boolean b : booleanos) {
-			b = false;
-		}
-	}
+	
 	public static void crearAnotacionNegativa(String carpetaOriginalNegativa, javax.swing.JLabel lcrearsample,
 			javax.swing.JButton bcrearsample) {
 		File origen = new File(carpetaOriginalNegativa);
