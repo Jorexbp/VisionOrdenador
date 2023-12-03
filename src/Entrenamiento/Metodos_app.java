@@ -4,7 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -309,22 +312,20 @@ public class Metodos_app {
 
 	}
 
-	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino, JLabel lcrearXML,
-			JButton bcrearXML) {
+	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino) {
 		String addrSample = "lib\\samples\\opencv_createsamples.exe";
 		String posTxt = carpetaOriginalPositiva + "\\pos.txt";
 		String posVec = carpetaDestino + "\\pos.vec";
 		int numeroSamples = calcularNumSamples(carpetaOriginalPositiva);
 		String nSamples = Integer.toString(numeroSamples * 10);
 
-		String cmd = "cmd /c start cmd.exe /k ";
+		String cmd = "cmd /c start cmd.exe /c ";
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
-			Runtime.getRuntime().exec(comandoSamples);
-
-			cambiarAUsable(lcrearXML, bcrearXML);
-		} catch (IOException e) {
+			Process procesoSamples = Runtime.getRuntime().exec(comandoSamples);
+			procesoSamples.waitFor();
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -344,14 +345,14 @@ public class Metodos_app {
 		int numNeg = calcularNumSamples(carpetaNeg);
 		String destino = carpetaPadre + "/cascade";
 
-		String dirVec = carpetaPadre + "\\Destino\\pos.vec";
+		String dirVec = carpetaPadre + "/pos.vec";// TODO MIRAR QUE NO ROMPA NADA SI CAMBIA \\Destino
 
 		String dirTxtNeg = carpetaOriginalNegativa + "\\neg.txt";
 		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
 				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages;
 
-		String cmd = "cmd /c start cmd.exe /c ";
+		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + comTR;
 
 		try {
@@ -393,21 +394,54 @@ public class Metodos_app {
 	public static boolean crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String carpetaDestino) {
 
 		crearAnotacionNegativa(carpetaFotosNeg);
+		carpetaPos = carpetaFotos;
 		JOptionPane.showMessageDialog(null,
 				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
 
 		String ejecutableAnotacion = "lib\\annotation\\opencv_annotation.exe";
-		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaDestino + "/pos.txt" + " --images="
+		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos + "/pos.txt --images="
 				+ carpetaFotos;
 
 		try {
+
 			Process pCrearAnotaciones = Runtime.getRuntime().exec(comandoAnotacion);
-			pCrearAnotaciones.waitFor();
+			while (pCrearAnotaciones.waitFor() != 0) {
+
+			}
+
+			quitarDireccionAbsoluta(carpetaFotos);
+
+			return true;
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		return false;
+	}
+
+	private static void quitarDireccionAbsoluta(String dir) {
+
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(dir + "\\pos.txt"));
+			String line;
+			String datos = "";
+			while ((line = br.readLine()) != null) {
+				datos += line.substring(line.lastIndexOf("\\") + 1) + "\n";
+			}
+			br.close();
+
+			File del = new File(dir + "\\pos.txt");
+			del.delete();
+
+			FileWriter fw = new FileWriter(dir + "\\pos.txt");
+			fw.write(datos);
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }

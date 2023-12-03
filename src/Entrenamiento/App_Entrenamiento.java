@@ -333,8 +333,8 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaDestino, lcrearXML, bcrearXML);
-				sam = true;
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaDestino);
+				Metodos_app.cambiarAUsable( lcrearXML, bcrearXML);				sam = true;
 				rellenarTextArea();
 			}
 		});
