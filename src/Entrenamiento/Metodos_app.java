@@ -78,9 +78,8 @@ public class Metodos_app {
 	public static String crearCarpetasPorDefecto(String nombreCarpetaDestino) {
 		if (nombreCarpetaDestino == null)
 			return null;
-		
-		nombreCarpetaDestino=System.getProperty("user.home")+"\\Desktop\\"+nombreCarpetaDestino;
-		
+
+		nombreCarpetaDestino = System.getProperty("user.home") + "\\Desktop\\" + nombreCarpetaDestino;
 
 		if (avisarBorrado(nombreCarpetaDestino))
 			reiniciarCarpetas(nombreCarpetaDestino);
@@ -150,10 +149,11 @@ public class Metodos_app {
 	}
 
 	public static void detectarRectangulos(String carpetaOriginal, String carpetaDestino, String datos) { // Fotos aqui
+		
 		JFrame frame = new JFrame("Cargando fotos...");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setBounds(425, 250, 450, 150);
-
+		frame.setUndecorated(true);
 		frame.setResizable(false);
 		frame.setLayout(new BorderLayout());
 
@@ -197,23 +197,14 @@ public class Metodos_app {
 						coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
 						escribirAnotation(archivo.getName(), coords, datos, carpetaOriginal);
 						frame.toFront();
-						System.out.println(datos);
+						// System.out.println(datos);
 						i++;
 						publish(i + 1);
 
 					}
 				}
-//				try {
-//					FileWriter fw = new FileWriter(new File(carpetaOriginal + "\\pos.txt"), true);
-//					fw.write(datos);
-//					fw.close();
-//
-//				} catch (IOException e) {
-//
-//					e.printStackTrace();
-//				}
-				frame.dispose(); // Dispose the frame when the progress reaches 100%
-				// Open a new frame with text
+
+				frame.dispose();
 				JFrame completionFrame = new JFrame("Carga completada");
 				JLabel completionLabel = new JLabel("La carga ha sido completada exitosamente");
 				completionLabel.setHorizontalAlignment(SwingConstants.CENTER);

@@ -1,7 +1,5 @@
 package OpenCV;
 
-
-
 import javax.swing.ImageIcon;
 
 import org.opencv.core.Core;
@@ -17,8 +15,6 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 
-
-
 public class DeteccionCara {
 	private static String modelo;
 
@@ -30,7 +26,7 @@ public class DeteccionCara {
 		return modelo;
 	}
 
-	public static byte[] detectarCara(Mat imagen ) {
+	public static byte[] detectarCara(Mat imagen) {
 		MatOfRect caras = new MatOfRect();
 
 		// Convertir a escala de grises
@@ -50,9 +46,8 @@ public class DeteccionCara {
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
 		// Cargar el XML de dataset de caras
-		//cascadaCara.load("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
-		cascadaCara.load("C:\\Users\\Alumno\\Desktop\\DESTINO_PRUEBA\\Mierda.xml");
-		
+		cascadaCara.load("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
 
@@ -61,7 +56,6 @@ public class DeteccionCara {
 		for (int i = 0; i < caraArr.length; i++) {
 			// Dibujar
 			Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 5);
-break;
 			
 		}
 
@@ -139,7 +133,8 @@ break;
 
 		// Cargar el XML de dataset de caras
 		if (modelo == null) {
-			//URL url = DeteccionCara.class.getResource("/haarcascade_frontalface_alt2.xml");
+			// URL url =
+			// DeteccionCara.class.getResource("/haarcascade_frontalface_alt2.xml");
 
 			cascadaCara.load(
 					"C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");

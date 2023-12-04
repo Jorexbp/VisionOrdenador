@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import Entrenamiento_Manual.LecturaFotos;
 import OpenCV.Camara;
 
 import inicio.PantallaInicial;
@@ -268,10 +269,12 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
 				datos = "";
-				
+
 				// TODO REINVENTAR LA RUEDA TXT
-				
 				Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre, datos);
+
+				LecturaFotos.comenzarCamara(carpetaOriginalPositiva);
+
 				pos = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
