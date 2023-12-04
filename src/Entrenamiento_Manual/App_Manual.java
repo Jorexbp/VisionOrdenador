@@ -52,7 +52,6 @@ public class App_Manual extends JFrame {
 	private JLabel lcarpetaFotosNegativas;
 	private JCheckBox cfotosnegaticas;
 	private JCheckBox cfotosnegativas;
-	private JButton belegircarpetaorigen_1;
 
 	/**
 	 * Launch the application.
@@ -322,26 +321,5 @@ public class App_Manual extends JFrame {
 		cfotosnegativas.setEnabled(false);
 		cfotosnegativas.setBounds(1008, 454, 254, 24);
 		contentPane.add(cfotosnegativas);
-		
-		belegircarpetaorigen_1 = new JButton("Seleccionar");
-		belegircarpetaorigen_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				direccionCarpetaDestino="C:/Users/Alumno/Desktop/DESTINO_PRUEBA";
-				direccionCarpetaFotos="C:/Users/Alumno/Desktop/PRUEBA";
-				direccionFotosNegativas="C:/Users/Alumno/Desktop/MuchasFotos/Neg";
-				Metodos_app.carpetaPos=direccionCarpetaFotos;
-				Metodos_app.carpetaNeg=direccionFotosNegativas;
-				
-				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
-				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino);
-				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas);
-
-				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
-				cCrearModelo.setSelected(true);
-			}
-		});
-		belegircarpetaorigen_1.setFont(new Font("Dialog", Font.BOLD, 14));
-		belegircarpetaorigen_1.setBounds(106, 279, 143, 32);
-		contentPane.add(belegircarpetaorigen_1);
 	}
 }

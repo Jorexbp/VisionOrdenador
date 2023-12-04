@@ -50,7 +50,9 @@ public class DeteccionCara {
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
 		// Cargar el XML de dataset de caras
-		cascadaCara.load("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+		//cascadaCara.load("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+		cascadaCara.load("C:\\Users\\Alumno\\Desktop\\DESTINO_PRUEBA\\Mierda.xml");
+		
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
 
@@ -59,7 +61,7 @@ public class DeteccionCara {
 		for (int i = 0; i < caraArr.length; i++) {
 			// Dibujar
 			Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 5);
-
+break;
 			
 		}
 

@@ -57,28 +57,8 @@ public class Metodos_app {
 		return true;
 	}
 
-	public static void reiniciarCarpetas(String carpeta, File carpetaPadre) {
+	public static void reiniciarCarpetas(String carpeta) {
 
-		if (!carpetaPadre.exists()) {
-			carpetaPadre.mkdir();
-		} else {
-			for (File f : carpetaPadre.listFiles()) {
-				if (!f.isDirectory()) {
-					f.delete();
-				}
-			}
-		}
-		File casc = new File(carpetaPadre + "/cascade");
-
-		if (!casc.exists()) {
-			casc.mkdir();
-		} else {
-			for (File f : casc.listFiles()) {
-				if (!f.isDirectory()) {
-					f.delete();
-				}
-			}
-		}
 		File directory = new File(carpeta);
 		if (!directory.exists()) {
 			directory.mkdir();
@@ -87,7 +67,7 @@ public class Metodos_app {
 				files.delete();
 			}
 		}
-		File modelos = new File(carpetaPadre + "/modelos");
+		File modelos = new File(carpeta + "/modelos");
 
 		if (!modelos.exists()) {
 			modelos.mkdir();
@@ -95,41 +75,17 @@ public class Metodos_app {
 
 	}
 
-	public static void carpetaCrearTipo(String dir, String tipo) {
-		File carpetaSubHijo;
-
-		carpetaSubHijo = new File(dir + "\\" + tipo);
-		if (!carpetaSubHijo.exists()) {
-			carpetaSubHijo.mkdir();
-		} else {
-			for (File files : carpetaSubHijo.listFiles()) {
-				files.delete();
-			}
-		}
-
-	}
-
-	public static String[] crearCarpetasPorDefecto(String nombreCarpetaOrigen, String nombreCarpetaDestino,
-			String escritorioUsuario, String carpetaOrigen, String carpetaDestino, File carpetaPadre) {
-		if (nombreCarpetaOrigen == null || nombreCarpetaDestino == null)
+	public static String crearCarpetasPorDefecto(String nombreCarpetaDestino) {
+		if (nombreCarpetaDestino == null)
 			return null;
-
-		nombreCarpetaOrigen = escritorioUsuario + "\\Carpeta_Origen_Destino\\" + nombreCarpetaOrigen;
-		nombreCarpetaDestino = escritorioUsuario + "\\Carpeta_Origen_Destino\\" + nombreCarpetaDestino;
-
-		if (avisarBorrado(nombreCarpetaOrigen))
-			reiniciarCarpetas(nombreCarpetaOrigen, carpetaPadre);
+		
+		nombreCarpetaDestino=System.getProperty("user.home")+"\\Desktop\\"+nombreCarpetaDestino;
+		
 
 		if (avisarBorrado(nombreCarpetaDestino))
-			reiniciarCarpetas(nombreCarpetaDestino, carpetaPadre);
+			reiniciarCarpetas(nombreCarpetaDestino);
 
-		carpetaOrigen = nombreCarpetaOrigen;
-		carpetaDestino = nombreCarpetaDestino;
-
-		carpetaCrearTipo(carpetaOrigen, "pos");
-		carpetaCrearTipo(carpetaOrigen, "neg");
-
-		return new String[] { nombreCarpetaOrigen, nombreCarpetaDestino };
+		return nombreCarpetaDestino;
 	}
 
 	public static String seleccionarCarpeta(int JFileOpcion) {
@@ -195,7 +151,7 @@ public class Metodos_app {
 
 	public static void detectarRectangulos(String carpetaOriginal, String carpetaDestino, String datos) { // Fotos aqui
 		JFrame frame = new JFrame("Cargando fotos...");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setBounds(425, 250, 450, 150);
 
 		frame.setResizable(false);
@@ -226,6 +182,7 @@ public class Metodos_app {
 
 				if (new File(carpetaOriginal + "\\pos.txt").exists()) {
 					new File(carpetaOriginal + "\\pos.txt").delete();
+
 				}
 
 				for (File archivo : archivos) {
@@ -238,24 +195,23 @@ public class Metodos_app {
 						byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
 						imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
 						coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
-
 						escribirAnotation(archivo.getName(), coords, datos, carpetaOriginal);
-
-						// System.out.println(datos);
+						frame.toFront();
+						System.out.println(datos);
 						i++;
 						publish(i + 1);
 
 					}
 				}
-				try {
-					FileWriter fw = new FileWriter(new File(carpetaOriginal + "/pos.txt"), true);
-					fw.write(datos);
-					fw.close();
-
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
+//				try {
+//					FileWriter fw = new FileWriter(new File(carpetaOriginal + "\\pos.txt"), true);
+//					fw.write(datos);
+//					fw.close();
+//
+//				} catch (IOException e) {
+//
+//					e.printStackTrace();
+//				}
 				frame.dispose(); // Dispose the frame when the progress reaches 100%
 				// Open a new frame with text
 				JFrame completionFrame = new JFrame("Carga completada");
@@ -264,7 +220,6 @@ public class Metodos_app {
 				completionFrame.add(completionLabel);
 				completionFrame.setSize(300, 100);
 				completionFrame.setLocationRelativeTo(null);
-				completionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				completionFrame.setVisible(true);
 				completionFrame.setResizable(false);
 				completionFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -279,9 +234,9 @@ public class Metodos_app {
 				}
 			}
 		};
-		if (new File(carpetaOriginal).exists()) {
-			new File(carpetaOriginal).delete();
-		}
+//		if (new File(carpetaOriginal).exists()) {
+//			new File(carpetaOriginal).delete();
+//		}
 
 		worker.execute();
 
@@ -323,7 +278,7 @@ public class Metodos_app {
 		int numeroSamples = calcularNumSamples(carpetaOriginalPositiva);
 		String nSamples = Integer.toString(numeroSamples * 10);
 
-		String cmd = "cmd /c start cmd.exe /k ";
+		String cmd = "cmd /c start cmd.exe /c ";
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
@@ -344,7 +299,7 @@ public class Metodos_app {
 
 	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
 
-		int nStages = calcularNumSamples(carpetaPos) / 20;
+		int nStages = calcularNumSamples(carpetaPos) / 11;
 		int numPos = (int) (calcularNumSamples(carpetaPos) / 1.5);
 		int numNeg = calcularNumSamples(carpetaNeg);
 		String destino = carpetaPadre;

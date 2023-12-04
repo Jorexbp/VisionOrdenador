@@ -37,11 +37,10 @@ public class App_Entrenamiento extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextArea textareainformativa;
-	private String carpetaOrigen, carpetaDestino,dirMod;
+	private String dirMod;
 	private JButton belegircarpetadestino;
-	private String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
-	private File carpetaPadre = new File(escritorioUsuario + "\\Carpeta_Origen_Destino");
+	private String carpetaPadre;
 	private JLabel lcargafotospos;
 	private JButton befotospos;
 	private JLabel lcargafotosneg;
@@ -81,20 +80,18 @@ public class App_Entrenamiento extends JFrame {
 	 * Create the frame.
 	 */
 	public void rellenarTextArea() {
-		textareainformativa.setText("Carpeta origen > ");
-		if (carpetaOrigen == null) {
-			textareainformativa.append("No seleccionada");
-		} else {
-			textareainformativa.append(carpetaOrigen);
+		textareainformativa.setText("");
+		textareainformativa.append("Carpeta destino > ");
+
+		if (carpetaPadre != null) {
+			textareainformativa.append(carpetaPadre);
 			Metodos_app.cambiarAUsable(lcargafotospos, befotospos);
-		}
-		textareainformativa.append("\nCarpeta destino > ");
-		if (carpetaDestino == null) {
-			textareainformativa.append("No seleccionada");
-		} else {
-			textareainformativa.append(carpetaDestino);
 			Metodos_app.cambiarAUsable(lcargafotosneg, bfotosneg);
+		} else {
+			textareainformativa.append("Nula");
+
 		}
+
 		textareainformativa.append("\nFotos positivas > ");
 
 		if (pos) {
@@ -134,7 +131,7 @@ public class App_Entrenamiento extends JFrame {
 
 		if (sam) {
 			textareainformativa.append("Sí");
-			textareainformativa.append("\nDirección de las samples> " + carpetaDestino + "\\pos.vec");
+			textareainformativa.append("\nDirección de las samples> " + carpetaPadre + "\\pos.vec");
 
 		} else {
 			textareainformativa.append("No");
@@ -168,6 +165,7 @@ public class App_Entrenamiento extends JFrame {
 	public App_Entrenamiento() {
 		iniciarComponentes();
 	}
+
 	public App_Entrenamiento(String direccionPremodelo) {
 		this.dirPreMod = direccionPremodelo;
 		premod = true;
@@ -199,24 +197,6 @@ public class App_Entrenamiento extends JFrame {
 		separator.setBounds(0, 79, 1288, 24);
 		contentPane.add(separator);
 
-		JLabel lcarpetaorigen = new JLabel("Carpeta origen");
-		lcarpetaorigen.setForeground(new Color(2, 0, 255));
-		lcarpetaorigen.setHorizontalAlignment(SwingConstants.CENTER);
-		lcarpetaorigen.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcarpetaorigen.setBounds(75, 114, 117, 24);
-		contentPane.add(lcarpetaorigen);
-
-		JButton belegircarpetaorigen = new JButton("Seleccionar");
-		belegircarpetaorigen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				carpetaOrigen = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
-				rellenarTextArea();
-			}
-		});
-		belegircarpetaorigen.setFont(new Font("Dialog", Font.BOLD, 14));
-		belegircarpetaorigen.setBounds(80, 149, 117, 23);
-		contentPane.add(belegircarpetaorigen);
-
 		textareainformativa = new JTextArea();
 		textareainformativa.setForeground(new Color(255, 255, 255));
 		textareainformativa.setBackground(new Color(0, 0, 0));
@@ -230,18 +210,18 @@ public class App_Entrenamiento extends JFrame {
 		lcarpetadestino.setHorizontalAlignment(SwingConstants.CENTER);
 		lcarpetadestino.setForeground(new Color(2, 0, 255));
 		lcarpetadestino.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcarpetadestino.setBounds(230, 114, 117, 24);
+		lcarpetadestino.setBounds(283, 115, 117, 24);
 		contentPane.add(lcarpetadestino);
 
 		belegircarpetadestino = new JButton("Seleccionar");
 		belegircarpetadestino.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				carpetaDestino = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
+				carpetaPadre = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				rellenarTextArea();
 			}
 		});
 		belegircarpetadestino.setFont(new Font("Dialog", Font.BOLD, 14));
-		belegircarpetadestino.setBounds(235, 149, 117, 23);
+		belegircarpetadestino.setBounds(288, 150, 117, 23);
 		contentPane.add(belegircarpetadestino);
 
 		JLabel lcarpetaspordefecto = new JLabel("Usar carpetas por defecto: ");
@@ -254,14 +234,13 @@ public class App_Entrenamiento extends JFrame {
 		btncarpetadefecto = new JButton("Nombrar");
 		btncarpetadefecto.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] carp = Metodos_app.crearCarpetasPorDefecto(
-						JOptionPane.showInputDialog("Introduce el nombre de la carpeta origen: "),
-						JOptionPane.showInputDialog("Introduce el nombre de la carpeta destino: "), escritorioUsuario,
-						carpetaOrigen, carpetaDestino, carpetaPadre);
+				String carp = Metodos_app.crearCarpetasPorDefecto(
+						JOptionPane.showInputDialog("Introduce el nombre de la carpeta destino")
+
+				);
 				if (carp == null)
 					return;
-				carpetaOrigen = carp[0];
-				carpetaDestino = carp[1];
+				carpetaPadre = carp;
 				rellenarTextArea();
 			}
 		});
@@ -289,7 +268,10 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
 				datos = "";
-				Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaDestino, datos);
+				
+				// TODO REINVENTAR LA RUEDA TXT
+				
+				Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre, datos);
 				pos = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
@@ -340,7 +322,7 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre.getAbsolutePath());
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre);
 				Metodos_app.cambiarAUsable(lcrearXML, bcrearXML);
 				sam = true;
 				rellenarTextArea();
@@ -355,7 +337,7 @@ public class App_Entrenamiento extends JFrame {
 		bcrearXML.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				dirMod = Metodos_app.crearXML(carpetaPadre.getAbsolutePath(), carpetaOriginalNegativa);
+				dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
 				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos");
 				mod = true;
 				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
@@ -451,7 +433,6 @@ public class App_Entrenamiento extends JFrame {
 
 			}
 
-		
 		});
 		URL url = App_Entrenamiento.class.getResource("/rein.png");
 
