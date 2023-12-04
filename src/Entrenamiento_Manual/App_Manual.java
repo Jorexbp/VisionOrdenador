@@ -11,12 +11,10 @@ import Entrenamiento.Metodos_app;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import java.awt.Color;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -54,6 +52,7 @@ public class App_Manual extends JFrame {
 	private JLabel lcarpetaFotosNegativas;
 	private JCheckBox cfotosnegaticas;
 	private JCheckBox cfotosnegativas;
+	private JButton belegircarpetaorigen_1;
 
 	/**
 	 * Launch the application.
@@ -226,13 +225,14 @@ public class App_Manual extends JFrame {
 				// TODO EJECUTAR ANOTACIONES...
 				// cCrearAnotaciones.setSelected(true);
 
-				//crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String carpetaDestino) {
+				// crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String
+				// carpetaDestino) {
 				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionFotosNegativas, direccionCarpetaDestino);
 				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
 				cCrearAnotaciones.setSelected(true);
 			}
 		});
-		
+
 		bidentificar.setFont(new Font("Dialog", Font.BOLD, 14));
 		bidentificar.setBounds(677, 181, 143, 32);
 		contentPane.add(bidentificar);
@@ -249,11 +249,11 @@ public class App_Manual extends JFrame {
 		bcrearmodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO CREAR SAMPLES Y MODELO
-				Metodos_app.crearSamples(direccionCarpetaFotos,direccionCarpetaDestino);
+				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino);
 				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas);
-				
-				
+
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
+				cCrearModelo.setSelected(true);
 
 			}
 		});
@@ -262,7 +262,7 @@ public class App_Manual extends JFrame {
 		bcrearmodelo.setBounds(873, 181, 143, 32);
 		contentPane.add(bcrearmodelo);
 
-		lcrear = new JLabel("Crear pre-modelo");
+		lcrear = new JLabel("Entrenar pre-modelo");
 		lcrear.setEnabled(false);
 		lcrear.setHorizontalAlignment(SwingConstants.CENTER);
 		lcrear.setForeground(new Color(2, 0, 255));
@@ -270,7 +270,13 @@ public class App_Manual extends JFrame {
 		lcrear.setBounds(860, 146, 156, 24);
 		contentPane.add(lcrear);
 
-		breentrenar = new JButton("Re-entrenar");
+		breentrenar = new JButton("Entrenar");
+		breentrenar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new App_Entrenamiento().setVisible(true);
+				dispose();
+			}
+		});
 		breentrenar.setEnabled(false);
 		breentrenar.setFont(new Font("Dialog", Font.BOLD, 14));
 		breentrenar.setBounds(1063, 181, 143, 32);
@@ -305,8 +311,7 @@ public class App_Manual extends JFrame {
 		lcarpetaFotosNegativas.setBounds(291, 146, 131, 24);
 		contentPane.add(lcarpetaFotosNegativas);
 
-		cfotosnegaticas = new JCheckBox(
-				"Seleccionar una carpeta con fotos de lo que NO se quiere identificar");
+		cfotosnegaticas = new JCheckBox("Seleccionar una carpeta con fotos de lo que NO se quiere identificar");
 		cfotosnegaticas.setFont(new Font("Dialog", Font.BOLD, 12));
 		cfotosnegaticas.setEnabled(false);
 		cfotosnegaticas.setBounds(231, 452, 428, 24);
@@ -318,21 +323,25 @@ public class App_Manual extends JFrame {
 		cfotosnegativas.setBounds(1008, 454, 254, 24);
 		contentPane.add(cfotosnegativas);
 		
-		JButton belegircarpetaorigen_1 = new JButton("Seleccionar");
+		belegircarpetaorigen_1 = new JButton("Seleccionar");
 		belegircarpetaorigen_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				direccionCarpetaFotos = "C:/Users/Alumno/Desktop/Fotos";
-				direccionCarpetaDestino="C:/Users/Alumno/Desktop/Destini";
-				cSelecCarpetaFotos.setSelected(true);
-				Metodos_app.cambiarAUsable(lcarpetaFotosNegativas, bfotosnegativas);
-				Metodos_app.cambiarAUsable(lidentificar, bidentificar);
-				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
-				Metodos_app.cambiarAUsable(lcarpetaDestino, bcarpetadestino);
-				cfotosnegaticas.setSelected(true);
+				direccionCarpetaDestino="C:/Users/Alumno/Desktop/DESTINO_PRUEBA";
+				direccionCarpetaFotos="C:/Users/Alumno/Desktop/PRUEBA";
+				direccionFotosNegativas="C:/Users/Alumno/Desktop/MuchasFotos/Neg";
+				Metodos_app.carpetaPos=direccionCarpetaFotos;
+				Metodos_app.carpetaNeg=direccionFotosNegativas;
+				
+				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
+				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino);
+				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas);
+
+				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
+				cCrearModelo.setSelected(true);
 			}
 		});
 		belegircarpetaorigen_1.setFont(new Font("Dialog", Font.BOLD, 14));
-		belegircarpetaorigen_1.setBounds(80, 283, 143, 32);
+		belegircarpetaorigen_1.setBounds(106, 279, 143, 32);
 		contentPane.add(belegircarpetaorigen_1);
 	}
 }

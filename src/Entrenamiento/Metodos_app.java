@@ -6,11 +6,9 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +32,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 import OpenCV.DeteccionCara;
 
 public class Metodos_app {
-	private static String carpetaPos, carpetaNeg;
+	public static String carpetaPos;
+	public static String carpetaNeg;
 
 	public static void cambiarAUsable(JLabel lcargafotospos2, JButton befotospos2) {
 		lcargafotospos2.setEnabled(true);
@@ -225,6 +224,10 @@ public class Metodos_app {
 				int[] coords = new int[4];
 				int i = 0;
 
+				if (new File(carpetaOriginal + "\\pos.txt").exists()) {
+					new File(carpetaOriginal + "\\pos.txt").delete();
+				}
+
 				for (File archivo : archivos) {
 					if (esArchivoDeImagen(archivo)) {
 
@@ -237,6 +240,7 @@ public class Metodos_app {
 						coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
 
 						escribirAnotation(archivo.getName(), coords, datos, carpetaOriginal);
+
 						// System.out.println(datos);
 						i++;
 						publish(i + 1);
@@ -293,7 +297,7 @@ public class Metodos_app {
 		}
 		FileWriter fw = null;
 		try {
-			fw = new FileWriter(new File(carpetaOriginal + "/pos.txt"), true);
+			fw = new FileWriter(new File(carpetaOriginal + "\\pos.txt"), true);
 			System.out.println(carpetaOriginal + "\\" + dir);
 			if (!new File(carpetaOriginal + "\\" + dir).exists())
 				return;
@@ -319,7 +323,7 @@ public class Metodos_app {
 		int numeroSamples = calcularNumSamples(carpetaOriginalPositiva);
 		String nSamples = Integer.toString(numeroSamples * 10);
 
-		String cmd = "cmd /c start cmd.exe /c ";
+		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
@@ -340,10 +344,10 @@ public class Metodos_app {
 
 	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
 
-		int nStages = calcularNumSamples(carpetaPos) / 8;
-		int numPos = calcularNumSamples(carpetaPos) - (calcularNumSamples(carpetaPos) / 5);
+		int nStages = calcularNumSamples(carpetaPos) / 20;
+		int numPos = (int) (calcularNumSamples(carpetaPos) / 1.5);
 		int numNeg = calcularNumSamples(carpetaNeg);
-		String destino = carpetaPadre + "/cascade";
+		String destino = carpetaPadre;
 
 		String dirVec = carpetaPadre + "/pos.vec";// TODO MIRAR QUE NO ROMPA NADA SI CAMBIA \\Destino
 
@@ -357,7 +361,9 @@ public class Metodos_app {
 
 		try {
 			Process creacionModelo = Runtime.getRuntime().exec(comandoSamples);
-			creacionModelo.waitFor();
+			while (creacionModelo.waitFor() != 0) {
+
+			}
 
 			File modelo = new File(destino + "/cascade.xml");
 			String nombreModelo = destino + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")

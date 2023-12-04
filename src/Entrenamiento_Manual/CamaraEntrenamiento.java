@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +16,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
+
+import inicio.PantallaInicial;
 
 public class CamaraEntrenamiento extends JFrame {
 
@@ -30,10 +31,10 @@ public class CamaraEntrenamiento extends JFrame {
 	private VideoCapture capturaVideo;
 	private Mat imagen;
 	private boolean clicked;
-	
 
-	public static void comenzarCamara(String dirCar) {
-		JOptionPane.showMessageDialog(null, "Asegúrese de que la cámara pueda ver el objeto a identificar, la toma de captura de pantalla ocurre cada 1.5 segundos");
+	public static void dirCarpeta(String dirCar) {
+		JOptionPane.showMessageDialog(null,
+				"Asegúrese de que la cámara pueda ver el objeto a identificar, la toma de captura de pantalla ocurre cada 1.25 segundos");
 		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -87,7 +88,7 @@ public class CamaraEntrenamiento extends JFrame {
 		ImageIcon icono = null;
 		while (true) {
 			try {
-				Thread.sleep(1500);
+				Thread.sleep(1250);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -101,13 +102,15 @@ public class CamaraEntrenamiento extends JFrame {
 
 			icono = new ImageIcon(datosImagen);
 
-			Imgcodecs.imwrite(dirCar+"/f_"+c+".jpg", imagen);
-			
+			Imgcodecs.imwrite(dirCar + "/f_" + c + ".jpg", imagen);
+
 			pantallaCamara.setIcon(icono);
 			c++;
-			
+
 			if (clicked) {
+				new PantallaInicial(0).setVisible(true);
 				dispose();
+
 				break;
 
 			}

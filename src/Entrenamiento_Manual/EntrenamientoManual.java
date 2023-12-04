@@ -1,19 +1,13 @@
 package Entrenamiento_Manual;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
-import Entrenamiento.Metodos_app;
+import Entrenamiento.App_Entrenamiento;
 
 public class EntrenamientoManual {
 
-	private static void crearCamara() {
-		JOptionPane.showMessageDialog(null, "Seleccione una carpeta para guardar las fotos temporalmente");
-		CamaraEntrenamiento.comenzarCamara(Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY));
-		// camara.comenzarCamara();
-	}
-
 	public static void main(String[] args) {
-		crearCamara();
+
+		String dirMod = "C:\\Users\\Alumno\\Desktop\\Carpeta_Origen_Destino\\modelos\\Prueba2.xml";
+		new App_Entrenamiento(dirMod).setVisible(true);
+
 	}
 }

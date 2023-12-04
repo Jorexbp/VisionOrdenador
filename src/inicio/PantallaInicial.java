@@ -8,8 +8,10 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -22,6 +24,10 @@ import javax.swing.border.EmptyBorder;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import Entrenamiento.App_Entrenamiento;
+import Entrenamiento.Metodos_app;
+import Entrenamiento_Manual.App_Manual;
+import Entrenamiento_Manual.CamaraEntrenamiento;
+import OpenCV.Camara;
 
 public class PantallaInicial extends JFrame {
 
@@ -33,7 +39,7 @@ public class PantallaInicial extends JFrame {
 	private JButton bcont;
 	private JScrollPane scrollPane;
 	private JLabel lseguntit;
-	private JButton bentrenador, bcrearpremodelo;
+	private JButton bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo;
 
 	/**
 	 * Launch the application.
@@ -76,7 +82,7 @@ public class PantallaInicial extends JFrame {
 
 		iniciarComponentes();
 		Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
-		Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo);
+		Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo);
 
 	}
 
@@ -84,7 +90,7 @@ public class PantallaInicial extends JFrame {
 
 		setTitle("Entrenador de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 614, 536);
+		setBounds(350, 100, 614, 536);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -129,7 +135,7 @@ public class PantallaInicial extends JFrame {
 		bcont.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
-				Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo);
+				Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo);
 			}
 		});
 		bcont.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -159,7 +165,8 @@ public class PantallaInicial extends JFrame {
 		bcrearpremodelo = new JButton("Crear un pre-modelo");
 		bcrearpremodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO app de crear el premodelo similar al entrenamiento pero mas sencillo
+				new App_Manual().setVisible(true);
+				dispose();
 			}
 		});
 		bcrearpremodelo.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -167,6 +174,37 @@ public class PantallaInicial extends JFrame {
 		bcrearpremodelo.setVisible(false);
 		bcrearpremodelo.setBounds(300, 300, 236, 44);
 		contentPane.add(bcrearpremodelo);
+
+		busarcamara = new JButton("Tomar fotos para usar");
+		busarcamara.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "Seleccione una carpeta para guardar las fotos temporalmente");
+				String dirCarpeta = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
+				if (dirCarpeta == null)
+					dirCarpeta = System.getProperty("user.home") + "\\Documents";
+				CamaraEntrenamiento.dirCarpeta(dirCarpeta);
+				dispose();
+			}
+		});
+		busarcamara.setFont(new Font("Dialog", Font.BOLD, 12));
+		busarcamara.setEnabled(true);
+		busarcamara.setVisible(false);
+		busarcamara.setBounds(165, 375, 236, 44);
+		contentPane.add(busarcamara);
+
+		bprobarmodelo = new JButton("Probar modelo");
+		bprobarmodelo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Camara camara = new Camara(Metodos_app.seleccionarCarpeta(JFileChooser.FILES_ONLY));
+				camara.comenzarCamara();
+				dispose();
+			}
+		});
+		bprobarmodelo.setFont(new Font("Dialog", Font.BOLD, 12));
+		bprobarmodelo.setEnabled(true);
+		bprobarmodelo.setVisible(false);
+		bprobarmodelo.setBounds(165, 225, 236, 44);
+		contentPane.add(bprobarmodelo);
 		Metodos_inicio.recogerLeyPrivacidadYLeyProteccionDeDatos(this.textArea);
 
 	}

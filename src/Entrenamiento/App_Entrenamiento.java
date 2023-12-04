@@ -20,7 +20,7 @@ import javax.swing.JSeparator;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
+
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
@@ -37,7 +37,7 @@ public class App_Entrenamiento extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextArea textareainformativa;
-	private String carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod;
+	private String carpetaOrigen, carpetaDestino,dirMod;
 	private JButton belegircarpetadestino;
 	private String escritorioUsuario = System.getProperty("user.home").concat("\\Desktop");
 	private JButton btncarpetadefecto;
@@ -166,6 +166,13 @@ public class App_Entrenamiento extends JFrame {
 	}
 
 	public App_Entrenamiento() {
+		iniciarComponentes();
+	}
+	public App_Entrenamiento(String direccionPremodelo) {
+		this.dirPreMod = direccionPremodelo;
+		premod = true;
+
+		DetectorAnotations.cargarModelo(dirPreMod);
 		iniciarComponentes();
 	}
 
@@ -333,8 +340,9 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaDestino);
-				Metodos_app.cambiarAUsable( lcrearXML, bcrearXML);				sam = true;
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre.getAbsolutePath());
+				Metodos_app.cambiarAUsable(lcrearXML, bcrearXML);
+				sam = true;
 				rellenarTextArea();
 			}
 		});
@@ -431,36 +439,19 @@ public class App_Entrenamiento extends JFrame {
 		breinicio.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				reiniciarStrings(carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod, carpetaOriginalPositiva,
-						carpetaOriginalNegativa, dirPreMod);
-
-				reiniciarComponentes(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample, bcrearsample,
-						lcrearXML, bcrearXML, btnProbar, lprobarmodelo);
-
-				reiniciarBooleanos(neg, pos, sam, mod, premod);
+//				reiniciarStrings(carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod, carpetaOriginalPositiva,
+//						carpetaOriginalNegativa, dirPreMod);
+//
+//				reiniciarComponentes(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample, bcrearsample,
+//						lcrearXML, bcrearXML, btnProbar, lprobarmodelo);
+//
+//				reiniciarBooleanos(neg, pos, sam, mod, premod);
 				rellenarTextArea();
-				System.out.println(carpetaOrigen);
 				// TODO NO REINICIA SABE DIOS
 
 			}
 
-			public void reiniciarStrings(String... rein) {
-				for (String string : rein) {
-					string = "";
-				}
-			}
-
-			public void reiniciarComponentes(javax.swing.JComponent... componentes) {
-				for (JComponent com : componentes) {
-					com.setEnabled(false);
-				}
-			}
-
-			public void reiniciarBooleanos(boolean... booleanos) {
-				for (boolean b : booleanos) {
-					b = false;
-				}
-			}
+		
 		});
 		URL url = App_Entrenamiento.class.getResource("/rein.png");
 
