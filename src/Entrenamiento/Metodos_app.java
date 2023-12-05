@@ -35,6 +35,14 @@ public class Metodos_app {
 	public static String carpetaPos;
 	public static String carpetaNeg;
 
+	public static void setCarpetaPositiva(String carpetaOriginalPositiva) {
+		carpetaPos = carpetaOriginalPositiva;
+	}
+
+	public static void setCarpetaNegativa(String carpetaOriginalNegativa) {
+		carpetaNeg = carpetaOriginalNegativa;
+	}
+
 	public static void cambiarAUsable(JLabel lcargafotospos2, JButton befotospos2) {
 		lcargafotospos2.setEnabled(true);
 		befotospos2.setEnabled(true);
@@ -149,7 +157,7 @@ public class Metodos_app {
 	}
 
 	public static void detectarRectangulos(String carpetaOriginal, String carpetaDestino, String datos) { // Fotos aqui
-		
+
 		JFrame frame = new JFrame("Cargando fotos...");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setBounds(425, 250, 450, 150);
@@ -295,7 +303,7 @@ public class Metodos_app {
 		int numNeg = calcularNumSamples(carpetaNeg);
 		String destino = carpetaPadre;
 
-		String dirVec = carpetaPadre + "/pos.vec";// TODO MIRAR QUE NO ROMPA NADA SI CAMBIA \\Destino
+		String dirVec = carpetaPadre + "/pos.vec";
 
 		String dirTxtNeg = carpetaOriginalNegativa + "\\neg.txt";
 		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
@@ -343,10 +351,8 @@ public class Metodos_app {
 		}
 	}
 
-	public static boolean crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String carpetaDestino) {
+	public static boolean crearAnotaciones(String carpetaFotos, String carpetaDestino) {
 
-		crearAnotacionNegativa(carpetaFotosNeg);
-		carpetaPos = carpetaFotos;
 		JOptionPane.showMessageDialog(null,
 				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
 
@@ -390,10 +396,24 @@ public class Metodos_app {
 			fw.write(datos);
 			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+	}
+
+	public static void reciclarFotosDenegadas(String carpetaPadre, String carpetaOriginal) {
+		// EL TXT DEBE ESTAR EN LA MISMA CARPETA QUE LAS FOTOS QUE HAYAN SIDO DENEGADAS,
+		// EN ESTE CASO ES LA MISMA QUE LAS POSITIVAS Y NO PUEDE TENER DIR ABSOLUTA USAR
+		// EL METODO QUITARABSOLUTA()
+		String direccionDenegadas = carpetaPadre + "\\fotos_denegadas.txt";
+		copiarFichero(new File(direccionDenegadas), carpetaOriginal); // SE ENCUENTRA EL TXT DONDE DEBE, SIGUE CON DIR
+																		// ABS
+		quitarDireccionAbsoluta(carpetaOriginal+"\\fotos_denegadas.txt"); // YA SIN DIR ABS
+
+		// TODO NO CREO QUE ESTE METODO ASI SIRVA, YA QUE NECESITO COMBINAR DOS TXT POSITIVOS, 
+		// HACER UN PASO INTERMEDIO QUE EJECUTE LAS ANNOTATIONS Y GUARDE EN EL MISMO TXT DE fotos_confirmadas.txt
+		// Y LO MANDE A LA CARPETA DE FOTOS POSITIVAS, O DIRECTAMENTE HACER EN ESA CARPETA
+		crearAnotaciones(direccionDenegadas, carpetaPadre);
 	}
 
 }

@@ -55,8 +55,7 @@ public class LecturaFotos extends JFrame {
 								return;
 							camara.iniciarCamara(carpetaFotos, carpetaPadre);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						e.printStackTrace();
 						}
 					}
 				}).start();
@@ -85,7 +84,6 @@ public class LecturaFotos extends JFrame {
 		btnConfirmar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO confirmar foto, siguiente y guardar las coords y txt de la foto
 				confirmado = true;
 			}
 		});
@@ -98,7 +96,6 @@ public class LecturaFotos extends JFrame {
 		btnDenegar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO denegar foto, siguiente y guardar en un txt la ruta de la foto
 				denegado = true;
 			}
 		});
@@ -132,8 +129,7 @@ public class LecturaFotos extends JFrame {
 					imagen = Imgcodecs.imdecode(new MatOfByte(DeteccionCara.detectarCara(imagen)),
 							Imgcodecs.IMREAD_COLOR);
 				} catch (Exception e) {
-					// TODO: handle exception
-
+				
 					break;
 				}
 				ancho = imagen.cols();
@@ -150,14 +146,13 @@ public class LecturaFotos extends JFrame {
 					try {
 						Thread.sleep(250);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 				coords = DetectorAnotations.detectarCoordenadas(imagen);
 
 				if (confirmado && (coords[0] > 0 && coords[1] > 0 && coords[2] > 0 && coords[3] > 0)) {
-					// TODO Guardo las coords y dir de la foto
+					
 					Imgproc.resize(imagen, imagen, new Size(ancho, alto));
 
 					direccionImagen = file.getAbsolutePath();
@@ -172,7 +167,6 @@ public class LecturaFotos extends JFrame {
 				} else {
 					direccionImagen = file.getAbsolutePath();
 
-					// TODO Guardo la dir de la foto en otro txt
 					fw = new FileWriter(new File(carpetaPadre + "\\fotos_denegadas.txt"), true);
 					// System.out.println(carpetaOriginal + "\\" + dir);
 
@@ -184,7 +178,6 @@ public class LecturaFotos extends JFrame {
 			}
 
 		}
-		// TODO ESCRIBIR LAS CONFIRMADAS Y LAS DENEGADAS SI HAY MAS DE 0
 		dispose();
 	}
 
@@ -203,7 +196,6 @@ public class LecturaFotos extends JFrame {
 						try {
 							camara.iniciarCamara(carpetaFotos, "");
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}

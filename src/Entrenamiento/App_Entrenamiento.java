@@ -47,7 +47,7 @@ public class App_Entrenamiento extends JFrame {
 	private JLabel lcargafotosneg;
 	private JButton bfotosneg;
 	private boolean neg, pos, sam, mod, premod;
-	//private String datos = "";
+	private String datos = "";
 	private JLabel lcrearsample;
 	private JButton bcrearsample;
 	private JLabel lcrearXML;
@@ -268,14 +268,25 @@ public class App_Entrenamiento extends JFrame {
 		befotospos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-				//datos = "";
+				datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
 				// Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre,
 				// datos);
 
 				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre);
-
+				Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
+				//Metodos_app.reciclarFotosDenegadas(carpetaPadre);
+				
+//				Metodos_app.crearAnotaciones(carpetaOriginalPositiva, carpetaOriginalNegativa)
+				
+				// CUANDO ESTO HAYA ACABADO HABRÁ DOS FICHERO NUEVOS EN LA CARPETA PADRE:
+				// fotos_confirmadas.txt y fotos_denegadas.txt, HABRÁ QUE EJECUTAR opencv_annotations.exe
+				// CON LAS FOTOS DENEGADAS Y AÑADIR ESE NUEVO TXT DE ANOTACIONES AL TXT fotos_confirmadas.txt
+				// Y USAR ESE TXT PARA EL METODO Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre, datos);
+				
+				
+				
 				pos = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
