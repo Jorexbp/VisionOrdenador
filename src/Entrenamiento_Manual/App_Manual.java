@@ -226,6 +226,7 @@ public class App_Manual extends JFrame {
 
 				// crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String
 				// carpetaDestino) {
+				// TODO CAMBIAR ANOTACIONES PARA PODER USARLO EN LECTURAFOTOS
 				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionFotosNegativas, direccionCarpetaDestino);
 				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
 				cCrearAnotaciones.setSelected(true);

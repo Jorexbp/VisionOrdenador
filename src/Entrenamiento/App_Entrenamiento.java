@@ -271,9 +271,10 @@ public class App_Entrenamiento extends JFrame {
 				datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
-				Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre, datos);
+				// Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre,
+				// datos);
 
-				LecturaFotos.comenzarCamara(carpetaOriginalPositiva);
+				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre);
 
 				pos = true;
 				if (pos && neg) {
@@ -386,6 +387,7 @@ public class App_Entrenamiento extends JFrame {
 				premod = true;
 
 				DetectorAnotations.cargarModelo(dirPreMod);
+				LecturaFotos.setModelo(dirMod);
 				rellenarTextArea();
 			}
 		});

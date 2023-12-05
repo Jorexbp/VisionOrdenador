@@ -5,14 +5,13 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -20,7 +19,6 @@ import org.opencv.core.MatOfByte;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 
 import Entrenamiento.DetectorAnotations;
 import OpenCV.DeteccionCara;
@@ -37,7 +35,12 @@ public class LecturaFotos extends JFrame {
 	private Mat imagen;
 	private boolean confirmado, denegado;
 
-	public static void comenzarCamara(String carpetaFotos) {
+	public static void setModelo(String dirMod) {
+		DeteccionCara.setModelo(dirMod);
+	}
+	
+
+	public static void comenzarCamara(String carpetaFotos, String carpetaPadre) {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -47,7 +50,14 @@ public class LecturaFotos extends JFrame {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						camara.iniciarCamara(carpetaFotos);
+						try {
+							if(carpetaFotos == null)
+								return;
+							camara.iniciarCamara(carpetaFotos, carpetaPadre);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}).start();
 			}
@@ -62,7 +72,7 @@ public class LecturaFotos extends JFrame {
 		// GUI
 		setLayout(null);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		pantallaCamara = new JLabel();
 		pantallaCamara.setBounds(20, 0, 640, 480);
 		add(pantallaCamara);
@@ -70,6 +80,7 @@ public class LecturaFotos extends JFrame {
 		btnConfirmar = new JButton("Confirmar");
 		btnConfirmar.setBounds(325, 480, 120, 40);
 		add(btnConfirmar);
+		btnConfirmar.setMnemonic('C');
 
 		btnConfirmar.addActionListener(new ActionListener() {
 			@Override
@@ -81,6 +92,7 @@ public class LecturaFotos extends JFrame {
 
 		btnDenegar = new JButton("Denegar");
 		btnDenegar.setBounds(175, 480, 120, 40);
+		btnDenegar.setMnemonic('D');
 		add(btnDenegar);
 
 		btnDenegar.addActionListener(new ActionListener() {
@@ -96,55 +108,84 @@ public class LecturaFotos extends JFrame {
 		setVisible(true);
 	}
 
-	public void iniciarCamara(String carpetaFotos) {
+	public void iniciarCamara(String carpetaFotos, String carpetaPadre) throws IOException {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		imagen = new Mat();
 		byte[] datosImagen;
 		int coords[] = new int[4];
 		double ancho, alto;
 		String direccionImagen = "";
-		while (true) {
-			File folder = new File(carpetaFotos);
-			File[] files = folder.listFiles();
+		File folder = new File(carpetaFotos);
+		File[] files = folder.listFiles();
+		FileWriter fw = null;
+		if (new File(carpetaPadre + "\\fotos_confirmadas.txt").exists())
+			new File(carpetaPadre + "\\fotos_confirmadas.txt").delete();
 
-			for (File file : files) {
-				if (file.isFile()) {
-					imagen = Imgcodecs.imread(file.getAbsolutePath());
+		if (new File(carpetaPadre + "\\fotos_denegadas.txt").exists())
+			new File(carpetaPadre + "\\fotos_denegadas.txt").delete();
+
+		for (File file : files) {
+			if (file.isFile()) {
+
+				imagen = Imgcodecs.imread(file.getAbsolutePath());
+				try {
 					imagen = Imgcodecs.imdecode(new MatOfByte(DeteccionCara.detectarCara(imagen)),
 							Imgcodecs.IMREAD_COLOR);
-					ancho = imagen.cols();
-					alto = imagen.rows();
-					Imgproc.resize(imagen, imagen, new Size(getWidth() - 50, getHeight() - 20));
+				} catch (Exception e) {
+					// TODO: handle exception
 
-					final MatOfByte buffer = new MatOfByte();
-					Imgcodecs.imencode(".jpg", imagen, buffer);
-
-					datosImagen = buffer.toArray();
-
-					pantallaCamara.setIcon(new ImageIcon(datosImagen));
-					while (!confirmado && !denegado) {
-						try {
-							Thread.sleep(500);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					if (confirmado) {
-						// TODO Guardo las coords y txt de la foto
-						Imgproc.resize(imagen, imagen, new Size(ancho, alto));
-
-						coords = DetectorAnotations.detectarCoordenadas(imagen);
-						direccionImagen = file.getAbsolutePath();
-
-					} else {
-						// TODO Guardo las coords y txt de la foto en otro txt
-					}
-					confirmado = denegado = false;
-
+					break;
 				}
+				ancho = imagen.cols();
+				alto = imagen.rows();
+				Imgproc.resize(imagen, imagen, new Size(getWidth() - 50, getHeight() - 20));
+
+				final MatOfByte buffer = new MatOfByte();
+				Imgcodecs.imencode(".jpg", imagen, buffer);
+
+				datosImagen = buffer.toArray();
+
+				pantallaCamara.setIcon(new ImageIcon(datosImagen));
+				while (!confirmado && !denegado) {
+					try {
+						Thread.sleep(250);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				coords = DetectorAnotations.detectarCoordenadas(imagen);
+
+				if (confirmado && (coords[0] > 0 && coords[1] > 0 && coords[2] > 0 && coords[3] > 0)) {
+					// TODO Guardo las coords y dir de la foto
+					Imgproc.resize(imagen, imagen, new Size(ancho, alto));
+
+					direccionImagen = file.getAbsolutePath();
+					fw = new FileWriter(new File(carpetaPadre + "\\fotos_confirmadas.txt"), true);
+					// System.out.println(carpetaOriginal + "\\" + dir);
+					direccionImagen = direccionImagen + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " "
+							+ coords[3] + "\n";
+
+					fw.write(direccionImagen);
+					fw.close();
+
+				} else {
+					direccionImagen = file.getAbsolutePath();
+
+					// TODO Guardo la dir de la foto en otro txt
+					fw = new FileWriter(new File(carpetaPadre + "\\fotos_denegadas.txt"), true);
+					// System.out.println(carpetaOriginal + "\\" + dir);
+
+					fw.write(direccionImagen + "\n");
+					fw.close();
+				}
+				confirmado = denegado = false;
+
 			}
 
 		}
+		// TODO ESCRIBIR LAS CONFIRMADAS Y LAS DENEGADAS SI HAY MAS DE 0
+		dispose();
 	}
 
 	public static void main(String[] args) {
@@ -159,7 +200,12 @@ public class LecturaFotos extends JFrame {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						camara.iniciarCamara(carpetaFotos);
+						try {
+							camara.iniciarCamara(carpetaFotos, "");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}).start();
 			}

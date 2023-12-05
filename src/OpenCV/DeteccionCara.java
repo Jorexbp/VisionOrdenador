@@ -31,7 +31,11 @@ public class DeteccionCara {
 
 		// Convertir a escala de grises
 		Mat frameGris = new Mat();
+		try {
 		Imgproc.cvtColor(imagen, frameGris, Imgproc.COLOR_BGR2GRAY);
+		}catch (Exception e) {
+			return null;
+		}
 
 		// Mejora de contraste para poder tener un mejor resultado
 		Imgproc.equalizeHist(frameGris, frameGris);
@@ -45,9 +49,18 @@ public class DeteccionCara {
 		// Deteccion de caras
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
-		// Cargar el XML de dataset de caras
-		cascadaCara.load("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+		if (modelo == null) {
+			// URL url =
+			// DeteccionCara.class.getResource("/haarcascade_frontalface_alt2.xml");
 
+			cascadaCara.load(
+					"C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+
+		} else {
+
+			cascadaCara.load(modelo);
+
+		}
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
 
