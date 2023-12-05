@@ -47,7 +47,7 @@ public class App_Entrenamiento extends JFrame {
 	private JLabel lcargafotosneg;
 	private JButton bfotosneg;
 	private boolean neg, pos, sam, mod, premod;
-	private String datos = "";
+	//private String datos = "";
 	private JLabel lcrearsample;
 	private JButton bcrearsample;
 	private JLabel lcrearXML;
@@ -268,7 +268,7 @@ public class App_Entrenamiento extends JFrame {
 		befotospos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-				datos = "";
+				//datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
 				// Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre,
