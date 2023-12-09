@@ -277,16 +277,12 @@ public class App_Entrenamiento extends JFrame {
 
 				if (new File(carpetaOriginalPositiva + "\\fotos_denegadas.txt").exists())
 					new File(carpetaOriginalPositiva + "\\fotos_denegadas.txt").delete();
+				
 				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
 				
 				Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
 				
 		
-				// CUANDO ESTO HAYA ACABADO HABRÁ DOS FICHERO NUEVOS EN LA CARPETA PADRE:
-				// fotos_confirmadas.txt y fotos_denegadas.txt, HABRÁ QUE EJECUTAR opencv_annotations.exe
-				// CON LAS FOTOS DENEGADAS Y AÑADIR ESE NUEVO TXT DE ANOTACIONES AL TXT fotos_confirmadas.txt
-				// Y USAR ESE TXT PARA EL METODO Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre, datos);
-				
 				
 				
 				pos = true;

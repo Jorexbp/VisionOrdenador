@@ -121,6 +121,7 @@ public class App_Manual extends JFrame {
 		belegircarpetaorigen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				direccionCarpetaFotos = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
+				System.out.println(direccionCarpetaFotos);
 				cSelecCarpetaFotos.setSelected(true);
 				Metodos_app.cambiarAUsable(lcarpetaFotosNegativas, bfotosnegativas);
 				// TODO CONTAR FOTOS DISPONIBLES Y/O RECORDATORIO DE IMPORTANCIA DE CANTIDAD
@@ -227,7 +228,7 @@ public class App_Manual extends JFrame {
 				// crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String
 				// carpetaDestino) {
 				// TODO CAMBIAR ANOTACIONES PARA PODER USARLO EN LECTURAFOTOS
-				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino);
+				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino,"pos.txt");
 				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
 				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
 				cCrearAnotaciones.setSelected(true);

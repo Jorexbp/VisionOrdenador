@@ -352,19 +352,15 @@ public class Metodos_app {
 		}
 	}
 
-	public static boolean crearAnotaciones(String carpetaFotos, String carpetaDestino) {
+	public static boolean crearAnotaciones(String carpetaFotos, String carpetaDestino,String nombreFicheroTXT) {
 
 		JOptionPane.showMessageDialog(null,
 				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
 
 		String ejecutableAnotacion = "lib\\annotation\\opencv_annotation.exe";
-		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos + " --images=" // HE CAMBIADO
-																										// LAS
-																										// ANNOTATIONS
-																										// SIN EL
-																										// \\pos.txt
-																										// MIRAR ROTURAS
-				+ carpetaFotos;
+		
+		
+		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos+"\\"+nombreFicheroTXT + " --images="+ carpetaFotos;
 
 		try {
 
@@ -373,7 +369,7 @@ public class Metodos_app {
 
 			}
 
-			quitarDireccionAbsoluta(carpetaFotos);
+		quitarDireccionAbsoluta(carpetaFotos);
 
 			return true;
 		} catch (IOException | InterruptedException e) {
@@ -408,28 +404,10 @@ public class Metodos_app {
 	}
 
 	public static void reciclarFotosDenegadas(String carpetaPadre, String carpetaOriginal) {
-		// EL TXT DEBE ESTAR EN LA MISMA CARPETA QUE LAS FOTOS QUE HAYAN SIDO DENEGADAS,
-		// EN ESTE CASO ES LA MISMA QUE LAS POSITIVAS
-		String direccionDenegadas = carpetaPadre + "\\fotos_denegadas.txt";
-		String carpetaDenegadas = carpetaOriginal + "\\fotos_denegadas.txt";
-
 	
-
-		//copiarFichero(new File(direccionDenegadas), carpetaOriginal); // SE ENCUENTRA EL TXT DONDE DEBE
+		crearAnotaciones(carpetaOriginal, carpetaPadre,"\\fotos_denegadas.txt");
 		
-		//quitarDireccionAbsoluta(carpetaDenegadas);
-
-		// TODO NO COPIA CORRECTAMENTE EL FICHERO DE DENEGADAS
-		
-		
-		
-		// TODO NO CREO QUE ESTE METODO ASI SIRVA, YA QUE NECESITO COMBINAR DOS TXT
-		// POSITIVOS,
-		// HACER UN PASO INTERMEDIO QUE EJECUTE LAS ANNOTATIONS Y GUARDE EN EL MISMO TXT
-		// DE fotos_confirmadas.txt
-		// Y LO MANDE A LA CARPETA DE FOTOS POSITIVAS, O DIRECTAMENTE HACER EN ESA
-		// CARPETA
-		crearAnotaciones(carpetaDenegadas, carpetaPadre);
+		// TODO YA CREA EL TXT DE DENEGADAS Y CONFIRMADAS, QUEDA UNIRLOS EN UN SOLO pos.txt Y CREAR LAS SAMPLES
 	}
 
 }

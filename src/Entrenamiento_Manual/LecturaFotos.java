@@ -162,8 +162,7 @@ public class LecturaFotos extends JFrame {
 
 				} else {
 					direccionImagen = file.getAbsolutePath();
-
-					fw = new FileWriter(new File(carpetaFotos + "\\fotos_denegadas.txt"), true);
+						fw = new FileWriter(new File(carpetaFotos + "\\fotos_denegadas.txt"), true);
 					// System.out.println(carpetaOriginal + "\\" + dir);
 
 					fw.write(direccionImagen + "\n");
