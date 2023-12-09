@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -337,14 +338,14 @@ public class Metodos_app {
 		return "";
 	}
 
-	public static String copiarFichero(File archivoOrigen, String dirDestino) {
-
-		Path source = Paths.get(archivoOrigen.toString());
-		Path destination = Paths.get(dirDestino);
+	public static String copiarFichero(String archivoOrigen, String carpetaDestino) {
+		Path origenPath = Paths.get(archivoOrigen);
+		Path destinoPath = Paths.get(carpetaDestino, origenPath.getFileName().toString());
 
 		try {
-			Files.copy(source, destination.resolve(source.getFileName()));
-			return destination.toString() + "\\" + archivoOrigen.getName();
+			// Copiar el archivo al destino
+			Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
+			return destinoPath.toString() + "\\" + new File(archivoOrigen).getName();
 		} catch (IOException e) {
 			System.err.println("Ha ocurrido un error al copiar el archivo: " + e.getMessage());
 			return null;
@@ -357,7 +358,12 @@ public class Metodos_app {
 				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
 
 		String ejecutableAnotacion = "lib\\annotation\\opencv_annotation.exe";
-		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos + "/pos.txt --images="
+		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos + " --images=" // HE CAMBIADO
+																										// LAS
+																										// ANNOTATIONS
+																										// SIN EL
+																										// \\pos.txt
+																										// MIRAR ROTURAS
 				+ carpetaFotos;
 
 		try {
@@ -381,7 +387,7 @@ public class Metodos_app {
 
 		BufferedReader br;
 		try {
-			br = new BufferedReader(new FileReader(dir + "\\pos.txt"));
+			br = new BufferedReader(new FileReader(dir));
 			String line;
 			String datos = "";
 			while ((line = br.readLine()) != null) {
@@ -389,10 +395,10 @@ public class Metodos_app {
 			}
 			br.close();
 
-			File del = new File(dir + "\\pos.txt");
+			File del = new File(dir);
 			del.delete();
 
-			FileWriter fw = new FileWriter(dir + "\\pos.txt");
+			FileWriter fw = new FileWriter(dir);
 			fw.write(datos);
 			fw.close();
 		} catch (IOException e) {
@@ -403,17 +409,24 @@ public class Metodos_app {
 
 	public static void reciclarFotosDenegadas(String carpetaPadre, String carpetaOriginal) {
 		// EL TXT DEBE ESTAR EN LA MISMA CARPETA QUE LAS FOTOS QUE HAYAN SIDO DENEGADAS,
-		// EN ESTE CASO ES LA MISMA QUE LAS POSITIVAS Y NO PUEDE TENER DIR ABSOLUTA USAR
-		// EL METODO QUITARABSOLUTA()
+		// EN ESTE CASO ES LA MISMA QUE LAS POSITIVAS
 		String direccionDenegadas = carpetaPadre + "\\fotos_denegadas.txt";
-		copiarFichero(new File(direccionDenegadas), carpetaOriginal); // SE ENCUENTRA EL TXT DONDE DEBE, SIGUE CON DIR
-																		// ABS
-		quitarDireccionAbsoluta(carpetaOriginal+"\\fotos_denegadas.txt"); // YA SIN DIR ABS
+		String carpetaDenegadas = carpetaOriginal + "\\fotos_denegadas.txt";
 
-		// TODO NO CREO QUE ESTE METODO ASI SIRVA, YA QUE NECESITO COMBINAR DOS TXT POSITIVOS, 
-		// HACER UN PASO INTERMEDIO QUE EJECUTE LAS ANNOTATIONS Y GUARDE EN EL MISMO TXT DE fotos_confirmadas.txt
-		// Y LO MANDE A LA CARPETA DE FOTOS POSITIVAS, O DIRECTAMENTE HACER EN ESA CARPETA
-		crearAnotaciones(direccionDenegadas, carpetaPadre);
+		if (new File(carpetaDenegadas).exists())
+			new File(carpetaDenegadas).delete();
+
+		copiarFichero(direccionDenegadas, carpetaOriginal); // SE ENCUENTRA EL TXT DONDE DEBE
+
+		quitarDireccionAbsoluta(carpetaDenegadas);
+
+		// TODO NO CREO QUE ESTE METODO ASI SIRVA, YA QUE NECESITO COMBINAR DOS TXT
+		// POSITIVOS,
+		// HACER UN PASO INTERMEDIO QUE EJECUTE LAS ANNOTATIONS Y GUARDE EN EL MISMO TXT
+		// DE fotos_confirmadas.txt
+		// Y LO MANDE A LA CARPETA DE FOTOS POSITIVAS, O DIRECTAMENTE HACER EN ESA
+		// CARPETA
+		crearAnotaciones(carpetaDenegadas, carpetaPadre);
 	}
 
 }

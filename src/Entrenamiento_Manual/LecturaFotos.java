@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,6 +22,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import Entrenamiento.DetectorAnotations;
+import Entrenamiento.Metodos_app;
 import OpenCV.DeteccionCara;
 
 public class LecturaFotos extends JFrame {
@@ -34,33 +36,31 @@ public class LecturaFotos extends JFrame {
 	private JButton btnConfirmar, btnDenegar;
 	private Mat imagen;
 	private boolean confirmado, denegado;
-
+	
 	public static void setModelo(String dirMod) {
 		DeteccionCara.setModelo(dirMod);
 	}
-	
 
 	public static void comenzarCamara(String carpetaFotos, String carpetaPadre) {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				LecturaFotos camara = new LecturaFotos();
-				// Empezar la camara en nuevo Thread
+		EventQueue.invokeLater(() -> {
+			LecturaFotos camara = new LecturaFotos();
 
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							if(carpetaFotos == null)
-								return;
-							camara.iniciarCamara(carpetaFotos, carpetaPadre);
-						} catch (IOException e) {
-						e.printStackTrace();
-						}
+			new Thread(() -> {
+				try {
+					if (carpetaFotos == null) {
+						return;
 					}
-				}).start();
-			}
+					camara.iniciarCamara(carpetaFotos, carpetaPadre);
+					Metodos_app.reciclarFotosDenegadas(carpetaPadre,carpetaFotos);
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}).start();
+		
+
 		});
+
 	}
 
 	public LecturaFotos() {
@@ -129,7 +129,7 @@ public class LecturaFotos extends JFrame {
 					imagen = Imgcodecs.imdecode(new MatOfByte(DeteccionCara.detectarCara(imagen)),
 							Imgcodecs.IMREAD_COLOR);
 				} catch (Exception e) {
-				
+
 					break;
 				}
 				ancho = imagen.cols();
@@ -152,7 +152,7 @@ public class LecturaFotos extends JFrame {
 				coords = DetectorAnotations.detectarCoordenadas(imagen);
 
 				if (confirmado && (coords[0] > 0 && coords[1] > 0 && coords[2] > 0 && coords[3] > 0)) {
-					
+
 					Imgproc.resize(imagen, imagen, new Size(ancho, alto));
 
 					direccionImagen = file.getAbsolutePath();
@@ -178,6 +178,7 @@ public class LecturaFotos extends JFrame {
 			}
 
 		}
+		
 		dispose();
 	}
 

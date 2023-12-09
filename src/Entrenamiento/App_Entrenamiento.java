@@ -27,6 +27,7 @@ import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.CountDownLatch;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
@@ -271,15 +272,12 @@ public class App_Entrenamiento extends JFrame {
 				datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
-				// Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre,
-				// datos);
-
-				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre);
+				
+				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
+				
 				Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
-				//Metodos_app.reciclarFotosDenegadas(carpetaPadre);
 				
-//				Metodos_app.crearAnotaciones(carpetaOriginalPositiva, carpetaOriginalNegativa)
-				
+		
 				// CUANDO ESTO HAYA ACABADO HABRÁ DOS FICHERO NUEVOS EN LA CARPETA PADRE:
 				// fotos_confirmadas.txt y fotos_denegadas.txt, HABRÁ QUE EJECUTAR opencv_annotations.exe
 				// CON LAS FOTOS DENEGADAS Y AÑADIR ESE NUEVO TXT DE ANOTACIONES AL TXT fotos_confirmadas.txt
@@ -353,7 +351,7 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
-				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos");
+				dirMod = Metodos_app.copiarFichero(dirMod, carpetaPadre + "/modelos");
 				mod = true;
 				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
 				rellenarTextArea();

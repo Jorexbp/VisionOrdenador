@@ -195,7 +195,10 @@ public class PantallaInicial extends JFrame {
 		bprobarmodelo = new JButton("Probar modelo");
 		bprobarmodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Camara camara = new Camara(Metodos_app.seleccionarCarpeta(JFileChooser.FILES_ONLY));
+				String modelo = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_ONLY);
+				if (modelo == null)
+					return;
+				Camara camara = new Camara();
 				camara.comenzarCamara();
 				dispose();
 			}
