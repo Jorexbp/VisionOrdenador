@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -36,7 +34,7 @@ public class LecturaFotos extends JFrame {
 	private JButton btnConfirmar, btnDenegar;
 	private Mat imagen;
 	private boolean confirmado, denegado;
-	
+
 	public static void setModelo(String dirMod) {
 		DeteccionCara.setModelo(dirMod);
 	}
@@ -50,14 +48,15 @@ public class LecturaFotos extends JFrame {
 					if (carpetaFotos == null) {
 						return;
 					}
-					camara.iniciarCamara(carpetaFotos, carpetaPadre);
-					Metodos_app.reciclarFotosDenegadas(carpetaPadre,carpetaFotos);
+					String nombreSubCarpeta = Metodos_app.crearSubCarpeta(carpetaFotos, "denegadas");
+
+					camara.iniciarCamara(carpetaFotos, carpetaPadre, nombreSubCarpeta);
+					Metodos_app.reciclarFotosDenegadas(carpetaPadre, carpetaFotos);
 
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}).start();
-		
 
 		});
 
@@ -105,7 +104,7 @@ public class LecturaFotos extends JFrame {
 		setVisible(true);
 	}
 
-	public void iniciarCamara(String carpetaFotos, String carpetaPadre) throws IOException {
+	public void iniciarCamara(String carpetaFotos, String carpetaPadre, String nombreSubCarpeta) throws IOException {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		imagen = new Mat();
 		byte[] datosImagen;
@@ -115,7 +114,6 @@ public class LecturaFotos extends JFrame {
 		File folder = new File(carpetaFotos);
 		File[] files = folder.listFiles();
 		FileWriter fw = null;
-	
 
 		for (File file : files) {
 			if (file.isFile()) {
@@ -145,14 +143,15 @@ public class LecturaFotos extends JFrame {
 						e.printStackTrace();
 					}
 				}
+				Imgproc.resize(imagen, imagen, new Size(ancho, alto));
+
 				coords = DetectorAnotations.detectarCoordenadas(imagen);
 
 				if (confirmado && (coords[0] > 0 && coords[1] > 0 && coords[2] > 0 && coords[3] > 0)) {
 
-					Imgproc.resize(imagen, imagen, new Size(ancho, alto));
-
+					
 					direccionImagen = file.getAbsolutePath();
-					fw = new FileWriter(new File(carpetaFotos + "\\fotos_confirmadas.txt"), true);
+					fw = new FileWriter(new File(nombreSubCarpeta + "\\fotos_confirmadas.txt"), true);
 					// System.out.println(carpetaOriginal + "\\" + dir);
 					direccionImagen = direccionImagen + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " "
 							+ coords[3] + "\n";
@@ -162,7 +161,7 @@ public class LecturaFotos extends JFrame {
 
 				} else {
 					direccionImagen = file.getAbsolutePath();
-						fw = new FileWriter(new File(carpetaFotos + "\\fotos_denegadas.txt"), true);
+					fw = new FileWriter(new File(nombreSubCarpeta + "\\fotos_denegadas.txt"), true);
 					// System.out.println(carpetaOriginal + "\\" + dir);
 
 					fw.write(direccionImagen + "\n");
@@ -173,7 +172,7 @@ public class LecturaFotos extends JFrame {
 			}
 
 		}
-		
+
 		dispose();
 	}
 
@@ -190,7 +189,7 @@ public class LecturaFotos extends JFrame {
 					@Override
 					public void run() {
 						try {
-							camara.iniciarCamara(carpetaFotos, "");
+							camara.iniciarCamara(carpetaFotos, "","");
 						} catch (IOException e) {
 							e.printStackTrace();
 						}

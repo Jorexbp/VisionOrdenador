@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -12,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -271,14 +271,14 @@ public class Metodos_app {
 
 	}
 
-	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino) {
+	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino, String subTXT) {
 		String addrSample = "lib\\samples\\opencv_createsamples.exe";
-		String posTxt = carpetaOriginalPositiva + "\\pos.txt";
+		String posTxt = carpetaOriginalPositiva + "\\" + subTXT;
 		String posVec = carpetaDestino + "\\pos.vec";
 		int numeroSamples = calcularNumSamples(carpetaOriginalPositiva);
 		String nSamples = Integer.toString(numeroSamples * 10);
 
-		String cmd = "cmd /c start cmd.exe /c ";
+		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
@@ -352,15 +352,15 @@ public class Metodos_app {
 		}
 	}
 
-	public static boolean crearAnotaciones(String carpetaFotos, String carpetaDestino,String nombreFicheroTXT) {
+	public static boolean crearAnotaciones(String carpetaFotos, String carpetaDestino, String nombreFicheroTXT) {
 
 		JOptionPane.showMessageDialog(null,
 				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
 
 		String ejecutableAnotacion = "lib\\annotation\\opencv_annotation.exe";
-		
-		
-		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos+"\\"+nombreFicheroTXT + " --images="+ carpetaFotos;
+
+		String comandoAnotacion = ejecutableAnotacion + " --annotations=" + carpetaFotos + "\\" + nombreFicheroTXT
+				+ " --images=" + carpetaFotos;
 
 		try {
 
@@ -369,8 +369,7 @@ public class Metodos_app {
 
 			}
 
-		quitarDireccionAbsoluta(carpetaFotos);
-
+		
 			return true;
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -404,10 +403,113 @@ public class Metodos_app {
 	}
 
 	public static void reciclarFotosDenegadas(String carpetaPadre, String carpetaOriginal) {
-	
-		crearAnotaciones(carpetaOriginal, carpetaPadre,"\\fotos_denegadas.txt");
 		
-		// TODO YA CREA EL TXT DE DENEGADAS Y CONFIRMADAS, QUEDA UNIRLOS EN UN SOLO pos.txt Y CREAR LAS SAMPLES
+
+		String nombreSubCarpeta = carpetaOriginal + "\\denegadas";
+
+		moverImagenesDesdeArchivo(nombreSubCarpeta + "\\fotos_denegadas.txt", nombreSubCarpeta);
+		crearAnotaciones(nombreSubCarpeta, carpetaPadre, "fotos_denegadas.txt");
+
+		unirFicherosTXT(nombreSubCarpeta, "fotos_denegadas.txt", "fotos_confirmadas.txt");
+		
+		
+		
+		// TODO MOVER LAS FOTOS Y EL POS.TXT DE LA SUBCARPETA DENEGADAS A LA ORIGINAL
+		// NORMAL Y QUITAR DIR ABSOLUTA
+		
+		moverContenido(nombreSubCarpeta,carpetaOriginal);
+		
+		
+		quitarDireccionAbsoluta(carpetaOriginal+"\\pos.txt");
+
+	}
+
+	public static String crearSubCarpeta(String carpetaOriginal, String string) {
+		File subCarpeta = new File(carpetaOriginal + "\\" + string);
+		if (subCarpeta.exists())
+			subCarpeta.delete();
+		else
+			subCarpeta.mkdir();
+
+		return carpetaOriginal + "\\" + string;
+
+	}
+
+	public static void unirFicherosTXT(String carpetaOriginal, String... ficheros) {
+
+		File archivoSalida = new File(carpetaOriginal + "\\pos.txt");
+
+		try (BufferedWriter escritor = new BufferedWriter(new FileWriter(archivoSalida))) {
+
+			for (String nombreFichero : ficheros) {
+				File ficheroEntrada = new File(carpetaOriginal + "\\" + nombreFichero);
+
+				try (BufferedReader lector = new BufferedReader(new FileReader(ficheroEntrada))) {
+					String linea;
+
+					while ((linea = lector.readLine()) != null) {
+						escritor.write(linea);
+						escritor.newLine();
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void moverContenido(String carpetaOrigen, String carpetaDestino) {
+        File directorioOrigen = new File(carpetaOrigen);
+        File directorioDestino = new File(carpetaDestino);
+
+        if (!directorioDestino.exists()) {
+            directorioDestino.mkdirs();
+        }
+
+        File[] archivos = directorioOrigen.listFiles();
+
+        if (archivos != null) {
+            for (File archivo : archivos) {
+                try {
+                    File nuevoArchivo = new File(directorioDestino, archivo.getName());
+
+                    if (!archivo.renameTo(nuevoArchivo)) {
+                        System.out.println("No se pudo mover el archivo " + archivo.getName());
+                    }
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+	public static void moverImagenesDesdeArchivo(String rutaArchivo, String carpetaDestino) {
+		if(!new File(rutaArchivo).exists())
+			return;
+		File directorioDestino = new File(carpetaDestino);
+		if (!directorioDestino.exists()) {
+			directorioDestino.mkdirs();
+		}
+
+		try (BufferedReader lector = new BufferedReader(new FileReader(rutaArchivo))) {
+			String linea;
+			while ((linea = lector.readLine()) != null) {
+				File archivo = new File(linea);
+				if (archivo.isFile() && esArchivoDeImagen(archivo)) {
+					try {
+						File nuevoArchivo = new File(directorioDestino, archivo.getName());
+						if (!archivo.renameTo(nuevoArchivo)) {
+							System.out.println("No se pudo mover el archivo " + archivo.getName());
+						}
+					} catch (SecurityException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

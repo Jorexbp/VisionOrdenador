@@ -27,7 +27,7 @@ import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
-import java.util.concurrent.CountDownLatch;
+
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
@@ -48,7 +48,7 @@ public class App_Entrenamiento extends JFrame {
 	private JLabel lcargafotosneg;
 	private JButton bfotosneg;
 	private boolean neg, pos, sam, mod, premod;
-	private String datos = "";
+	private String datos = "",posTXT;
 	private JLabel lcrearsample;
 	private JButton bcrearsample;
 	private JLabel lcrearXML;
@@ -272,14 +272,19 @@ public class App_Entrenamiento extends JFrame {
 				datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
-				if (new File(carpetaOriginalPositiva + "\\fotos_confirmadas.txt").exists())
-					new File(carpetaOriginalPositiva + "\\fotos_confirmadas.txt").delete();
-
-				if (new File(carpetaOriginalPositiva + "\\fotos_denegadas.txt").exists())
-					new File(carpetaOriginalPositiva + "\\fotos_denegadas.txt").delete();
+				
+				
+				
+				
+				
+				
+			
+				
+				
+				
 				
 				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
-				
+				posTXT = "pos.txt";
 				Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
 				
 		
@@ -335,7 +340,7 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre);
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre,posTXT);
 				Metodos_app.cambiarAUsable(lcrearXML, bcrearXML);
 				sam = true;
 				rellenarTextArea();
