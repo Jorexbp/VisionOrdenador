@@ -115,11 +115,7 @@ public class LecturaFotos extends JFrame {
 		File folder = new File(carpetaFotos);
 		File[] files = folder.listFiles();
 		FileWriter fw = null;
-		if (new File(carpetaPadre + "\\fotos_confirmadas.txt").exists())
-			new File(carpetaPadre + "\\fotos_confirmadas.txt").delete();
-
-		if (new File(carpetaPadre + "\\fotos_denegadas.txt").exists())
-			new File(carpetaPadre + "\\fotos_denegadas.txt").delete();
+	
 
 		for (File file : files) {
 			if (file.isFile()) {
@@ -156,7 +152,7 @@ public class LecturaFotos extends JFrame {
 					Imgproc.resize(imagen, imagen, new Size(ancho, alto));
 
 					direccionImagen = file.getAbsolutePath();
-					fw = new FileWriter(new File(carpetaPadre + "\\fotos_confirmadas.txt"), true);
+					fw = new FileWriter(new File(carpetaFotos + "\\fotos_confirmadas.txt"), true);
 					// System.out.println(carpetaOriginal + "\\" + dir);
 					direccionImagen = direccionImagen + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " "
 							+ coords[3] + "\n";
@@ -167,7 +163,7 @@ public class LecturaFotos extends JFrame {
 				} else {
 					direccionImagen = file.getAbsolutePath();
 
-					fw = new FileWriter(new File(carpetaPadre + "\\fotos_denegadas.txt"), true);
+					fw = new FileWriter(new File(carpetaFotos + "\\fotos_denegadas.txt"), true);
 					// System.out.println(carpetaOriginal + "\\" + dir);
 
 					fw.write(direccionImagen + "\n");

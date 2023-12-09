@@ -338,14 +338,14 @@ public class Metodos_app {
 		return "";
 	}
 
-	public static String copiarFichero(String archivoOrigen, String carpetaDestino) {
-		Path origenPath = Paths.get(archivoOrigen);
-		Path destinoPath = Paths.get(carpetaDestino, origenPath.getFileName().toString());
+	public static String copiarFichero(File archivoOrigen, String dirDestino) {
+
+		Path source = Paths.get(archivoOrigen.toString());
+		Path destination = Paths.get(dirDestino);
 
 		try {
-			// Copiar el archivo al destino
-			Files.copy(origenPath, destinoPath, StandardCopyOption.REPLACE_EXISTING);
-			return destinoPath.toString() + "\\" + new File(archivoOrigen).getName();
+			Files.copy(source, destination.resolve(source.getFileName()));
+			return destination.toString() + "\\" + archivoOrigen.getName();
 		} catch (IOException e) {
 			System.err.println("Ha ocurrido un error al copiar el archivo: " + e.getMessage());
 			return null;
@@ -413,13 +413,16 @@ public class Metodos_app {
 		String direccionDenegadas = carpetaPadre + "\\fotos_denegadas.txt";
 		String carpetaDenegadas = carpetaOriginal + "\\fotos_denegadas.txt";
 
-		if (new File(carpetaDenegadas).exists())
-			new File(carpetaDenegadas).delete();
+	
 
-		copiarFichero(direccionDenegadas, carpetaOriginal); // SE ENCUENTRA EL TXT DONDE DEBE
+		//copiarFichero(new File(direccionDenegadas), carpetaOriginal); // SE ENCUENTRA EL TXT DONDE DEBE
+		
+		//quitarDireccionAbsoluta(carpetaDenegadas);
 
-		quitarDireccionAbsoluta(carpetaDenegadas);
-
+		// TODO NO COPIA CORRECTAMENTE EL FICHERO DE DENEGADAS
+		
+		
+		
 		// TODO NO CREO QUE ESTE METODO ASI SIRVA, YA QUE NECESITO COMBINAR DOS TXT
 		// POSITIVOS,
 		// HACER UN PASO INTERMEDIO QUE EJECUTE LAS ANNOTATIONS Y GUARDE EN EL MISMO TXT

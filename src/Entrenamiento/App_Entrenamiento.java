@@ -272,7 +272,11 @@ public class App_Entrenamiento extends JFrame {
 				datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
-				
+				if (new File(carpetaOriginalPositiva + "\\fotos_confirmadas.txt").exists())
+					new File(carpetaOriginalPositiva + "\\fotos_confirmadas.txt").delete();
+
+				if (new File(carpetaOriginalPositiva + "\\fotos_denegadas.txt").exists())
+					new File(carpetaOriginalPositiva + "\\fotos_denegadas.txt").delete();
 				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
 				
 				Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
@@ -351,7 +355,7 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
-				dirMod = Metodos_app.copiarFichero(dirMod, carpetaPadre + "/modelos");
+				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos/"+new File(dirMod).getName());
 				mod = true;
 				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
 				rellenarTextArea();
