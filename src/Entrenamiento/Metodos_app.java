@@ -157,7 +157,7 @@ public class Metodos_app {
 
 	}
 
-	public static void detectarRectangulos(String carpetaOriginal, String carpetaDestino, String datos) { // Fotos aqui
+	public static void detectarRectangulos(String carpetaOriginal, String carpetaDestino) { // Fotos aqui
 
 		JFrame frame = new JFrame("Cargando fotos...");
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -197,16 +197,16 @@ public class Metodos_app {
 				for (File archivo : archivos) {
 					if (esArchivoDeImagen(archivo)) {
 
-						// System.out.println(archivo);
 						BufferedImage originalImage = ImageIO.read(archivo);
 
 						Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
 						byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
+						
 						imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
 						coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
-						escribirAnotation(archivo.getName(), coords, datos, carpetaOriginal);
+						escribirAnotation(archivo.getName(), coords, carpetaOriginal);
 						frame.toFront();
-						// System.out.println(datos);
+						
 						i++;
 						publish(i + 1);
 
@@ -244,7 +244,7 @@ public class Metodos_app {
 
 	}
 
-	public static void escribirAnotation(String dir, int[] coords, String datos, String carpetaOriginal) {
+	public static void escribirAnotation(String dir, int[] coords, String carpetaOriginal) {
 		for (int i = 0; i < coords.length; i++) {
 			if (coords[i] < 0) {
 				return;
@@ -253,10 +253,11 @@ public class Metodos_app {
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(new File(carpetaOriginal + "\\pos.txt"), true);
-			System.out.println(carpetaOriginal + "\\" + dir);
+			//	 System.out.println(carpetaOriginal + "\\" + dir);
 			if (!new File(carpetaOriginal + "\\" + dir).exists())
 				return;
-			datos = dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
+		String	datos = dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
+		//System.out.println(datos);
 			fw.write(datos);
 
 		} catch (IOException e) {

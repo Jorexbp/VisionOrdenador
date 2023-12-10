@@ -30,6 +30,7 @@ import java.net.URL;
 
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import javax.swing.JCheckBox;
 
 public class App_Entrenamiento extends JFrame {
 
@@ -59,6 +60,7 @@ public class App_Entrenamiento extends JFrame {
 	private JLabel lprobarmodelo;
 	private JButton btnProbar;
 	private JButton breinicio;
+	private JCheckBox ccomprobarimagen;
 
 	/**
 	 * Launch the application.
@@ -212,7 +214,7 @@ public class App_Entrenamiento extends JFrame {
 		lcarpetadestino.setHorizontalAlignment(SwingConstants.CENTER);
 		lcarpetadestino.setForeground(new Color(2, 0, 255));
 		lcarpetadestino.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcarpetadestino.setBounds(283, 115, 117, 24);
+		lcarpetadestino.setBounds(82, 114, 117, 24);
 		contentPane.add(lcarpetadestino);
 
 		belegircarpetadestino = new JButton("Seleccionar");
@@ -223,14 +225,14 @@ public class App_Entrenamiento extends JFrame {
 			}
 		});
 		belegircarpetadestino.setFont(new Font("Dialog", Font.BOLD, 14));
-		belegircarpetadestino.setBounds(288, 150, 117, 23);
+		belegircarpetadestino.setBounds(82, 149, 117, 23);
 		contentPane.add(belegircarpetadestino);
 
 		JLabel lcarpetaspordefecto = new JLabel("Usar carpetas por defecto: ");
 		lcarpetaspordefecto.setHorizontalAlignment(SwingConstants.CENTER);
 		lcarpetaspordefecto.setForeground(new Color(2, 0, 255));
 		lcarpetaspordefecto.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcarpetaspordefecto.setBounds(75, 211, 194, 24);
+		lcarpetaspordefecto.setBounds(72, 221, 194, 24);
 		contentPane.add(lcarpetaspordefecto);
 
 		btncarpetadefecto = new JButton("Nombrar");
@@ -247,14 +249,14 @@ public class App_Entrenamiento extends JFrame {
 			}
 		});
 		btncarpetadefecto.setFont(new Font("Dialog", Font.BOLD, 12));
-		btncarpetadefecto.setBounds(279, 214, 89, 23);
+		btncarpetadefecto.setBounds(276, 224, 89, 23);
 		contentPane.add(btncarpetadefecto);
 
 		JLabel lblseCrearnEn = new JLabel("(Se crearán en el escritorio)");
 		lblseCrearnEn.setHorizontalAlignment(SwingConstants.CENTER);
 		lblseCrearnEn.setForeground(new Color(2, 0, 255));
 		lblseCrearnEn.setFont(new Font("Dialog", Font.BOLD, 10));
-		lblseCrearnEn.setBounds(75, 233, 194, 24);
+		lblseCrearnEn.setBounds(72, 243, 194, 24);
 		contentPane.add(lblseCrearnEn);
 
 		lcargafotospos = new JLabel("Fotos positivas");
@@ -262,7 +264,7 @@ public class App_Entrenamiento extends JFrame {
 		lcargafotospos.setHorizontalAlignment(SwingConstants.CENTER);
 		lcargafotospos.setForeground(new Color(2, 0, 255));
 		lcargafotospos.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcargafotospos.setBounds(475, 114, 117, 24);
+		lcargafotospos.setBounds(433, 114, 117, 24);
 		contentPane.add(lcargafotospos);
 
 		befotospos = new JButton("Seleccionar");
@@ -272,23 +274,19 @@ public class App_Entrenamiento extends JFrame {
 				datos = "";
 
 				// TODO REINVENTAR LA RUEDA TXT
-				
-				
-				
-				
-				
+				posTXT = "pos.txt";
+				if(ccomprobarimagen.isSelected()) {
+					LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
+					
+					Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
+				}else {
+					// TODO HACER LAS ANOTACIONES SIN LA COMPROBACION
+					Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre);
+
+				}
 				
 			
-				
-				
-				
-				
-				LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
-				posTXT = "pos.txt";
-				Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
-				
-		
-				
+
 				
 				pos = true;
 				if (pos && neg) {
@@ -299,7 +297,7 @@ public class App_Entrenamiento extends JFrame {
 		});
 		befotospos.setEnabled(false);
 		befotospos.setFont(new Font("Dialog", Font.BOLD, 14));
-		befotospos.setBounds(480, 149, 117, 23);
+		befotospos.setBounds(433, 149, 117, 23);
 		contentPane.add(befotospos);
 
 		bfotosneg = new JButton("Seleccionar");
@@ -356,7 +354,7 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
-				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos/"+new File(dirMod).getName());
+				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos/");
 				mod = true;
 				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
 				rellenarTextArea();
@@ -406,14 +404,14 @@ public class App_Entrenamiento extends JFrame {
 			}
 		});
 		btnCargar.setFont(new Font("Dialog", Font.BOLD, 14));
-		btnCargar.setBounds(541, 233, 162, 34);
+		btnCargar.setBounds(738, 233, 162, 34);
 		contentPane.add(btnCargar);
 
 		lcargamodelo = new JLabel("Cargar pre-modelo");
 		lcargamodelo.setHorizontalAlignment(SwingConstants.CENTER);
 		lcargamodelo.setForeground(new Color(2, 0, 255));
 		lcargamodelo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcargamodelo.setBounds(498, 197, 246, 24);
+		lcargamodelo.setBounds(695, 197, 246, 24);
 		contentPane.add(lcargamodelo);
 
 		btnProbar = new JButton("Probar");
@@ -463,6 +461,12 @@ public class App_Entrenamiento extends JFrame {
 		breinicio.setBorderPainted(false);
 		breinicio.setBounds(1096, 15, 74, 52);
 		contentPane.add(breinicio);
+		
+		ccomprobarimagen = new JCheckBox("Comprobar imágenes");
+		ccomprobarimagen.setForeground(new Color(0, 0, 255));
+		ccomprobarimagen.setFont(new Font("Tahoma", Font.BOLD, 11));
+		ccomprobarimagen.setBounds(415, 179, 147, 23);
+		contentPane.add(ccomprobarimagen);
 
 		rellenarTextArea();
 	}

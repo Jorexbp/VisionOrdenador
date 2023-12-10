@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class ConexionBBDD {
-	public static void main(String[] args) {
-		
+	
+	public Connection getConexion() {
 		Connection con = null;
 		try {
 			Class.forName("org.postgresql.Driver");
@@ -14,4 +14,6 @@ public class ConexionBBDD {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }
