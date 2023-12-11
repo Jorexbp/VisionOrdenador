@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class ConexionBBDD {
 		return false;
 	}
 
-	public String crearColumnas(Hashtable<String, String> tabla) {
+	public String crearColumnas(Hashtable<String, String> tabla, int primaryKey) {
 		String columnas = "";
 		for (Map.Entry<String, String> entry : tabla.entrySet()) {
 
@@ -89,15 +90,30 @@ public class ConexionBBDD {
 		if (columnas.lastIndexOf(',') == columnas.length() - 2) {
 			columnas = columnas.substring(0, columnas.lastIndexOf(','));
 		}
-		// System.out.println(columnas);
+		if(primaryKey!=-1) {
+			String[] arr = columnas.split(",");
+			arr[primaryKey] = arr[primaryKey] +" PRIMARY KEY";
+			columnas="";
+			for (int i = 0; i < arr.length; i++) {
+				if(i >=  arr.length-1) {
+					columnas+=arr[i];
+					break;
+				}
+					
+				columnas+=arr[i]+",";
+			}
+		
+		}
+		
+		System.out.println(columnas);
 		return columnas;
 	}
 
-	public void crearTabla(String nombreTabla, Hashtable<String, String> columnas) {
+	public void crearTabla(String nombreTabla, Hashtable<String, String> columnas,int primaryKey) {
 		abrirConexion();
 		Statement statement;
 		try {
-			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas) + ");";
+			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas,primaryKey) + ");";
 			statement = con.createStatement();
 			statement.executeUpdate(query);
 			System.out.println("Tabla creada");
@@ -115,38 +131,39 @@ public class ConexionBBDD {
 			if (valores[i].getClass().getName().equals("java.lang.String")
 					|| valores[i].getClass().getName().equals("java.sql.Date")) {
 				val += "'" + valores[i] + "',";
-			}
-			val += valores[i] + ",";
+			} else
+				val += valores[i] + ",";
+		}
+		if (val.lastIndexOf(',') == val.length() - 1) {
+			val = val.substring(0, val.lastIndexOf(','));
 		}
 		return val;
 	}
 
-	public String ordenColumnas(String nombreTabla) {
+	public ArrayList<String> ordenColumnas(String nombreTabla) {
 		abrirConexion();
+		ArrayList<String> colus = new ArrayList<>();
 
 		DatabaseMetaData dbmd;
 		try {
+
 			dbmd = con.getMetaData();
 			ResultSet rs = dbmd.getColumns(null, null, nombreTabla.toLowerCase(), "%");
-			String[] v = new String[100];
-			int c = 0;
-			while (rs.next()) { // El campo 3 es el nombre de la tablas
-				v[c] = rs.getString(4)+" : "+rs.getString(6);
-				c++;
-			
+			while (rs.next()) {
+				colus.add(rs.getString(4)
+				/*
+				 * + " : " + rs.getString(6) // TIPO DE DATO
+				 */
+				);
+
 			}
-			for (int i = 0; i < v.length; i++) {
-				if(v[i]==null)
-					break;
-				System.out.println(v[i]);
-			}
+			// System.out.println(colus);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			cerrarConexion();
 		}
-		return "";
+		return colus;
 
 	}
 
@@ -168,11 +185,19 @@ public class ConexionBBDD {
 		}
 	}
 
-	public void insertarRegistroCompleto(String nombreTabla, String name, String address) {
+	public void insertarRegistroParcial(String nombreTabla, Object[] valores, String... campos) {
 		abrirConexion();
 		Statement statement;
 		try {
-			String query = String.format("insert into %s(name,address) values('%s','%s');", nombreTabla, name, address);
+			String camposRefact = "";
+			for (String string : campos) {
+				camposRefact += string + ",";
+			}
+			camposRefact = camposRefact.substring(0, camposRefact.lastIndexOf(','));
+
+			String val = arrayObjectAInsert(valores);
+
+			String query = "insert into " + nombreTabla + " (" + camposRefact + ") values(" + val + ");";
 			statement = con.createStatement();
 			statement.executeUpdate(query);
 			System.out.println("Registro insertado");
