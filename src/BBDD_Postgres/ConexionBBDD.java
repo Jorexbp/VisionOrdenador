@@ -90,30 +90,30 @@ public class ConexionBBDD {
 		if (columnas.lastIndexOf(',') == columnas.length() - 2) {
 			columnas = columnas.substring(0, columnas.lastIndexOf(','));
 		}
-		if(primaryKey!=-1) {
+		if (primaryKey != -1) {
 			String[] arr = columnas.split(",");
-			arr[primaryKey] = arr[primaryKey] +" PRIMARY KEY";
-			columnas="";
+			arr[primaryKey] = arr[primaryKey] + " PRIMARY KEY";
+			columnas = "";
 			for (int i = 0; i < arr.length; i++) {
-				if(i >=  arr.length-1) {
-					columnas+=arr[i];
+				if (i >= arr.length - 1) {
+					columnas += arr[i];
 					break;
 				}
-					
-				columnas+=arr[i]+",";
+
+				columnas += arr[i] + ",";
 			}
-		
+
 		}
-		
-		System.out.println(columnas);
+
+//		System.out.println(columnas);
 		return columnas;
 	}
 
-	public void crearTabla(String nombreTabla, Hashtable<String, String> columnas,int primaryKey) {
+	public void crearTabla(String nombreTabla, Hashtable<String, String> columnas, int primaryKey) {
 		abrirConexion();
 		Statement statement;
 		try {
-			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas,primaryKey) + ");";
+			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas, primaryKey) + ");";
 			statement = con.createStatement();
 			statement.executeUpdate(query);
 			System.out.println("Tabla creada");
@@ -131,13 +131,16 @@ public class ConexionBBDD {
 			if (valores[i].getClass().getName().equals("java.lang.String")
 					|| valores[i].getClass().getName().equals("java.sql.Date")) {
 				val += "'" + valores[i] + "',";
+			} else if (valores[i].toString().contains("xml")) {
+				val += "XMLPARSE(DOCUMENT CONVERT_FROM(pg_read_binary_file(\'" + valores[i].toString()
+						+ "\'), 'UTF8')),";
 			} else
 				val += valores[i] + ",";
 		}
 		if (val.lastIndexOf(',') == val.length() - 1) {
 			val = val.substring(0, val.lastIndexOf(','));
 		}
-		return val;
+		return val.replace("\\", "/");
 	}
 
 	public ArrayList<String> ordenColumnas(String nombreTabla) {
@@ -174,6 +177,7 @@ public class ConexionBBDD {
 
 			String val = arrayObjectAInsert(valores);
 
+			// System.out.println(val);
 			String query = "insert into " + nombreTabla + " values(" + val + ");";
 			statement = con.createStatement();
 			statement.executeUpdate(query);
@@ -196,8 +200,11 @@ public class ConexionBBDD {
 			camposRefact = camposRefact.substring(0, camposRefact.lastIndexOf(','));
 
 			String val = arrayObjectAInsert(valores);
-
+			System.out.println(val);
+			
+			
 			String query = "insert into " + nombreTabla + " (" + camposRefact + ") values(" + val + ");";
+		
 			statement = con.createStatement();
 			statement.executeUpdate(query);
 			System.out.println("Registro insertado");

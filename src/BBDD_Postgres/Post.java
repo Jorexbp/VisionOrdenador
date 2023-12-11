@@ -1,5 +1,6 @@
 package BBDD_Postgres;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -20,7 +21,7 @@ public class Post {
 		ht.put("Fecha", "Date");
 		ht.put("Modelo", "XML");
 
-		db.crearTabla("PruebaJava", ht,4);
+		db.crearTabla("PruebaJava", ht,-1);
 //		
 //		
 //		
@@ -36,8 +37,8 @@ public class Post {
 //		}
 //
 //		db.insertarRegistroCompleto("PruebaJava", val);
-		
-		Object obj[] = new Object[] {"ModPru.xml","NomModPru"};
+		File fxml = new File("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+		Object obj[] = new Object[] {fxml,"NomModPru"};
 		db.insertarRegistroParcial("PruebaJava",obj , "Modelo","Nombre");
 
 	}
