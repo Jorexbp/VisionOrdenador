@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class ConexionBBDD {
-	
+
 	public Connection getConexion() {
 		Connection con = null;
 		try {
@@ -13,7 +13,7 @@ public class ConexionBBDD {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return con;
 	}
-	
-	
+
 }
