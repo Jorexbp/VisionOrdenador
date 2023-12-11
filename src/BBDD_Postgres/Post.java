@@ -1,19 +1,42 @@
 package BBDD_Postgres;
 
-import java.sql.Connection;
+import java.util.Hashtable;
 
 public class Post {
 	public static void main(String args[]) {
+		
 		ConexionBBDD db = new ConexionBBDD();
-		Connection conn = db.getConexion();
-		db.createTable(conn,"employee");
-        //db.insert_row(conn,"employee","Rajat","India");
-       // db.update_name(conn,"employee","Rahul","Rajat");
-       // db.search_by_name(conn,"employee","Rajat");
-       // db.delete_row_by_name(conn,"employee","Rajat");
-     //   db.delete_row_by_id(conn,"employee",2);
-      //  db.read_data(conn,"employee");
-        db.delete_table(conn,"employee");
+		//db.borrarTabla("PruebaJava");
+		
+		
+
+		
+//		Object[] array = new Object[]{"Hola", 12, 4.5, 's'};
+//		for (Object elemento : array) {
+//		    System.out.println(elemento.getClass().getName());
+//		}
+		
+		Hashtable<String,String> ht = new Hashtable<>();
+		
+		ht.put("Nombre", "String"	);
+		ht.put("N_Entrenamientos", "Integer");
+		ht.put("Tamano", "Double");
+		ht.put("Fecha", "Date");
+		ht.put("Modelo", "XML");
+		
+		db.crearTabla("PruebaJava",ht);
+//		
+//		Object[] valoresRegistro = new Object[] {};
+//		
+//		//db.insertarRegistroCompleto("PruebaJava", args);
+//		
+//		String estadoConexion = db.getEstadoConexion() ? "abierta":"cerrada";
+//		System.out.println("Conexion "+estadoConexion);
+		
+db.ordenColumnas("PruebaJava");
+		
+	
+		
 		
 	}
 }
