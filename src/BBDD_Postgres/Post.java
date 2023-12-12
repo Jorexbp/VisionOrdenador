@@ -10,7 +10,7 @@ public class Post {
 	public static void main(String args[]) {
 
 		ConexionBBDD db = new ConexionBBDD();
-//		 db.borrarTabla("PruebaJava");
+		 db.borrarTabla("PruebaJava");
 //
 //
 //		Hashtable<String, String> ht = new Hashtable<>();
@@ -40,8 +40,7 @@ public class Post {
 //		File fxml = new File("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
 //		Object obj[] = new Object[] {fxml,"NomModPru"};
 //		db.insertarRegistroParcial("PruebaJava",obj , "Modelo","Nombre");
-		
 
-
+//db.borrarPorNombre("PruebaJava", "NomModPru");
 	}
 }

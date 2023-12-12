@@ -1,10 +1,12 @@
-package BBDD_Postgres;
+package OperadorBBDD;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class ConexionBBDD {
-	private Connection con = null;
+public class Metodos_BBDD {
+	private static Connection con = null;
 
 	public boolean getEstadoConexion() {
 		if (con == null)
@@ -22,7 +24,7 @@ public class ConexionBBDD {
 			return true;
 	}
 
-	public boolean abrirConexion() {
+	public static boolean abrirConexion() {
 		cerrarConexion();
 		try {
 			Class.forName("org.postgresql.Driver");
@@ -37,7 +39,7 @@ public class ConexionBBDD {
 		return false;
 	}
 
-	public boolean cerrarConexion() {
+	public static boolean cerrarConexion() {
 		try {
 			con = null;
 			return true;
@@ -47,7 +49,7 @@ public class ConexionBBDD {
 		return false;
 	}
 
-	public String crearColumnas(Hashtable<String, String> tabla, int primaryKey) {
+	public static String crearColumnas(Hashtable<String, String> tabla, int primaryKey) {
 		String columnas = "";
 		for (Map.Entry<String, String> entry : tabla.entrySet()) {
 
@@ -109,19 +111,31 @@ public class ConexionBBDD {
 		return columnas;
 	}
 
-	public void crearTabla(String nombreTabla, Hashtable<String, String> columnas, int primaryKey) {
+	public static DefaultTableModel crearColumnas(DefaultTableModel modelo) {
+		modelo.addColumn("Nombre");
+		modelo.addColumn("Tamaño");
+		modelo.addColumn("Fecha");
+		modelo.addColumn("Entrenamientos");
+		modelo.addColumn("XML");
+		return modelo;
+	}
+
+	public static boolean crearTabla(String nombreTabla, Hashtable<String, String> columnas, int primaryKey) {
 		abrirConexion();
 		Statement statement;
 		try {
+			// System.out.println(crearColumnas(columnas, primaryKey));
 			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas, primaryKey) + ");";
 			statement = con.createStatement();
 			int salida = statement.executeUpdate(query);
-			System.out.println(salida!=0?"Tabla creada":"Tabla NO creada");
+			// System.out.println(salida != 0 ? "Tabla creada" : "Tabla NO creada");
+			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
+		return false;
 	}
 
 	private String arrayObjectAInsert(Object[] valores) {
@@ -131,7 +145,7 @@ public class ConexionBBDD {
 			if (valores[i].getClass().getName().equals("java.lang.String")
 					|| valores[i].getClass().getName().equals("java.sql.Date")) {
 				val += "'" + valores[i] + "',";
-				
+
 			} else if (valores[i].toString().contains("xml")) {
 				val += "XMLPARSE(DOCUMENT CONVERT_FROM(pg_read_binary_file(\'" + valores[i].toString()
 						+ "\'), 'UTF8')),";
@@ -172,7 +186,7 @@ public class ConexionBBDD {
 
 	}
 
-	public void insertarRegistroCompleto(String nombreTabla, Object[] valores) {
+	public boolean insertarRegistroCompleto(String nombreTabla, Object[] valores) {
 		abrirConexion();
 		Statement statement;
 		try {
@@ -183,15 +197,18 @@ public class ConexionBBDD {
 			String query = "insert into " + nombreTabla + " values(" + val + ");";
 			statement = con.createStatement();
 			int salida = statement.executeUpdate(query);
-			System.out.println(salida!=0?"Registro insertado":"Registro NO insertado");
+			// System.out.println(salida != 0 ? "Registro insertado" : "Registro NO
+			// insertado");
+			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
+		return false;
 	}
 
-	public void insertarRegistroParcial(String nombreTabla, Object[] valores, String... campos) {
+	public boolean insertarRegistroParcial(String nombreTabla, Object[] valores, String... campos) {
 		abrirConexion();
 		Statement statement;
 		try {
@@ -207,13 +224,15 @@ public class ConexionBBDD {
 
 			statement = con.createStatement();
 			int salida = statement.executeUpdate(query);
-			System.out.println(salida!=0?"Registro insertado":"Registro NO insertado");
-			
+			// System.out.println(salida != 0 ? "Registro insertado" : "Registro NO
+			// insertado");
+			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
+		return false;
 	}
 
 	public void leerDatos(String nombreTabla) {
@@ -221,35 +240,18 @@ public class ConexionBBDD {
 		Statement statement;
 		ResultSet rs = null;
 		try {
-			String query = String.format("select * from "+nombreTabla);
+			String query = String.format("select * from " + nombreTabla);
 			statement = con.createStatement();
 			rs = statement.executeQuery(query);
 			int creg = 1;
 			while (rs.next()) {
-				System.out.println("Registro "+creg+": ");
+				System.out.println("Registro " + creg + ": ");
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
 					System.out.println(rs.getString(i));
 				}
 
 			}
 
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			cerrarConexion();
-		}
-	}
-
-	public void actualizarTabla(String nombreTabla, String old_name, String new_name) {
-		abrirConexion();
-
-		// TODO ESTE METODO NO ACTUALIZA CORRECTAMENTE
-		Statement statement;
-		try {
-			String query = String.format("update %s set name='%s' where name='%s'", nombreTabla, new_name, old_name);
-			statement = con.createStatement();
-			int salida = statement.executeUpdate(query);
-			System.out.println(salida!=0?"Registro actualizado":"Registro NO actualizado");
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
@@ -278,37 +280,15 @@ public class ConexionBBDD {
 		}
 	}
 
-	public void buscarPorID(String nombreTabla, int id) {
-		abrirConexion();
-		Statement statement;
-		ResultSet rs = null;
-		try {
-			String query = String.format("select * from %s where empid= %s", nombreTabla, id);
-			statement = con.createStatement();
-			rs = statement.executeQuery(query);
-			while (rs.next()) {
-				System.out.print(rs.getString("empid") + " ");
-				System.out.print(rs.getString("name") + " ");
-				System.out.println(rs.getString("address"));
-
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			cerrarConexion();
-		}
-	}
-
 	public void borrarPorNombre(String nombreTabla, String name) {
 		abrirConexion();
 		Statement statement;
 		try {
 			String query = String.format("delete from %s where nombre='%s'", nombreTabla, name);
 			statement = con.createStatement();
-		int salida =	statement.executeUpdate(query);
-		
-		
-			System.out.println(salida!=0?"Registro borrado":"Registro NO borrado");
+			int salida = statement.executeUpdate(query);
+
+			System.out.println(salida != 0 ? "Registro borrado" : "Registro NO borrado");
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
@@ -316,22 +296,7 @@ public class ConexionBBDD {
 		}
 	}
 
-	public void borrarPorID(String nombreTabla, int id) {
-		abrirConexion();
-		Statement statement;
-		try {
-			String query = String.format("delete from %s where empid= %s", nombreTabla, id);
-			statement = con.createStatement();
-			statement.executeUpdate(query);
-			System.out.println("Registro borrado");
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			cerrarConexion();
-		}
-	}
-
-	public void borrarTabla(String nombreTabla) {
+	public static void borrarTabla(String nombreTabla) {
 		abrirConexion();
 		Statement statement;
 		try {
