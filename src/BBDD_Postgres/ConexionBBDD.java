@@ -131,9 +131,11 @@ public class ConexionBBDD {
 			if (valores[i].getClass().getName().equals("java.lang.String")
 					|| valores[i].getClass().getName().equals("java.sql.Date")) {
 				val += "'" + valores[i] + "',";
+				
 			} else if (valores[i].toString().contains("xml")) {
 				val += "XMLPARSE(DOCUMENT CONVERT_FROM(pg_read_binary_file(\'" + valores[i].toString()
 						+ "\'), 'UTF8')),";
+				// SI ESTO DA ERROR DE PERMISOS AÑADIR A UNA CARPETA CON "TODOS" EN SEGURIDAD
 			} else
 				val += valores[i] + ",";
 		}
@@ -200,11 +202,9 @@ public class ConexionBBDD {
 			camposRefact = camposRefact.substring(0, camposRefact.lastIndexOf(','));
 
 			String val = arrayObjectAInsert(valores);
-			System.out.println(val);
-			
-			
+
 			String query = "insert into " + nombreTabla + " (" + camposRefact + ") values(" + val + ");";
-		
+
 			statement = con.createStatement();
 			statement.executeUpdate(query);
 			System.out.println("Registro insertado");
@@ -220,13 +220,16 @@ public class ConexionBBDD {
 		Statement statement;
 		ResultSet rs = null;
 		try {
-			String query = String.format("select * from %s", nombreTabla);
+			String query = String.format("select * from "+nombreTabla);
 			statement = con.createStatement();
 			rs = statement.executeQuery(query);
+			int creg = 1;
 			while (rs.next()) {
-				System.out.print(rs.getString("empid") + " ");
-				System.out.print(rs.getString("name") + " ");
-				System.out.println(rs.getString("Address") + " ");
+				System.out.println("Registro "+creg+": ");
+				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
+					System.out.println(rs.getString(i));
+				}
+
 			}
 
 		} catch (Exception e) {

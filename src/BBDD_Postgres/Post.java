@@ -10,18 +10,18 @@ public class Post {
 	public static void main(String args[]) {
 
 		ConexionBBDD db = new ConexionBBDD();
-		 db.borrarTabla("PruebaJava");
-
-
-		Hashtable<String, String> ht = new Hashtable<>();
-
-		ht.put("Nombre", "String");
-		ht.put("N_Entrenamientos", "Integer");
-		ht.put("Tamano", "Double");
-		ht.put("Fecha", "Date");
-		ht.put("Modelo", "XML");
-
-		db.crearTabla("PruebaJava", ht,-1);
+//		 db.borrarTabla("PruebaJava");
+//
+//
+//		Hashtable<String, String> ht = new Hashtable<>();
+//
+//		ht.put("Nombre", "String");
+//		ht.put("N_Entrenamientos", "Integer");
+//		ht.put("Tamano", "Double");
+//		ht.put("Fecha", "Date");
+//		ht.put("Modelo", "XML");
+//
+//		db.crearTabla("PruebaJava", ht,-1);
 //		
 //		
 //		
@@ -37,9 +37,11 @@ public class Post {
 //		}
 //
 //		db.insertarRegistroCompleto("PruebaJava", val);
-		File fxml = new File("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
-		Object obj[] = new Object[] {fxml,"NomModPru"};
-		db.insertarRegistroParcial("PruebaJava",obj , "Modelo","Nombre");
+//		File fxml = new File("C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
+//		Object obj[] = new Object[] {fxml,"NomModPru"};
+//		db.insertarRegistroParcial("PruebaJava",obj , "Modelo","Nombre");
+		
+
 
 	}
 }
