@@ -122,12 +122,13 @@ public class Metodos_BBDD {
 	}
 
 	public static DefaultTableModel crearColumnas(DefaultTableModel modelo) {
-		modelo.addColumn("XML");
+		modelo.addColumn("Nombre");
 
-		modelo.addColumn("Tamaño");
+		modelo.addColumn("Tamaño_KiB");
 		modelo.addColumn("Fecha");
 		// modelo.addColumn("Entrenamientos");
-		modelo.addColumn("Nombre");
+		modelo.addColumn("XML");
+
 		return modelo;
 	}
 
@@ -142,7 +143,7 @@ public class Metodos_BBDD {
 			// System.out.println(salida != 0 ? "Tabla creada" : "Tabla NO creada");
 			return salida != 0;
 		} catch (Exception e) {
-			System.out.println(e);
+			// System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
@@ -338,7 +339,7 @@ public class Metodos_BBDD {
 			Metodos_BBDD.insertarRegistroCompleto("Modelos", primerRegis);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+
 		}
 	}
 
@@ -346,7 +347,19 @@ public class Metodos_BBDD {
 		abrirConexion();
 		Statement statement;
 		ResultSet rs = null;
-		modelo = new DefaultTableModel();
+		modelo = new DefaultTableModel() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// all cells false
+				return false;
+			}
+		};
 		modelo = crearColumnas(modelo);
 		try {
 			String query = String.format("select * from " + nombreTabla);
@@ -358,12 +371,15 @@ public class Metodos_BBDD {
 
 			while (rs.next()) {
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
-					if (rs.getString(i) != null && i == 1) {
+					if (rs.getString(i) != null && i == rs.getMetaData().getColumnCount()) {
 						reg[i - 1] = "Correcto";
+					} else if (i == 1) {
+						reg[i - 1] = rs.getString(i + 3);
 					} else {
 						reg[i - 1] = rs.getString(i);
 
 					}
+					// System.out.println(rs.getString(i));
 
 				}
 				modelo.addRow(reg);

@@ -109,7 +109,7 @@ public class App_GestorBBDD extends JFrame {
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		table.getTableHeader().setEnabled(false);
-
+		
 		modelo = Metodos_BBDD.crearColumnas(modelo);
 		table.setModel(modelo);
 
