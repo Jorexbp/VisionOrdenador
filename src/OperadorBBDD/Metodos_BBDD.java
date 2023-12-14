@@ -1,16 +1,26 @@
 package OperadorBBDD;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -112,11 +122,12 @@ public class Metodos_BBDD {
 	}
 
 	public static DefaultTableModel crearColumnas(DefaultTableModel modelo) {
-		modelo.addColumn("Nombre");
+		modelo.addColumn("XML");
+
 		modelo.addColumn("Tamaño");
 		modelo.addColumn("Fecha");
-		modelo.addColumn("Entrenamientos");
-		modelo.addColumn("XML");
+		// modelo.addColumn("Entrenamientos");
+		modelo.addColumn("Nombre");
 		return modelo;
 	}
 
@@ -138,7 +149,7 @@ public class Metodos_BBDD {
 		return false;
 	}
 
-	private String arrayObjectAInsert(Object[] valores) {
+	private static String arrayObjectAInsert(Object[] valores) {
 		String val = "";
 
 		for (int i = 0; i < valores.length; i++) {
@@ -159,7 +170,7 @@ public class Metodos_BBDD {
 		return val.replace("\\", "/");
 	}
 
-	public ArrayList<String> ordenColumnas(String nombreTabla) {
+	public static ArrayList<String> ordenColumnas(String nombreTabla) {
 		abrirConexion();
 		ArrayList<String> colus = new ArrayList<>();
 
@@ -186,7 +197,7 @@ public class Metodos_BBDD {
 
 	}
 
-	public boolean insertarRegistroCompleto(String nombreTabla, Object[] valores) {
+	public static boolean insertarRegistroCompleto(String nombreTabla, Object[] valores) {
 		abrirConexion();
 		Statement statement;
 		try {
@@ -235,7 +246,7 @@ public class Metodos_BBDD {
 		return false;
 	}
 
-	public void leerDatos(String nombreTabla) {
+	public static void leerDatos(String nombreTabla) {
 		abrirConexion();
 		Statement statement;
 		ResultSet rs = null;
@@ -309,6 +320,73 @@ public class Metodos_BBDD {
 		} finally {
 			cerrarConexion();
 		}
+	}
+
+	public static void insertarRegistroInicial() {
+		File modeloXML = new File("C:/Users/Alumno/Desktop/haarcascade_frontalface_alt2.xml");
+		try {
+			Path path = Paths.get(modeloXML.getAbsolutePath());
+			long size = Files.size(path) / 1024;
+
+			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+
+			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+			Object[] primerRegis = new Object[] { modeloXML, size, df.format(new Date(attr.creationTime().toMillis())),
+					"Ejemplo.xml" };
+
+			Metodos_BBDD.insertarRegistroCompleto("Modelos", primerRegis);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static DefaultTableModel insertarRegistrosAJTable(String nombreTabla, DefaultTableModel modelo) {
+		abrirConexion();
+		Statement statement;
+		ResultSet rs = null;
+		modelo = new DefaultTableModel();
+		modelo = crearColumnas(modelo);
+		try {
+			String query = String.format("select * from " + nombreTabla);
+
+			statement = con.createStatement();
+			rs = statement.executeQuery(query);
+
+			Object[] reg = new Object[rs.getMetaData().getColumnCount()];
+
+			while (rs.next()) {
+				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
+					if (rs.getString(i) != null && i == 1) {
+						reg[i - 1] = "Correcto";
+					} else {
+						reg[i - 1] = rs.getString(i);
+
+					}
+
+				}
+				modelo.addRow(reg);
+
+			}
+
+			return modelo;
+
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cerrarConexion();
+		}
+		return null;
+	}
+
+	public static JTable centrarRegistrosEnJTable(JTable tabla) {
+		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();
+		tcr.setHorizontalAlignment(SwingConstants.CENTER);
+		for (int i = 0; i < tabla.getColumnCount(); i++) {
+			tabla.getColumnModel().getColumn(i).setCellRenderer(tcr);
+		}
+		return tabla;
 	}
 
 }

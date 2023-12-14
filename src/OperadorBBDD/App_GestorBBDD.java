@@ -125,11 +125,22 @@ public class App_GestorBBDD extends JFrame {
 		contentPane.add(btndroptable);
 
 		Hashtable<String, String> columnasBBDD = new Hashtable<String, String>();
-		columnasBBDD.put("Nombre", "String");
-		columnasBBDD.put("Tamaño", "Double");
+		columnasBBDD.put("Nombre", "String"); // Ultimo en el orden
+		columnasBBDD.put("Tamaño_KiB", "Double");
 		columnasBBDD.put("Fecha", "Date");
-		columnasBBDD.put("XML", "XML");
+		columnasBBDD.put("XML", "XML"); // Primero en el orden
 
+		
 		System.out.println(Metodos_BBDD.crearTabla("Modelos", columnasBBDD, 3));
+		
+//		for (String s : Metodos_BBDD.ordenColumnas("Modelos")) {
+//			System.out.println(s);
+//		}
+
+		Metodos_BBDD.insertarRegistroInicial();
+		modelo = Metodos_BBDD.insertarRegistrosAJTable("Modelos",modelo);
+		table.setModel(modelo);
+		
+		table = Metodos_BBDD.centrarRegistrosEnJTable(table);
 	}
 }
