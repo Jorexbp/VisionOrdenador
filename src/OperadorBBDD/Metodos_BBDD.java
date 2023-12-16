@@ -29,6 +29,8 @@ import java.util.Map;
 
 public class Metodos_BBDD {
 	private static Connection con = null;
+	private static String direccionServidor = "localhost", puertoServidor = "5432", nombreBBDDPostgresql = "Prueba",
+			nombreUsuarioPostgresql = "postgres", contrasenaUsuarioPostgresql = "admin";
 
 	public boolean getEstadoConexion() {
 		if (con == null)
@@ -41,7 +43,9 @@ public class Metodos_BBDD {
 		cerrarConexion();
 		try {
 			Class.forName("org.postgresql.Driver");
-			con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/Prueba", "postgres", "admin");
+			con = DriverManager.getConnection(
+					"jdbc:postgresql://" + direccionServidor + ":" + puertoServidor + "/" + nombreBBDDPostgresql + "",
+					nombreUsuarioPostgresql, contrasenaUsuarioPostgresql);
 			if (con == null) {
 				JOptionPane.showMessageDialog(null, "No se pudo conectar a la BBDD");
 			} else
@@ -315,6 +319,48 @@ public class Metodos_BBDD {
 			statement.executeUpdate(query);
 			return true;
 			// System.out.println(salida != 0 ? "Registro borrado" : "Registro NO borrado");
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cerrarConexion();
+		}
+		return false;
+	}
+
+	public static boolean actualizarRegistro(String nombreTabla, String nombreViejo, String nuevoNombre) {
+		abrirConexion();
+		Statement statement;
+		try {
+			String query = String.format("update %s set nombre='%s' where nombre='%s'", nombreTabla, nuevoNombre,
+					nombreViejo);
+			statement = con.createStatement();
+			int act = statement.executeUpdate(query);
+			if (act > 0) {
+				return true;
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cerrarConexion();
+		}
+		return false;
+	}
+
+	public static boolean actualizarRegistro(String nombreTabla, String nombreViejo, String nuevoNombre,
+			String direccionXML) {
+		abrirConexion();
+		Statement statement;
+		try {
+			File archivoXML = new File(direccionXML);
+
+			String query = "	UPDATE " + nombreTabla + " SET nombre = '" + nuevoNombre
+					+ "', xml = XMLPARSE(DOCUMENT CONVERT_FROM(pg_read_binary_file('" + archivoXML.getAbsolutePath()
+					+ "'), 'UTF8')) WHERE nombre = '" + nombreViejo + "';";
+			statement = con.createStatement();
+			int act = statement.executeUpdate(query);
+			if (act > 0) {
+				return true;
+			}
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {

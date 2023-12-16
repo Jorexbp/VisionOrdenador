@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import Entrenamiento.App_Entrenamiento;
+import inicio.Metodos_inicio;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
@@ -23,10 +24,21 @@ import javax.swing.JTable;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Hashtable;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JTextField;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 public class App_GestorBBDD extends JFrame {
 
@@ -50,6 +62,13 @@ public class App_GestorBBDD extends JFrame {
 	private JButton btnBorrar;
 	private JButton btnInsertar;
 	private JLabel lmostrar;
+	private JButton btnActualizar;
+	private JInternalFrame jifActualizarRegistro;
+	private JLabel lnomjif;
+	private JTextField tnombrejif;
+	private JTextField ttamañojif;
+	private JTextField tfechajif;
+	private String direccionXML, nombreViejo;
 
 	/**
 	 * Launch the application.
@@ -190,7 +209,7 @@ public class App_GestorBBDD extends JFrame {
 		});
 		btnBorrar.setForeground(new Color(255, 0, 0));
 		btnBorrar.setFont(new Font("Dialog", Font.BOLD, 12));
-		btnBorrar.setBounds(262, 480, 150, 45);
+		btnBorrar.setBounds(550, 480, 150, 45);
 		contentPane.add(btnBorrar);
 
 		lmostrar = new JLabel("");
@@ -198,5 +217,146 @@ public class App_GestorBBDD extends JFrame {
 		lmostrar.setFont(new Font("Dialog", Font.BOLD, 12));
 		lmostrar.setBounds(475, 550, 350, 25);
 		contentPane.add(lmostrar);
+
+		btnActualizar = new JButton("Actualizar modelo");
+		btnActualizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				try {
+					direccionXML = null;
+					nombreViejo = table.getValueAt(table.getSelectedRow(), 0).toString();
+					tnombrejif.setText(table.getValueAt(table.getSelectedRow(), 0).toString().substring(0,
+							table.getValueAt(table.getSelectedRow(), 0).toString().indexOf(".xml")));
+					ttamañojif.setText(table.getValueAt(table.getSelectedRow(), 1).toString()+" KiB");
+					tfechajif.setText(table.getValueAt(table.getSelectedRow(), 2).toString());
+
+					jifActualizarRegistro.setVisible(true);
+					Metodos_inicio.visibilidad(false, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndroptable);
+
+					Metodos_BBDD.repintarJTable(table, modelo);
+				} catch (Exception s) {
+					lmostrar.setText("Debe seleccionar un registro");
+
+				}
+
+			}
+		});
+		btnActualizar.setForeground(new Color(0, 128, 0));
+		btnActualizar.setFont(new Font("Dialog", Font.BOLD, 12));
+		btnActualizar.setBounds(290, 481, 150, 45);
+		contentPane.add(btnActualizar);
+
+		jifActualizarRegistro = new JInternalFrame("Actualizar registro");
+		jifActualizarRegistro.addInternalFrameListener(new InternalFrameAdapter() {
+			@Override
+			public void internalFrameClosing(InternalFrameEvent e) {
+				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndroptable);
+			}
+		});
+		jifActualizarRegistro.setVisible(false);
+		jifActualizarRegistro.setClosable(true);
+		jifActualizarRegistro.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		jifActualizarRegistro.setBounds(241, 150, 750, 175);
+		contentPane.add(jifActualizarRegistro);
+		jifActualizarRegistro.getContentPane().setLayout(null);
+
+		lnomjif = new JLabel("Nombre");
+		lnomjif.setHorizontalAlignment(SwingConstants.CENTER);
+		lnomjif.setFont(new Font("Dialog", Font.BOLD, 12));
+		lnomjif.setBounds(45, 10, 85, 25);
+		jifActualizarRegistro.getContentPane().add(lnomjif);
+
+		tnombrejif = new JTextField();
+		tnombrejif.setHorizontalAlignment(SwingConstants.CENTER);
+		tnombrejif.setFont(new Font("Dialog", Font.BOLD, 12));
+		tnombrejif.setBounds(25, 45, 125, 25);
+		jifActualizarRegistro.getContentPane().add(tnombrejif);
+		tnombrejif.setColumns(10);
+
+		JLabel ltamañojif = new JLabel("Tamaño en KiB");
+		ltamañojif.setHorizontalAlignment(SwingConstants.CENTER);
+		ltamañojif.setFont(new Font("Dialog", Font.BOLD, 12));
+		ltamañojif.setBounds(215, 10, 120, 25);
+		jifActualizarRegistro.getContentPane().add(ltamañojif);
+
+		ttamañojif = new JTextField();
+		ttamañojif.setEnabled(false);
+		ttamañojif.setHorizontalAlignment(SwingConstants.CENTER);
+		ttamañojif.setFont(new Font("Dialog", Font.BOLD, 12));
+		ttamañojif.setColumns(10);
+		ttamañojif.setBounds(213, 45, 125, 25);
+		jifActualizarRegistro.getContentPane().add(ttamañojif);
+
+		JLabel lfechajif = new JLabel("Fecha de creación");
+		lfechajif.setHorizontalAlignment(SwingConstants.CENTER);
+		lfechajif.setFont(new Font("Dialog", Font.BOLD, 12));
+		lfechajif.setBounds(407, 10, 120, 25);
+		jifActualizarRegistro.getContentPane().add(lfechajif);
+
+		tfechajif = new JTextField();
+		tfechajif.setHorizontalAlignment(SwingConstants.CENTER);
+		tfechajif.setFont(new Font("Dialog", Font.BOLD, 12));
+		tfechajif.setEnabled(false);
+		tfechajif.setColumns(10);
+		tfechajif.setBounds(405, 45, 125, 25);
+		jifActualizarRegistro.getContentPane().add(tfechajif);
+
+		JLabel lmodeloXML = new JLabel("Modelo XML");
+		lmodeloXML.setHorizontalAlignment(SwingConstants.CENTER);
+		lmodeloXML.setFont(new Font("Dialog", Font.BOLD, 12));
+		lmodeloXML.setBounds(597, 10, 120, 25);
+		jifActualizarRegistro.getContentPane().add(lmodeloXML);
+
+		JButton btnNewButton = new JButton("Cambiar Modelo");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				direccionXML = Metodos_BBDD.seleccionarModelo(JFileChooser.FILES_ONLY);
+				Path path = Paths.get(direccionXML);
+				try {
+					long size = Files.size(path) / 1024;
+
+					BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+					SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+					ttamañojif.setText(size + " KiB");
+					tfechajif.setText(df.format(new Date(attr.creationTime().toMillis())));
+
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		btnNewButton.setFont(new Font("Dialog", Font.BOLD, 10));
+		btnNewButton.setBounds(595, 47, 125, 25);
+		jifActualizarRegistro.getContentPane().add(btnNewButton);
+
+		JButton btnConfirmar = new JButton("Confirmar");
+		btnConfirmar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean actualizado = false;
+				if (direccionXML == null) {
+					actualizado = Metodos_BBDD.actualizarRegistro("Modelos", nombreViejo,
+							tnombrejif.getText().concat(".xml"));
+				} else {
+					actualizado = Metodos_BBDD.actualizarRegistro("Modelos", nombreViejo,
+							tnombrejif.getText().concat(".xml"), direccionXML);
+				}
+
+				lmostrar.setText(actualizado ? "Registro actualizado" : "Registro NO actualizado");
+
+				Metodos_BBDD.repintarJTable(table, modelo);
+
+				jifActualizarRegistro.dispose();
+
+				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndroptable);
+
+			}
+		});
+		btnConfirmar.setForeground(new Color(0, 128, 0));
+		btnConfirmar.setFont(new Font("Dialog", Font.BOLD, 12));
+		btnConfirmar.setBounds(595, 90, 125, 25);
+		jifActualizarRegistro.getContentPane().add(btnConfirmar);
 	}
 }
