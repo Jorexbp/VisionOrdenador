@@ -82,7 +82,6 @@ public class CamaraEntrenamiento extends JFrame {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		capturaVideo = new VideoCapture(0);
 		imagen = new Mat();
-		@SuppressWarnings("unused")
 		byte[] datosImagen;
 		int c = 0;
 		ImageIcon icono = null;
@@ -90,7 +89,6 @@ public class CamaraEntrenamiento extends JFrame {
 			try {
 				Thread.sleep(1250);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			capturaVideo.read(imagen);

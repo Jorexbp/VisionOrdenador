@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import Entrenamiento.App_Entrenamiento;
+import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -16,10 +17,12 @@ import javax.swing.SwingConstants;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
 import java.awt.event.ActionEvent;
@@ -44,6 +47,9 @@ public class App_GestorBBDD extends JFrame {
 		}
 	};
 	private JButton btndroptable;
+	private JButton btnBorrar;
+	private JButton btnInsertar;
+	private JLabel lmostrar;
 
 	/**
 	 * Launch the application.
@@ -86,6 +92,8 @@ public class App_GestorBBDD extends JFrame {
 		JButton bvolver = new JButton("");
 		bvolver.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				new PantallaInicial(0).setVisible(true);
+				dispose();
 			}
 		});
 		URL url2 = App_Entrenamiento.class.getResource("/volver.png");
@@ -107,9 +115,10 @@ public class App_GestorBBDD extends JFrame {
 		contentPane.add(scrollPane);
 
 		table = new JTable();
+		table.setFont(new Font("Dialog", Font.PLAIN, 12));
 		scrollPane.setViewportView(table);
 		table.getTableHeader().setEnabled(false);
-		
+
 		modelo = Metodos_BBDD.crearColumnas(modelo);
 		table.setModel(modelo);
 
@@ -130,17 +139,64 @@ public class App_GestorBBDD extends JFrame {
 		columnasBBDD.put("Fecha", "Date");
 		columnasBBDD.put("XML", "XML"); // Primero en el orden
 
-		
-		System.out.println(Metodos_BBDD.crearTabla("Modelos", columnasBBDD, 3));
-		
+		// System.out.println(Metodos_BBDD.crearTabla("Modelos", columnasBBDD, 3));
+
 //		for (String s : Metodos_BBDD.ordenColumnas("Modelos")) {
 //			System.out.println(s);
 //		}
 
-		Metodos_BBDD.insertarRegistroInicial();
-		modelo = Metodos_BBDD.insertarRegistrosAJTable("Modelos",modelo);
-		table.setModel(modelo);
-		
-		table = Metodos_BBDD.centrarRegistrosEnJTable(table);
+		// Metodos_BBDD.insertarRegistroInicial();
+		Metodos_BBDD.repintarJTable(table, modelo);
+
+		btnInsertar = new JButton("Insertar modelo");
+		btnInsertar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String direcionXML = Metodos_BBDD.seleccionarModelo(JFileChooser.FILES_ONLY);
+
+				if (!direcionXML.trim().toLowerCase().endsWith(".xml")) {
+					lmostrar.setText("El archivo seleccionado debe ser un XML");
+				} else {
+
+					Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
+							new File(direcionXML).getName());
+					boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
+					if (!insertado) {
+						lmostrar.setText("Registro NO insertado");
+						return;
+					} else
+						lmostrar.setText("Registro insertado");
+					Metodos_BBDD.repintarJTable(table, modelo);
+				}
+			}
+		});
+		btnInsertar.setForeground(new Color(0, 0, 255));
+		btnInsertar.setFont(new Font("Dialog", Font.BOLD, 12));
+		btnInsertar.setBounds(30, 481, 150, 45);
+		contentPane.add(btnInsertar);
+
+		btnBorrar = new JButton("Borrar modelo");
+		btnBorrar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					boolean borrado = Metodos_BBDD.borrarPorNombre("Modelos",
+							table.getValueAt(table.getSelectedRow(), 0).toString());
+					lmostrar.setText(borrado ? "Registro eliminado" : "Registro NO eliminado");
+					Metodos_BBDD.repintarJTable(table, modelo);
+				} catch (Exception s) {
+					lmostrar.setText("Debe seleccionar un registro");
+
+				}
+			}
+		});
+		btnBorrar.setForeground(new Color(255, 0, 0));
+		btnBorrar.setFont(new Font("Dialog", Font.BOLD, 12));
+		btnBorrar.setBounds(262, 480, 150, 45);
+		contentPane.add(btnBorrar);
+
+		lmostrar = new JLabel("");
+		lmostrar.setHorizontalAlignment(SwingConstants.CENTER);
+		lmostrar.setFont(new Font("Dialog", Font.BOLD, 12));
+		lmostrar.setBounds(475, 550, 350, 25);
+		contentPane.add(lmostrar);
 	}
 }

@@ -1,6 +1,7 @@
 package OperadorBBDD;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,9 +10,11 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -124,8 +127,8 @@ public class Metodos_BBDD {
 	public static DefaultTableModel crearColumnas(DefaultTableModel modelo) {
 		modelo.addColumn("Nombre");
 
-		modelo.addColumn("Tamaño_KiB");
-		modelo.addColumn("Fecha");
+		modelo.addColumn("Tamaño en KiB");
+		modelo.addColumn("Fecha de creación");
 		// modelo.addColumn("Entrenamientos");
 		modelo.addColumn("XML");
 
@@ -214,6 +217,11 @@ public class Metodos_BBDD {
 			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
+			if (e.toString().contains("duplicada")) {
+				JOptionPane.showMessageDialog(null,
+						"No puede repetirse el nombre de los modelos\n\tRegistro no insertado");
+			}
+
 		} finally {
 			cerrarConexion();
 		}
@@ -292,20 +300,27 @@ public class Metodos_BBDD {
 		}
 	}
 
-	public void borrarPorNombre(String nombreTabla, String name) {
+	public static void repintarJTable(JTable tabla, DefaultTableModel modelo) {
+		modelo = insertarRegistrosAJTable("Modelos", modelo);
+		tabla.setModel(modelo);
+		tabla = centrarRegistrosEnJTable(tabla);
+	}
+
+	public static boolean borrarPorNombre(String nombreTabla, String name) {
 		abrirConexion();
 		Statement statement;
 		try {
 			String query = String.format("delete from %s where nombre='%s'", nombreTabla, name);
 			statement = con.createStatement();
-			int salida = statement.executeUpdate(query);
-
-			System.out.println(salida != 0 ? "Registro borrado" : "Registro NO borrado");
+			statement.executeUpdate(query);
+			return true;
+			// System.out.println(salida != 0 ? "Registro borrado" : "Registro NO borrado");
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
+		return false;
 	}
 
 	public static void borrarTabla(String nombreTabla) {
@@ -323,19 +338,32 @@ public class Metodos_BBDD {
 		}
 	}
 
-	public static void insertarRegistroInicial() {
-		File modeloXML = new File("C:/Users/Alumno/Desktop/haarcascade_frontalface_alt2.xml");
+	public static Object[] parsearARegistro(File modeloXML, String nombreModelo) {
+		Path path = Paths.get(modeloXML.getAbsolutePath());
+		long size;
+		Object[] registro = null;
 		try {
-			Path path = Paths.get(modeloXML.getAbsolutePath());
-			long size = Files.size(path) / 1024;
+			size = Files.size(path) / 1024;
 
 			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
 
 			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
-			Object[] primerRegis = new Object[] { modeloXML, size, df.format(new Date(attr.creationTime().toMillis())),
-					"Ejemplo.xml" };
+			registro = new Object[] { modeloXML, size, df.format(new Date(attr.creationTime().toMillis())),
+					nombreModelo };
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		return registro;
+	}
+
+	public static void insertarRegistroInicial() {
+		File modeloXML = new File("C:/Users/Alumno/Desktop/haarcascade_frontalface_alt2.xml");
+		try {
+
+			Object[] primerRegis = parsearARegistro(modeloXML, "Ejemplo.xml");
 			Metodos_BBDD.insertarRegistroCompleto("Modelos", primerRegis);
 
 		} catch (Exception e) {
@@ -403,6 +431,24 @@ public class Metodos_BBDD {
 			tabla.getColumnModel().getColumn(i).setCellRenderer(tcr);
 		}
 		return tabla;
+	}
+
+	public static String seleccionarModelo(int JFileOpcion) {
+		JFileChooser jfc = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos .xml", "xml");
+		jfc.setAcceptAllFileFilterUsed(false);
+		jfc.setFileFilter(filter);
+		jfc.setFileSelectionMode(JFileOpcion);
+		String carpeta = "";
+		if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			File ficheroCarpeta = jfc.getSelectedFile();
+			carpeta = ficheroCarpeta.getAbsolutePath();
+
+		} else {
+			return null;
+		}
+		return carpeta;
+
 	}
 
 }
