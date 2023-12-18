@@ -227,7 +227,7 @@ public class App_GestorBBDD extends JFrame {
 					nombreViejo = table.getValueAt(table.getSelectedRow(), 0).toString();
 					tnombrejif.setText(table.getValueAt(table.getSelectedRow(), 0).toString().substring(0,
 							table.getValueAt(table.getSelectedRow(), 0).toString().indexOf(".xml")));
-					ttamañojif.setText(table.getValueAt(table.getSelectedRow(), 1).toString()+" KiB");
+					ttamañojif.setText(table.getValueAt(table.getSelectedRow(), 1).toString() + " KiB");
 					tfechajif.setText(table.getValueAt(table.getSelectedRow(), 2).toString());
 
 					jifActualizarRegistro.setVisible(true);
@@ -358,5 +358,6 @@ public class App_GestorBBDD extends JFrame {
 		btnConfirmar.setFont(new Font("Dialog", Font.BOLD, 12));
 		btnConfirmar.setBounds(595, 90, 125, 25);
 		jifActualizarRegistro.getContentPane().add(btnConfirmar);
+
 	}
 }

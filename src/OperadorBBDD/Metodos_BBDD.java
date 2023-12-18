@@ -32,13 +32,6 @@ public class Metodos_BBDD {
 	private static String direccionServidor = "localhost", puertoServidor = "5432", nombreBBDDPostgresql = "Prueba",
 			nombreUsuarioPostgresql = "postgres", contrasenaUsuarioPostgresql = "admin";
 
-	public boolean getEstadoConexion() {
-		if (con == null)
-			return false;
-		else
-			return true;
-	}
-
 	public static boolean abrirConexion() {
 		cerrarConexion();
 		try {
@@ -66,43 +59,42 @@ public class Metodos_BBDD {
 		return false;
 	}
 
+	public boolean getEstadoConexion() {
+		if (con == null)
+			return false;
+		else
+			return true;
+	}
+
+	
 	public static String crearColumnas(Hashtable<String, String> tabla, int primaryKey) {
 		String columnas = "";
 		for (Map.Entry<String, String> entry : tabla.entrySet()) {
-
-			// System.out.println("Nombre: " + entry.getKey() + " - Dato: " +
-			// entry.getValue());
+			
 			switch (entry.getValue().toLowerCase()) {
 
 			case "integer": {
 				columnas += entry.getKey() + " INTEGER, ";
 				break;
 			}
-
 			case "string": {
 				columnas += entry.getKey() + " TEXT, ";
-
 				break;
 			}
-
 			case "double": {
 				columnas += entry.getKey() + " DOUBLE PRECISION, ";
-
 				break;
 			}
-
 			case "date": {
 				columnas += entry.getKey() + " DATE, ";
-
 				break;
 			}
 			case "xml": {
 				columnas += entry.getKey() + " XML, ";
-
 				break;
 			}
 			default:
-				throw new IllegalArgumentException("Valor incorrecto: " + entry.getValue());
+				throw new IllegalArgumentException("Tipo de dato no compatible: " + entry.getValue());
 			}
 		}
 
@@ -124,7 +116,6 @@ public class Metodos_BBDD {
 
 		}
 
-//		System.out.println(columnas);
 		return columnas;
 	}
 
@@ -140,21 +131,23 @@ public class Metodos_BBDD {
 	}
 
 	public static boolean crearTabla(String nombreTabla, Hashtable<String, String> columnas, int primaryKey) {
-		abrirConexion();
-		Statement statement;
+		abrirConexion(); // Primero abrimos la conexión a la BBDD
+		Statement statement; // El statement que tendrá la query a ejecutar en él
 		try {
-			// System.out.println(crearColumnas(columnas, primaryKey));
+			
 			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas, primaryKey) + ");";
-			statement = con.createStatement();
-			int salida = statement.executeUpdate(query);
-			// System.out.println(salida != 0 ? "Tabla creada" : "Tabla NO creada");
-			return salida != 0;
+			
+			statement = con.createStatement(); // Creamos la query
+			
+			int salida = statement.executeUpdate(query); // Ejecutamos la creación de la tabla
+			
+			return salida != 0; // Se ejecutó correctamente y se creó o no la tabla
 		} catch (Exception e) {
-			// System.out.println(e);
+			 System.out.println(e);
 		} finally {
-			cerrarConexion();
+			cerrarConexion(); // Asegurando que se cierra la conexión
 		}
-		return false;
+		return false; // No se ha creado nada por algún error de sintaxis o conexión
 	}
 
 	private static String arrayObjectAInsert(Object[] valores) {
@@ -209,15 +202,14 @@ public class Metodos_BBDD {
 		abrirConexion();
 		Statement statement;
 		try {
-
 			String val = arrayObjectAInsert(valores);
 
-			// System.out.println(val);
 			String query = "insert into " + nombreTabla + " values(" + val + ");";
+			
 			statement = con.createStatement();
+			
 			int salida = statement.executeUpdate(query);
-			// System.out.println(salida != 0 ? "Registro insertado" : "Registro NO
-			// insertado");
+			
 			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -240,6 +232,7 @@ public class Metodos_BBDD {
 			for (String string : campos) {
 				camposRefact += string + ",";
 			}
+			
 			camposRefact = camposRefact.substring(0, camposRefact.lastIndexOf(','));
 
 			String val = arrayObjectAInsert(valores);
@@ -247,9 +240,9 @@ public class Metodos_BBDD {
 			String query = "insert into " + nombreTabla + " (" + camposRefact + ") values(" + val + ");";
 
 			statement = con.createStatement();
+
 			int salida = statement.executeUpdate(query);
-			// System.out.println(salida != 0 ? "Registro insertado" : "Registro NO
-			// insertado");
+
 			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -272,6 +265,7 @@ public class Metodos_BBDD {
 				System.out.println("Registro " + creg + ": ");
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
 					System.out.println(rs.getString(i));
+					
 				}
 
 			}
@@ -281,6 +275,32 @@ public class Metodos_BBDD {
 		} finally {
 			cerrarConexion();
 		}
+	}
+	
+	public static String buscarPorNombre(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
+		abrirConexion();
+		Statement statement;
+		ResultSet rs = null;
+		String datosRegistro = "";
+		try {
+			String query = "select * from " + nombreTabla + " where " + campoPorElQueBuscar + "= '"
+					+ valorPorElQueBuscar + "'";
+			statement = con.createStatement();
+			rs = statement.executeQuery(query);
+			while (rs.next()) {
+				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
+					datosRegistro += rs.getString(i) + ", ";
+				}
+
+			}
+			datosRegistro = datosRegistro.substring(0, datosRegistro.lastIndexOf(','));
+
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cerrarConexion();
+		}
+		return datosRegistro;
 	}
 
 	public void buscarPorNombre(String nombreTabla, String name) {
