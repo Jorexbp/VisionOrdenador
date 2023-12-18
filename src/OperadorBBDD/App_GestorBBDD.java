@@ -197,7 +197,7 @@ public class App_GestorBBDD extends JFrame {
 		btnBorrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					boolean borrado = Metodos_BBDD.borrarPorNombre("Modelos",
+					boolean borrado = Metodos_BBDD.borrarRegistro("Modelos", "nombre",
 							table.getValueAt(table.getSelectedRow(), 0).toString());
 					lmostrar.setText(borrado ? "Registro eliminado" : "Registro NO eliminado");
 					Metodos_BBDD.repintarJTable(table, modelo);
@@ -337,10 +337,11 @@ public class App_GestorBBDD extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				boolean actualizado = false;
 				if (direccionXML == null) {
+
 					actualizado = Metodos_BBDD.actualizarRegistro("Modelos", nombreViejo,
-							tnombrejif.getText().concat(".xml"));
+							tnombrejif.getText().concat(".xml"), "nombre", "nombre");
 				} else {
-					actualizado = Metodos_BBDD.actualizarRegistro("Modelos", nombreViejo,
+					actualizado = Metodos_BBDD.actualizarRegistroXML("Modelos", nombreViejo,
 							tnombrejif.getText().concat(".xml"), direccionXML);
 				}
 

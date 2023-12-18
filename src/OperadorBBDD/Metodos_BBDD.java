@@ -66,11 +66,10 @@ public class Metodos_BBDD {
 			return true;
 	}
 
-	
 	public static String crearColumnas(Hashtable<String, String> tabla, int primaryKey) {
 		String columnas = "";
 		for (Map.Entry<String, String> entry : tabla.entrySet()) {
-			
+
 			switch (entry.getValue().toLowerCase()) {
 
 			case "integer": {
@@ -134,16 +133,16 @@ public class Metodos_BBDD {
 		abrirConexion(); // Primero abrimos la conexión a la BBDD
 		Statement statement; // El statement que tendrá la query a ejecutar en él
 		try {
-			
+
 			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas, primaryKey) + ");";
-			
+
 			statement = con.createStatement(); // Creamos la query
-			
+
 			int salida = statement.executeUpdate(query); // Ejecutamos la creación de la tabla
-			
+
 			return salida != 0; // Se ejecutó correctamente y se creó o no la tabla
 		} catch (Exception e) {
-			 System.out.println(e);
+			System.out.println(e);
 		} finally {
 			cerrarConexion(); // Asegurando que se cierra la conexión
 		}
@@ -205,11 +204,11 @@ public class Metodos_BBDD {
 			String val = arrayObjectAInsert(valores);
 
 			String query = "insert into " + nombreTabla + " values(" + val + ");";
-			
+
 			statement = con.createStatement();
-			
+
 			int salida = statement.executeUpdate(query);
-			
+
 			return salida != 0;
 		} catch (Exception e) {
 			System.out.println(e);
@@ -232,7 +231,7 @@ public class Metodos_BBDD {
 			for (String string : campos) {
 				camposRefact += string + ",";
 			}
-			
+
 			camposRefact = camposRefact.substring(0, camposRefact.lastIndexOf(','));
 
 			String val = arrayObjectAInsert(valores);
@@ -265,7 +264,7 @@ public class Metodos_BBDD {
 				System.out.println("Registro " + creg + ": ");
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
 					System.out.println(rs.getString(i));
-					
+
 				}
 
 			}
@@ -276,8 +275,8 @@ public class Metodos_BBDD {
 			cerrarConexion();
 		}
 	}
-	
-	public static String buscarPorNombre(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
+
+	public static String buscarRegistro(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
 		abrirConexion();
 		Statement statement;
 		ResultSet rs = null;
@@ -289,7 +288,7 @@ public class Metodos_BBDD {
 			rs = statement.executeQuery(query);
 			while (rs.next()) {
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
-					datosRegistro += rs.getString(i) + ", ";
+					datosRegistro += rs.getString(i) + ",";
 				}
 
 			}
@@ -303,56 +302,42 @@ public class Metodos_BBDD {
 		return datosRegistro;
 	}
 
-	public void buscarPorNombre(String nombreTabla, String name) {
-		abrirConexion();
-		Statement statement;
-		ResultSet rs = null;
-		try {
-			String query = String.format("select * from %s where name= '%s'", nombreTabla, name);
-			statement = con.createStatement();
-			rs = statement.executeQuery(query);
-			while (rs.next()) {
-				System.out.print(rs.getString("empid") + " ");
-				System.out.print(rs.getString("name") + " ");
-				System.out.println(rs.getString("address"));
-
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			cerrarConexion();
-		}
-	}
-
 	public static void repintarJTable(JTable tabla, DefaultTableModel modelo) {
 		modelo = insertarRegistrosAJTable("Modelos", modelo);
 		tabla.setModel(modelo);
 		tabla = centrarRegistrosEnJTable(tabla);
 	}
 
-	public static boolean borrarPorNombre(String nombreTabla, String name) {
+	public static boolean borrarRegistro(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
 		abrirConexion();
 		Statement statement;
+
 		try {
-			String query = String.format("delete from %s where nombre='%s'", nombreTabla, name);
+			String query = "delete from " + nombreTabla + " where " + campoPorElQueBuscar + "= '" + valorPorElQueBuscar
+					+ "'";
+
 			statement = con.createStatement();
-			statement.executeUpdate(query);
-			return true;
-			// System.out.println(salida != 0 ? "Registro borrado" : "Registro NO borrado");
+
+			int elim = statement.executeUpdate(query);
+
+			return elim != 0 ? true : false;
+
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
+
 		return false;
 	}
 
-	public static boolean actualizarRegistro(String nombreTabla, String nombreViejo, String nuevoNombre) {
+	public static boolean actualizarRegistro(String nombreTabla, String valorDelCampoIdentificativo, String valorNuevo,
+			String campoAModificar, String campoIdentificativoUnico) {
 		abrirConexion();
 		Statement statement;
 		try {
-			String query = String.format("update %s set nombre='%s' where nombre='%s'", nombreTabla, nuevoNombre,
-					nombreViejo);
+			String query = "update " + nombreTabla + " set " + campoAModificar + "='" + valorNuevo + "' where "
+					+ campoIdentificativoUnico + "='" + valorDelCampoIdentificativo + "';";
 			statement = con.createStatement();
 			int act = statement.executeUpdate(query);
 			if (act > 0) {
@@ -366,7 +351,7 @@ public class Metodos_BBDD {
 		return false;
 	}
 
-	public static boolean actualizarRegistro(String nombreTabla, String nombreViejo, String nuevoNombre,
+	public static boolean actualizarRegistroXML(String nombreTabla, String nombreViejo, String nuevoNombre,
 			String direccionXML) {
 		abrirConexion();
 		Statement statement;
@@ -389,19 +374,20 @@ public class Metodos_BBDD {
 		return false;
 	}
 
-	public static void borrarTabla(String nombreTabla) {
+	public static boolean borrarTabla(String nombreTabla) {
 		abrirConexion();
 		Statement statement;
 		try {
 			String query = String.format("drop table %s", nombreTabla);
 			statement = con.createStatement();
-			statement.executeUpdate(query);
-			System.out.println("Tabla borrada");
+			int borrado = statement.executeUpdate(query);
+			return borrado != 0 ? true : false;
 		} catch (Exception e) {
 			System.out.println(e);
 		} finally {
 			cerrarConexion();
 		}
+		return false;
 	}
 
 	public static Object[] parsearARegistro(File modeloXML, String nombreModelo) {
