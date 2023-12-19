@@ -28,6 +28,7 @@ import Entrenamiento.Metodos_app;
 import Entrenamiento_Manual.App_Manual;
 import Entrenamiento_Manual.CamaraEntrenamiento;
 import OpenCV.Camara;
+import OperadorBBDD.App_GestorBBDD;
 
 public class PantallaInicial extends JFrame {
 
@@ -39,7 +40,7 @@ public class PantallaInicial extends JFrame {
 	private JButton bcont;
 	private JScrollPane scrollPane;
 	private JLabel lseguntit;
-	private JButton bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo;
+	private JButton bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo,bgestorBBDDModelos;
 
 	/**
 	 * Launch the application.
@@ -82,7 +83,7 @@ public class PantallaInicial extends JFrame {
 
 		iniciarComponentes();
 		Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
-		Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo);
+		Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo,bgestorBBDDModelos);
 
 	}
 
@@ -135,7 +136,7 @@ public class PantallaInicial extends JFrame {
 		bcont.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Metodos_inicio.visibilidad(false, ltit, scrollPane, cacepta, bcont);
-				Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo);
+				Metodos_inicio.visibilidad(true, lseguntit, bentrenador, bcrearpremodelo, busarcamara, bprobarmodelo,bgestorBBDDModelos);
 			}
 		});
 		bcont.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -161,6 +162,19 @@ public class PantallaInicial extends JFrame {
 		bentrenador.setVisible(false);
 		bentrenador.setBounds(43, 300, 236, 44);
 		contentPane.add(bentrenador);
+		
+		bgestorBBDDModelos = new JButton("Gestionar BBDD de modelos");
+		bgestorBBDDModelos.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new App_GestorBBDD().setVisible(true);
+				dispose();
+			}
+		});
+		bgestorBBDDModelos.setFont(new Font("Dialog", Font.BOLD, 12));
+		bgestorBBDDModelos.setEnabled(true);
+		bgestorBBDDModelos.setVisible(false);
+		bgestorBBDDModelos.setBounds(300, 375, 236, 44);
+		contentPane.add(bgestorBBDDModelos);
 
 		bcrearpremodelo = new JButton("Crear un pre-modelo");
 		bcrearpremodelo.addActionListener(new ActionListener() {
@@ -189,7 +203,7 @@ public class PantallaInicial extends JFrame {
 		busarcamara.setFont(new Font("Dialog", Font.BOLD, 12));
 		busarcamara.setEnabled(true);
 		busarcamara.setVisible(false);
-		busarcamara.setBounds(165, 375, 236, 44);
+		busarcamara.setBounds(43, 375, 236, 44);
 		contentPane.add(busarcamara);
 
 		bprobarmodelo = new JButton("Probar modelo");

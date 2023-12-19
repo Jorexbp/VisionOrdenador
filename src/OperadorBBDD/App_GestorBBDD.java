@@ -12,6 +12,8 @@ import inicio.Metodos_inicio;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.Color;
 import javax.swing.SwingConstants;
@@ -145,7 +147,14 @@ public class App_GestorBBDD extends JFrame {
 		btndroptable = new JButton("Borrar Tabla");
 		btndroptable.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Metodos_BBDD.borrarTabla("Modelos");
+				boolean borrado = false;
+				if (JOptionPane.showConfirmDialog(null,
+						"¿Quiere eliminar la tabla: Modelos?") == JOptionPane.OK_OPTION) {
+
+					borrado = Metodos_BBDD.borrarTabla("Modelos");
+				}
+				lmostrar.setText(borrado ? "Tabla eliminada" : "Tabla NO eliminada");
+
 			}
 		});
 		btndroptable.setForeground(new Color(255, 0, 0));
@@ -197,11 +206,18 @@ public class App_GestorBBDD extends JFrame {
 		btnBorrar = new JButton("Borrar modelo");
 		btnBorrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 				try {
-					boolean borrado = Metodos_BBDD.borrarRegistro("Modelos", "nombre",
-							table.getValueAt(table.getSelectedRow(), 0).toString());
+					boolean borrado = false;
+					if (JOptionPane.showConfirmDialog(null, "¿Quiere eliminar el registro: "
+							+ table.getValueAt(table.getSelectedRow(), 0).toString() + "?") == JOptionPane.OK_OPTION) {
+
+						borrado = Metodos_BBDD.borrarRegistro("Modelos", "nombre",
+								table.getValueAt(table.getSelectedRow(), 0).toString());
+						Metodos_BBDD.repintarJTable(table, modelo);
+					}
 					lmostrar.setText(borrado ? "Registro eliminado" : "Registro NO eliminado");
-					Metodos_BBDD.repintarJTable(table, modelo);
+
 				} catch (Exception s) {
 					lmostrar.setText("Debe seleccionar un registro");
 

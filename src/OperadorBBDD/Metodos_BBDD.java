@@ -34,14 +34,17 @@ public class Metodos_BBDD {
 	private static Connection con = null;
 	private static String direccionServidor = "localhost", puertoServidor = "5432", nombreBBDDPostgresql = "Prueba",
 			nombreUsuarioPostgresql = "postgres", contrasenaUsuarioPostgresql = "admin";
+	private static Statement statement = null;
+	private static ResultSet rs = null;
+	private static DatabaseMetaData dbmd;
 
 	public static boolean abrirConexion() {
-		cerrarConexion();
 		try {
 			Class.forName("org.postgresql.Driver");
 			con = DriverManager.getConnection(
 					"jdbc:postgresql://" + direccionServidor + ":" + puertoServidor + "/" + nombreBBDDPostgresql + "",
 					nombreUsuarioPostgresql, contrasenaUsuarioPostgresql);
+
 			if (con == null) {
 				JOptionPane.showMessageDialog(null, "No se pudo conectar a la BBDD");
 			} else
@@ -54,7 +57,11 @@ public class Metodos_BBDD {
 
 	public static boolean cerrarConexion() {
 		try {
-			con = null;
+			con.close();
+			statement.close();
+			rs.close();
+			dbmd = null;
+
 			return true;
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "No se ha podido cerra la conexión a la BBDD");
@@ -134,7 +141,6 @@ public class Metodos_BBDD {
 
 	public static boolean crearTabla(String nombreTabla, Hashtable<String, String> columnas, int primaryKey) {
 		abrirConexion(); // Primero abrimos la conexión a la BBDD
-		Statement statement; // El statement que tendrá la query a ejecutar en él
 		try {
 
 			String query = "create table " + nombreTabla + "(" + crearColumnas(columnas, primaryKey) + ");";
@@ -177,11 +183,10 @@ public class Metodos_BBDD {
 		abrirConexion();
 		ArrayList<String> colus = new ArrayList<>();
 
-		DatabaseMetaData dbmd;
 		try {
 
 			dbmd = con.getMetaData();
-			ResultSet rs = dbmd.getColumns(null, null, nombreTabla.toLowerCase(), "%");
+			rs = dbmd.getColumns(null, null, nombreTabla.toLowerCase(), "%");
 			while (rs.next()) {
 				colus.add(rs.getString(4)
 				/*
@@ -202,7 +207,7 @@ public class Metodos_BBDD {
 
 	public static boolean insertarRegistroCompleto(String nombreTabla, Object[] valores) {
 		abrirConexion();
-		Statement statement;
+
 		try {
 			String val = arrayObjectAInsert(valores);
 
@@ -228,7 +233,7 @@ public class Metodos_BBDD {
 
 	public boolean insertarRegistroParcial(String nombreTabla, Object[] valores, String... campos) {
 		abrirConexion();
-		Statement statement;
+
 		try {
 			String camposRefact = "";
 			for (String string : campos) {
@@ -256,8 +261,7 @@ public class Metodos_BBDD {
 
 	public static void leerDatos(String nombreTabla) {
 		abrirConexion();
-		Statement statement;
-		ResultSet rs = null;
+
 		try {
 			String query = String.format("select * from " + nombreTabla);
 			statement = con.createStatement();
@@ -281,8 +285,7 @@ public class Metodos_BBDD {
 
 	public static String buscarRegistro(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
 		abrirConexion();
-		Statement statement;
-		ResultSet rs = null;
+
 		String datosRegistro = "";
 		try {
 			String query = "select * from " + nombreTabla + " where " + campoPorElQueBuscar + "= '"
@@ -313,7 +316,6 @@ public class Metodos_BBDD {
 
 	public static boolean borrarRegistro(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
 		abrirConexion();
-		Statement statement;
 
 		try {
 			String query = "delete from " + nombreTabla + " where " + campoPorElQueBuscar + "= '" + valorPorElQueBuscar
@@ -337,7 +339,7 @@ public class Metodos_BBDD {
 	public static boolean actualizarRegistro(String nombreTabla, String valorDelCampoIdentificativo, String valorNuevo,
 			String campoAModificar, String campoIdentificativoUnico) {
 		abrirConexion();
-		Statement statement;
+
 		try {
 			String query = "update " + nombreTabla + " set " + campoAModificar + "='" + valorNuevo + "' where "
 					+ campoIdentificativoUnico + "='" + valorDelCampoIdentificativo + "';";
@@ -357,7 +359,7 @@ public class Metodos_BBDD {
 	public static boolean actualizarRegistroXML(String nombreTabla, String nombreViejo, String nuevoNombre,
 			String direccionXML) {
 		abrirConexion();
-		Statement statement;
+
 		try {
 			File archivoXML = new File(direccionXML);
 
@@ -379,7 +381,7 @@ public class Metodos_BBDD {
 
 	public static boolean borrarTabla(String nombreTabla) {
 		abrirConexion();
-		Statement statement;
+
 		try {
 			String query = String.format("drop table %s", nombreTabla);
 			statement = con.createStatement();
@@ -417,27 +419,23 @@ public class Metodos_BBDD {
 			String valorDiferenciador) {
 		abrirConexion();
 		try {
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT " + nombreColumnaXML + " FROM " + nombreTabla + " WHERE "
+			statement = con.createStatement();
+			rs = statement.executeQuery("SELECT " + nombreColumnaXML + " FROM " + nombreTabla + " WHERE "
 					+ campoDiferenciador + "='" + valorDiferenciador + "'");
-
-			System.out.println(rs);
 
 			if (rs.next()) {
 				String xmlData = rs.getString(nombreColumnaXML);
 				FileWriter fileWriter = new FileWriter(
 						Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY) + "/" + valorDiferenciador);
-				System.out.println(xmlData);
+
 				fileWriter.write(xmlData);
 				fileWriter.close();
 			}
-			System.out.println(rs);
 
-			rs.close();
-			stmt.close();
-			con.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			cerrarConexion();
 		}
 
 	}
@@ -456,8 +454,7 @@ public class Metodos_BBDD {
 
 	public static DefaultTableModel insertarRegistrosAJTable(String nombreTabla, DefaultTableModel modelo) {
 		abrirConexion();
-		Statement statement;
-		ResultSet rs = null;
+
 		modelo = new DefaultTableModel() {
 
 			/**
@@ -467,7 +464,6 @@ public class Metodos_BBDD {
 
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				// all cells false
 				return false;
 			}
 		};
