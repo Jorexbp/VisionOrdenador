@@ -69,6 +69,7 @@ public class App_GestorBBDD extends JFrame {
 	private JTextField ttamañojif;
 	private JTextField tfechajif;
 	private String direccionXML, nombreViejo;
+	private JButton btndescargar;
 
 	/**
 	 * Launch the application.
@@ -322,7 +323,6 @@ public class App_GestorBBDD extends JFrame {
 					tfechajif.setText(df.format(new Date(attr.creationTime().toMillis())));
 
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -359,6 +359,23 @@ public class App_GestorBBDD extends JFrame {
 		btnConfirmar.setFont(new Font("Dialog", Font.BOLD, 12));
 		btnConfirmar.setBounds(595, 90, 125, 25);
 		jifActualizarRegistro.getContentPane().add(btnConfirmar);
+
+		btndescargar = new JButton("Descargar modelo");
+		btndescargar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Metodos_BBDD.descargarModeloXML("xml", "Modelos", "nombre",
+							table.getValueAt(table.getSelectedRow(), 0).toString());
+				} catch (Exception a) {
+					lmostrar.setText("Debe seleccionar un registro");
+				}
+			}
+
+		});
+		btndescargar.setForeground(new Color(0, 128, 128));
+		btndescargar.setFont(new Font("Dialog", Font.BOLD, 12));
+		btndescargar.setBounds(30, 559, 150, 45);
+		contentPane.add(btndescargar);
 
 	}
 }

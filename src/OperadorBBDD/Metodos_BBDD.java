@@ -1,6 +1,7 @@
 package OperadorBBDD;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import Entrenamiento.Metodos_app;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -404,11 +407,39 @@ public class Metodos_BBDD {
 			registro = new Object[] { modeloXML, size, df.format(new Date(attr.creationTime().toMillis())),
 					nombreModelo };
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return registro;
+	}
+
+	public static void descargarModeloXML(String nombreColumnaXML, String nombreTabla, String campoDiferenciador,
+			String valorDiferenciador) {
+		abrirConexion();
+		try {
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT " + nombreColumnaXML + " FROM " + nombreTabla + " WHERE "
+					+ campoDiferenciador + "='" + valorDiferenciador + "'");
+
+			System.out.println(rs);
+
+			if (rs.next()) {
+				String xmlData = rs.getString(nombreColumnaXML);
+				FileWriter fileWriter = new FileWriter(
+						Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY) + "/" + valorDiferenciador);
+				System.out.println(xmlData);
+				fileWriter.write(xmlData);
+				fileWriter.close();
+			}
+			System.out.println(rs);
+
+			rs.close();
+			stmt.close();
+			con.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void insertarRegistroInicial() {
