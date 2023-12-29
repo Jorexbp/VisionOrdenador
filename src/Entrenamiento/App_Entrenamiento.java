@@ -339,7 +339,7 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT);
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT,1);
 				Metodos_app.cambiarAUsable(lcrearXML, bcrearXML);
 				Metodos_app.cambiarAUsable(lnumiter, spniteraciones);
 
@@ -363,12 +363,13 @@ public class App_Entrenamiento extends JFrame {
 					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
 					Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
 					Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
-					Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT);
+					Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT,i+1);
 					
 					DetectorAnotations.cargarModelo(dirMod);
 					LecturaFotos.setModelo(dirMod);
 
 				}
+				System.out.println(dirMod);
 				File modelo = new File(dirMod + "/cascade.xml");
 
 				String nombreModelo = dirMod + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")

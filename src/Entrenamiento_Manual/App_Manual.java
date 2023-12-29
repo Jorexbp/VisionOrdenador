@@ -251,7 +251,7 @@ public class App_Manual extends JFrame {
 		bcrearmodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO CREAR SAMPLES Y MODELO
-				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino,"pos.txt");
+				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino,"pos.txt",1);
 				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas);
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);

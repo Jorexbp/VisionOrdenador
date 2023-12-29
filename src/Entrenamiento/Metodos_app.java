@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -35,6 +37,8 @@ import OpenCV.DeteccionCara;
 public class Metodos_app {
 	public static String carpetaPos;
 	public static String carpetaNeg;
+	private static ReentrantLock bloqueo = new ReentrantLock();
+	private static Condition condicion = bloqueo.newCondition();
 
 	public static void setCarpetaPositiva(String carpetaOriginalPositiva) {
 		carpetaPos = carpetaOriginalPositiva;
@@ -226,7 +230,8 @@ public class Metodos_app {
 				completionFrame.setVisible(true);
 				completionFrame.setResizable(false);
 				completionFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
+				Thread.sleep(2500);
+				completionFrame.dispose();
 				return null;
 			}
 
@@ -264,7 +269,7 @@ public class Metodos_app {
 				try {
 					originalImage = ImageIO.read(archivo);
 					Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
-					byte[] bytesMat = DeteccionCara.detectarCara(imageCara); // TODO NO FUNCIONA BIEN
+					byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
 
 					imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
 					coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
@@ -306,8 +311,9 @@ public class Metodos_app {
 
 	}
 
-	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino, String subTXT) {
+	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino, String subTXT, int iter) {
 
+		bloqueo.lock();
 		String addrSample = "lib\\samples\\opencv_createsamples.exe";
 		String posTxt = carpetaOriginalPositiva + "\\" + subTXT;
 
@@ -323,10 +329,14 @@ public class Metodos_app {
 				+ "\" -vec \"" + posVec + "\"";
 		try {
 			Process procesoSamples = Runtime.getRuntime().exec(comandoSamples);
-			while (!new File(posVec).exists()) {
-
+			while (new File(posVec).exists() && iter != 1) {
+				condicion.await();
 			}
+
 			procesoSamples.waitFor();
+
+			condicion.signal();
+			bloqueo.unlock();
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -341,6 +351,7 @@ public class Metodos_app {
 	}
 
 	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
+		bloqueo.lock();
 
 		int nStages = calcularNumSamples(carpetaPos) / 13;
 		int numPos = (int) (calcularNumSamples(carpetaPos) / 1.5);
@@ -363,25 +374,36 @@ public class Metodos_app {
 				while ((fic.getAbsolutePath().contains("stage") && !fic.isDirectory())
 						|| fic.getAbsolutePath().contains("params")) {
 					Thread.sleep(500);
+					condicion.await();
 				}
 
 			}
-			
-
+			Thread.sleep(1500);
 			Runtime.getRuntime().exec(comandoSamples);
 			while (!new File(destino + "/cascade.xml").exists()) {
 				Thread.sleep(500);
 			}
+
+			if (new File(destino + "/modelos/cascade.xml").exists())
+				new File(destino + "/modelos/cascade.xml").delete();
+
+			// TODO A PARTIR DE LA SEGUNDA ITERACION NO PUEDE COPIARLO PORQUE ESTA SIENDO
+			// USADO, PUEDO RENOMBRARLO USANDO SU ID DE ITERACION Y USARLOS ASI
+			Path pathOrigen = Paths.get(destino + "/cascade.xml");
+			Path pathDestino = Paths.get(destino + "/modelos/cascade.xml");
+			Files.move(pathOrigen, pathDestino);
+
 			for (File fic : new File(destino).listFiles()) {
-				if (fic.getAbsolutePath().contains("stage") && !fic.isDirectory()) {
-					fic.delete();
-				} else if (fic.getAbsolutePath().contains("params") && !fic.isDirectory()) {
+				if (!fic.isDirectory()) {
 					fic.delete();
 				}
 
 			}
 
-			return destino + "/cascade.xml";
+			condicion.signal();
+			bloqueo.unlock();
+
+			return destino + "/modelos/cascade.xml";
 
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
