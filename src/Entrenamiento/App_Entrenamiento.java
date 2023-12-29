@@ -31,6 +31,8 @@ import java.net.URL;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JCheckBox;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 public class App_Entrenamiento extends JFrame {
 
@@ -61,6 +63,8 @@ public class App_Entrenamiento extends JFrame {
 	private JButton btnProbar;
 	private JButton breinicio;
 	private JCheckBox ccomprobarimagen;
+	private JSpinner spniteraciones;
+	private JLabel lnumiter;
 
 	/**
 	 * Launch the application.
@@ -271,22 +275,20 @@ public class App_Entrenamiento extends JFrame {
 		befotospos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
-				
+
 				// TODO REINVENTAR LA RUEDA TXT
 				posTXT = "pos.txt";
-				if(ccomprobarimagen.isSelected()) {
-					LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO ACABE DE EJECUTARSE
-					
+				if (ccomprobarimagen.isSelected()) {
+					LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO
+																						// ACABE DE EJECUTARSE
+
 					Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
-				}else {
+				} else {
 					// TODO HACER LAS ANOTACIONES SIN LA COMPROBACION
 					Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre);
 
 				}
-				
-			
 
-				
 				pos = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
@@ -337,8 +339,10 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre,posTXT);
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT);
 				Metodos_app.cambiarAUsable(lcrearXML, bcrearXML);
+				Metodos_app.cambiarAUsable(lnumiter, spniteraciones);
+
 				sam = true;
 				rellenarTextArea();
 			}
@@ -352,7 +356,31 @@ public class App_Entrenamiento extends JFrame {
 		bcrearXML.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
+				int nIteraciones = (int) spniteraciones.getValue();
+				// TODO ESTA MAL; HAY QUE HACER EL PROCESO DE ENTRENAR DE NUEVO, SE VUELVE A
+				// CREAR TODO Y YA
+				for (int i = 0; i < nIteraciones; i++) {
+					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
+					Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
+					Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
+					Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT);
+					
+					DetectorAnotations.cargarModelo(dirMod);
+					LecturaFotos.setModelo(dirMod);
+
+				}
+				File modelo = new File(dirMod + "/cascade.xml");
+
+				String nombreModelo = dirMod + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")
+						+ ".xml";
+
+				if (modelo.renameTo(new File(nombreModelo))) {
+					JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombreModelo);
+				} else {
+					JOptionPane.showMessageDialog(null, "No se ha podido cambiar el nombre del modelo");
+
+				}
+
 				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos/");
 				mod = true;
 				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
@@ -403,14 +431,14 @@ public class App_Entrenamiento extends JFrame {
 			}
 		});
 		btnCargar.setFont(new Font("Dialog", Font.BOLD, 14));
-		btnCargar.setBounds(738, 233, 162, 34);
+		btnCargar.setBounds(600, 233, 162, 34);
 		contentPane.add(btnCargar);
 
 		lcargamodelo = new JLabel("Cargar pre-modelo");
 		lcargamodelo.setHorizontalAlignment(SwingConstants.CENTER);
 		lcargamodelo.setForeground(new Color(2, 0, 255));
 		lcargamodelo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lcargamodelo.setBounds(695, 197, 246, 24);
+		lcargamodelo.setBounds(550, 197, 246, 24);
 		contentPane.add(lcargamodelo);
 
 		btnProbar = new JButton("Probar");
@@ -422,7 +450,7 @@ public class App_Entrenamiento extends JFrame {
 			}
 		});
 		btnProbar.setFont(new Font("Dialog", Font.BOLD, 14));
-		btnProbar.setBounds(994, 233, 162, 34);
+		btnProbar.setBounds(800, 233, 162, 34);
 		contentPane.add(btnProbar);
 
 		lprobarmodelo = new JLabel("Probar modelo");
@@ -430,7 +458,7 @@ public class App_Entrenamiento extends JFrame {
 		lprobarmodelo.setHorizontalAlignment(SwingConstants.CENTER);
 		lprobarmodelo.setForeground(new Color(2, 0, 255));
 		lprobarmodelo.setFont(new Font("Dialog", Font.BOLD, 14));
-		lprobarmodelo.setBounds(951, 197, 246, 24);
+		lprobarmodelo.setBounds(750, 197, 246, 24);
 		contentPane.add(lprobarmodelo);
 
 		breinicio = new JButton("");
@@ -460,12 +488,28 @@ public class App_Entrenamiento extends JFrame {
 		breinicio.setBorderPainted(false);
 		breinicio.setBounds(1096, 15, 74, 52);
 		contentPane.add(breinicio);
-		
+
 		ccomprobarimagen = new JCheckBox("Comprobar imágenes");
 		ccomprobarimagen.setForeground(new Color(0, 0, 255));
-		ccomprobarimagen.setFont(new Font("Tahoma", Font.BOLD, 11));
+		ccomprobarimagen.setFont(new Font("Dialog", Font.BOLD, 11));
 		ccomprobarimagen.setBounds(415, 179, 147, 23);
 		contentPane.add(ccomprobarimagen);
+
+		spniteraciones = new JSpinner();
+		spniteraciones.setEnabled(false);
+		spniteraciones
+				.setModel(new SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+		spniteraciones.setFont(new Font("Dialog", Font.BOLD, 14));
+		spniteraciones.setBounds(1052, 233, 50, 30);
+		contentPane.add(spniteraciones);
+
+		lnumiter = new JLabel("Iteraciones del entrenamiento");
+		lnumiter.setHorizontalAlignment(SwingConstants.CENTER);
+		lnumiter.setForeground(new Color(2, 0, 255));
+		lnumiter.setFont(new Font("Dialog", Font.BOLD, 14));
+		lnumiter.setEnabled(false);
+		lnumiter.setBounds(961, 197, 246, 24);
+		contentPane.add(lnumiter);
 
 		rellenarTextArea();
 	}

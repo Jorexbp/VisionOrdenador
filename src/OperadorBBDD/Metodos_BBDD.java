@@ -64,7 +64,7 @@ public class Metodos_BBDD {
 
 			return true;
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "No se ha podido cerra la conexión a la BBDD");
+			JOptionPane.showMessageDialog(null, "No se ha podido cerrar la conexión a la BBDD");
 		}
 		return false;
 	}

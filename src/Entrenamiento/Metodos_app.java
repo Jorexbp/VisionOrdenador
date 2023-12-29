@@ -44,7 +44,7 @@ public class Metodos_app {
 		carpetaNeg = carpetaOriginalNegativa;
 	}
 
-	public static void cambiarAUsable(JLabel lcargafotospos2, JButton befotospos2) {
+	public static void cambiarAUsable(javax.swing.JComponent lcargafotospos2, javax.swing.JComponent befotospos2) {
 		lcargafotospos2.setEnabled(true);
 		befotospos2.setEnabled(true);
 	}
@@ -124,6 +124,9 @@ public class Metodos_app {
 		}
 
 		try {
+			if (new File(carpetaOriginalNegativa + "/neg.txt").exists()) {
+				new File(carpetaOriginalNegativa + "/neg.txt").delete();
+			}
 			FileWriter fw = new FileWriter(carpetaOriginalNegativa + "/neg.txt");
 			fw.write(datos);
 			fw.close();
@@ -179,6 +182,10 @@ public class Metodos_app {
 
 		cambiarNombres(carpetaOriginal, carpetaDestino);
 
+		if (new File(carpetaOriginal + "\\pos.txt").exists()) {
+			new File(carpetaOriginal + "\\pos.txt").delete();
+
+		}
 		File origen = new File(carpetaOriginal);
 		File[] archivos = origen.listFiles();
 
@@ -189,26 +196,22 @@ public class Metodos_app {
 				int[] coords = new int[4];
 				int i = 0;
 
-				if (new File(carpetaOriginal + "\\pos.txt").exists()) {
-					new File(carpetaOriginal + "\\pos.txt").delete();
-
-				}
-
 				for (File archivo : archivos) {
 					if (esArchivoDeImagen(archivo)) {
 
 						BufferedImage originalImage = ImageIO.read(archivo);
 
 						Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
-						byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
-						
+						byte[] bytesMat = DeteccionCara.detectarCara(imageCara); // TODO NO FUNCIONA BIEN
+
 						imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
 						coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
+
 						escribirAnotation(archivo.getName(), coords, carpetaOriginal);
 						frame.toFront();
-						
+
 						i++;
-						publish(i + 1);
+						publish(i);
 
 					}
 				}
@@ -244,6 +247,39 @@ public class Metodos_app {
 
 	}
 
+	public static void crearPositivos(String carpetaOriginal, String carpetaDestino) {
+		if (new File(carpetaOriginal + "\\pos.txt").exists()) {
+			new File(carpetaOriginal + "\\pos.txt").delete();
+
+		}
+		File origen = new File(carpetaOriginal);
+		File[] archivos = origen.listFiles();
+
+		int[] coords = new int[4];
+
+		for (File archivo : archivos) {
+			if (esArchivoDeImagen(archivo)) {
+
+				BufferedImage originalImage;
+				try {
+					originalImage = ImageIO.read(archivo);
+					Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
+					byte[] bytesMat = DeteccionCara.detectarCara(imageCara); // TODO NO FUNCIONA BIEN
+
+					imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
+					coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
+
+					escribirAnotation(archivo.getName(), coords, carpetaOriginal);
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}
+	}
+
 	public static void escribirAnotation(String dir, int[] coords, String carpetaOriginal) {
 		for (int i = 0; i < coords.length; i++) {
 			if (coords[i] < 0) {
@@ -253,13 +289,11 @@ public class Metodos_app {
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(new File(carpetaOriginal + "\\pos.txt"), true);
-			//	 System.out.println(carpetaOriginal + "\\" + dir);
-			if (!new File(carpetaOriginal + "\\" + dir).exists())
-				return;
-		String	datos = dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
-		//System.out.println(datos);
-			fw.write(datos);
 
+			String datos = dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
+			System.out.println(datos);
+			fw.write(datos);
+			fw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -273,17 +307,25 @@ public class Metodos_app {
 	}
 
 	public static void crearSamples(String carpetaOriginalPositiva, String carpetaDestino, String subTXT) {
+
 		String addrSample = "lib\\samples\\opencv_createsamples.exe";
 		String posTxt = carpetaOriginalPositiva + "\\" + subTXT;
+
 		String posVec = carpetaDestino + "\\pos.vec";
 		int numeroSamples = calcularNumSamples(carpetaOriginalPositiva);
 		String nSamples = Integer.toString(numeroSamples * 10);
+		if (new File(posVec).exists()) {
+			new File(posVec).delete();
+		}
 
 		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
 			Process procesoSamples = Runtime.getRuntime().exec(comandoSamples);
+			while (!new File(posVec).exists()) {
+
+			}
 			procesoSamples.waitFor();
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -300,7 +342,7 @@ public class Metodos_app {
 
 	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
 
-		int nStages = calcularNumSamples(carpetaPos) / 11;
+		int nStages = calcularNumSamples(carpetaPos) / 13;
 		int numPos = (int) (calcularNumSamples(carpetaPos) / 1.5);
 		int numNeg = calcularNumSamples(carpetaNeg);
 		String destino = carpetaPadre;
@@ -310,29 +352,37 @@ public class Metodos_app {
 		String dirTxtNeg = carpetaOriginalNegativa + "\\neg.txt";
 		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
-				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages;
+				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages + " -mode ALL";
 
 		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + comTR;
 
 		try {
-			Process creacionModelo = Runtime.getRuntime().exec(comandoSamples);
-			while (creacionModelo.waitFor() != 0) {
+
+			for (File fic : new File(destino).listFiles()) {
+				while ((fic.getAbsolutePath().contains("stage") && !fic.isDirectory())
+						|| fic.getAbsolutePath().contains("params")) {
+					Thread.sleep(500);
+				}
+
+			}
+			
+
+			Runtime.getRuntime().exec(comandoSamples);
+			while (!new File(destino + "/cascade.xml").exists()) {
+				Thread.sleep(500);
+			}
+			for (File fic : new File(destino).listFiles()) {
+				if (fic.getAbsolutePath().contains("stage") && !fic.isDirectory()) {
+					fic.delete();
+				} else if (fic.getAbsolutePath().contains("params") && !fic.isDirectory()) {
+					fic.delete();
+				}
 
 			}
 
-			File modelo = new File(destino + "/cascade.xml");
-			String nombreModelo = destino + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")
-					+ ".xml";
+			return destino + "/cascade.xml";
 
-			if (modelo.renameTo(new File(nombreModelo))) {
-				JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombreModelo);
-				return nombreModelo;
-			} else {
-				JOptionPane.showMessageDialog(null, "No se ha podido cambiar el nombre del modelo");
-				return "";
-
-			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -370,7 +420,6 @@ public class Metodos_app {
 
 			}
 
-		
 			return true;
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -404,7 +453,6 @@ public class Metodos_app {
 	}
 
 	public static void reciclarFotosDenegadas(String carpetaPadre, String carpetaOriginal) {
-		
 
 		String nombreSubCarpeta = carpetaOriginal + "\\denegadas";
 
@@ -412,16 +460,13 @@ public class Metodos_app {
 		crearAnotaciones(nombreSubCarpeta, carpetaPadre, "fotos_denegadas.txt");
 
 		unirFicherosTXT(nombreSubCarpeta, "fotos_denegadas.txt", "fotos_confirmadas.txt");
-		
-		
-		
+
 		// TODO MOVER LAS FOTOS Y EL POS.TXT DE LA SUBCARPETA DENEGADAS A LA ORIGINAL
 		// NORMAL Y QUITAR DIR ABSOLUTA
-		
-		moverContenido(nombreSubCarpeta,carpetaOriginal);
-		
-		
-		quitarDireccionAbsoluta(carpetaOriginal+"\\pos.txt");
+
+		moverContenido(nombreSubCarpeta, carpetaOriginal);
+
+		quitarDireccionAbsoluta(carpetaOriginal + "\\pos.txt");
 
 	}
 
@@ -459,34 +504,34 @@ public class Metodos_app {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void moverContenido(String carpetaOrigen, String carpetaDestino) {
-        File directorioOrigen = new File(carpetaOrigen);
-        File directorioDestino = new File(carpetaDestino);
+		File directorioOrigen = new File(carpetaOrigen);
+		File directorioDestino = new File(carpetaDestino);
 
-        if (!directorioDestino.exists()) {
-            directorioDestino.mkdirs();
-        }
+		if (!directorioDestino.exists()) {
+			directorioDestino.mkdirs();
+		}
 
-        File[] archivos = directorioOrigen.listFiles();
+		File[] archivos = directorioOrigen.listFiles();
 
-        if (archivos != null) {
-            for (File archivo : archivos) {
-                try {
-                    File nuevoArchivo = new File(directorioDestino, archivo.getName());
+		if (archivos != null) {
+			for (File archivo : archivos) {
+				try {
+					File nuevoArchivo = new File(directorioDestino, archivo.getName());
 
-                    if (!archivo.renameTo(nuevoArchivo)) {
-                        System.out.println("No se pudo mover el archivo " + archivo.getName());
-                    }
-                } catch (SecurityException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+					if (!archivo.renameTo(nuevoArchivo)) {
+						System.out.println("No se pudo mover el archivo " + archivo.getName());
+					}
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 	public static void moverImagenesDesdeArchivo(String rutaArchivo, String carpetaDestino) {
-		if(!new File(rutaArchivo).exists())
+		if (!new File(rutaArchivo).exists())
 			return;
 		File directorioDestino = new File(carpetaDestino);
 		if (!directorioDestino.exists()) {

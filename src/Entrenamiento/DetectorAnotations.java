@@ -91,13 +91,13 @@ public class DetectorAnotations {
 		int yInicial = -1;
 		int anchoRectangulo = 0;
 		int altoRectangulo = 0;
-		Scalar colorRojo = new Scalar(0, 0, 255); // BGR format for red in OpenCV
+		Scalar colorRojo = new Scalar(0, 0, 255); 
 
 		for (int y = 0; y < alto; y++) {
 			for (int x = 0; x < ancho; x++) {
-				double[] pixelValue = imagen.get(y, x); // OpenCV uses row, column indexing
+				double[] pixelValue = imagen.get(y, x); 
 				Scalar colorPixel = new Scalar(pixelValue);
-
+				
 				if (esColorRojo(colorPixel, colorRojo)) {
 
 					if (xInicial == -1) {

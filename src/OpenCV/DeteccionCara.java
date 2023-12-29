@@ -1,5 +1,7 @@
 package OpenCV;
 
+import java.net.URL;
+
 import javax.swing.ImageIcon;
 
 import org.opencv.core.Core;
@@ -31,12 +33,9 @@ public class DeteccionCara {
 
 		// Convertir a escala de grises
 		Mat frameGris = new Mat();
-		try {
 		Imgproc.cvtColor(imagen, frameGris, Imgproc.COLOR_BGR2GRAY);
-		}catch (Exception e) {
-			return null;
-		}
-
+		
+		
 		// Mejora de contraste para poder tener un mejor resultado
 		Imgproc.equalizeHist(frameGris, frameGris);
 
@@ -45,13 +44,14 @@ public class DeteccionCara {
 		if (Math.round(altura * 0.2f) > 0) {
 			tamañoCara = Math.round(altura * 0.2f);
 		}
+		
 
 		// Deteccion de caras
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
 		if (modelo == null) {
-			// URL url =
-			// DeteccionCara.class.getResource("/haarcascade_frontalface_alt2.xml");
+//			 URL url =
+//			 DeteccionCara.class.getResource("/haarcascade_frontalface_alt2.xml");
 
 			cascadaCara.load(
 					"C:\\Users\\Alumno\\git\\VisionOrdenador\\Vison\\resources\\haarcascade_frontalface_alt2.xml");
@@ -63,10 +63,11 @@ public class DeteccionCara {
 		}
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
-
+// tamaño correcto
+		
 		// Dibujar rectángulos rojos en la imagen original
 		Rect[] caraArr = caras.toArray();
-		for (int i = 0; i < caraArr.length; i++) {
+		for (int i = 0; i < caraArr.length; i++) {// TODO PROBLEMA ES LENGTH == 0
 			// Dibujar
 			Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 5);
 			
@@ -232,13 +233,5 @@ public class DeteccionCara {
 		return buffer.toArray();
 	}
 
-	public static void main(String[] args) {
-		// Cargo la pinche libreria
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-		// Lea la imagen de la carpeta
-		Mat imagen = Imgcodecs.imread("imagenes/ejemplo2.jpg");
-
-		detectarCara(imagen);
-	}
 }

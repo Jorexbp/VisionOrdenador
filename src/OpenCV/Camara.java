@@ -19,6 +19,11 @@ import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.VideoCapture;
 
+import inicio.PantallaInicial;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 public class Camara extends JFrame {
 
 	/**
@@ -47,6 +52,7 @@ public class Camara extends JFrame {
 			@Override
 			public void run() {
 				Camara camara = new Camara();
+				camara.iniciarComponentes();
 				// Empezar la camara en nuevo Thread
 
 				new Thread(new Runnable() {
@@ -60,20 +66,20 @@ public class Camara extends JFrame {
 	}
 
 	public Camara() {
-		iniciarComponentes();
+
 	}
 
 	private void iniciarComponentes() {
 		// GUI
-		setLayout(null);
+		getContentPane().setLayout(null);
 
 		pantallaCamara = new JLabel();
 		pantallaCamara.setBounds(0, 0, 640, 480);
-		add(pantallaCamara);
+		getContentPane().add(pantallaCamara);
 
 		btnCapturar = new JButton("Capturar");
 		btnCapturar.setBounds(325, 480, 120, 40);
-		add(btnCapturar);
+		getContentPane().add(btnCapturar);
 
 		btnCapturar.addActionListener(new ActionListener() {
 			@Override
@@ -84,7 +90,7 @@ public class Camara extends JFrame {
 
 		btnExtremos = new JButton("Ver Extremos");
 		btnExtremos.setBounds(175, 480, 120, 40);
-		add(btnExtremos);
+		getContentPane().add(btnExtremos);
 
 		btnExtremos.addActionListener(new ActionListener() {
 			@Override
@@ -95,7 +101,7 @@ public class Camara extends JFrame {
 		});
 		btnCaras = new JButton("Ver Caras");
 		btnCaras.setBounds(0, 480, 120, 40);
-		add(btnCaras);
+		getContentPane().add(btnCaras);
 
 		btnCaras.addActionListener(new ActionListener() {
 			@Override
@@ -107,7 +113,7 @@ public class Camara extends JFrame {
 
 		btnCamara = new JButton("Ver Cámara");
 		btnCamara.setBounds(475, 480, 120, 40);
-		add(btnCamara);
+		getContentPane().add(btnCamara);
 
 		btnCamara.addActionListener(new ActionListener() {
 			@Override
@@ -119,11 +125,22 @@ public class Camara extends JFrame {
 
 		setSize(new Dimension(640, 560));
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setVisible(true);
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				capturaVideo.release();
+				capturaVideo = null;
+				new PantallaInicial(0).setVisible(true);
+			}
+		});
 	}
 
 	public void iniciarCamara() {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
 		capturaVideo = new VideoCapture(0);
 		imagen = new Mat();
 		@SuppressWarnings("unused")
@@ -131,62 +148,51 @@ public class Camara extends JFrame {
 
 		ImageIcon icono = null;
 		while (true) {
-			capturaVideo.read(imagen);
+			try {
+				if (capturaVideo == null) {
+					break;
+				}
+				capturaVideo.read(imagen);
 
-			final MatOfByte buffer = new MatOfByte();
-			Imgcodecs.imencode(".jpg", imagen, buffer);
+				final MatOfByte buffer = new MatOfByte();
+				Imgcodecs.imencode(".jpg", imagen, buffer);
 
-			datosImagen = buffer.toArray();
+				datosImagen = buffer.toArray();
 
-			if (camara) {
+				if (camara) {
 
-				icono = new ImageIcon(DeteccionCara.mostrarInfoCara(imagen));
+					icono = new ImageIcon(DeteccionCara.mostrarInfoCara(imagen));
 
-			} else if (soloCaras) {
-				try {
-					ImageIcon ic = new ImageIcon(DeteccionCara.detecarSoloCara(imagen));
-					icono = ic;
-				} catch (Exception e) {
+				} else if (soloCaras) {
+					try {
+						ImageIcon ic = new ImageIcon(DeteccionCara.detecarSoloCara(imagen));
+						icono = ic;
+					} catch (Exception e) {
+
+					}
+
+				} else {
+					icono = new ImageIcon(Extremos.detectarExtremos(imagen));
 
 				}
+				pantallaCamara.setIcon(icono);
+				if (clicked) {
+					String nombre = JOptionPane.showInputDialog(this, "Introduzca el nombre de la imagen");
+					if (nombre == null) {
+						nombre = new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date());
+					}
 
-			} else {
-				icono = new ImageIcon(Extremos.detectarExtremos(imagen));
+					String dir = "Detecciones/" + nombre + ".jpg";
+					DeteccionCara.guardarImagen(imagen, dir);
 
-			}
-			pantallaCamara.setIcon(icono);
-			if (clicked) {
-				String nombre = JOptionPane.showInputDialog(this, "Introduzca el nombre de la imagen");
-				if (nombre == null) {
-					nombre = new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date());
+					clicked = false;
+
 				}
-
-				String dir = "Detecciones/" + nombre + ".jpg";
-				DeteccionCara.guardarImagen(imagen, dir);
-
-				clicked = false;
+			} catch (Exception e) {
 
 			}
 		}
-	}
-
-	public static void main(String[] args) {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				Camara camara = new Camara();
-				// Empezar la camara en nuevo Thread
-
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						camara.iniciarCamara();
-					}
-				}).start();
-			}
-		});
-
+		// capturaVideo = null;
 	}
 
 }

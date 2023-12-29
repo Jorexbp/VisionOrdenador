@@ -94,7 +94,7 @@ public class PantallaInicial extends JFrame {
 		setBounds(350, 100, 614, 536);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+		setResizable(false);
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
