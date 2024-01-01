@@ -328,6 +328,7 @@ public class Metodos_app {
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
+			
 			Process procesoSamples = Runtime.getRuntime().exec(comandoSamples);
 			while (new File(posVec).exists() && iter != 1) {
 				condicion.await();
@@ -365,7 +366,7 @@ public class Metodos_app {
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
 				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages + " -mode ALL";
 
-		String cmd = "cmd /c start cmd.exe /k ";
+		String cmd = "cmd /c start cmd.exe /c ";
 		String comandoSamples = cmd + comTR;
 
 		try {

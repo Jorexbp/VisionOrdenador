@@ -223,6 +223,9 @@ public class Metodos_BBDD {
 			if (e.toString().contains("duplicada")) {
 				JOptionPane.showMessageDialog(null,
 						"No puede repetirse el nombre de los modelos\n\tRegistro no insertado");
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"Asegúrese de que el XML sea legible por 'Todos' en\nla pestaña de seguridad\n\tRegistro no insertado ");
 			}
 
 		} finally {

@@ -370,11 +370,12 @@ public class App_Entrenamiento extends JFrame {
 
 				}
 				System.out.println(dirMod);
-				File modelo = new File(dirMod + "/cascade.xml");
-
-				String nombreModelo = dirMod + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")
+				File modelo = new File(dirMod);
+				
+				String nombreModelo = dirMod.substring(0,dirMod.lastIndexOf('/')) + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")
 						+ ".xml";
-
+				System.out.println(nombreModelo);
+				
 				if (modelo.renameTo(new File(nombreModelo))) {
 					JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombreModelo);
 				} else {
@@ -386,6 +387,7 @@ public class App_Entrenamiento extends JFrame {
 				mod = true;
 				Metodos_app.cambiarAUsable(lprobarmodelo, btnProbar);
 				rellenarTextArea();
+				// TODO HACER BOTON DE REINICIO
 			}
 		});
 		bcrearXML.setFont(new Font("Dialog", Font.BOLD, 14));
