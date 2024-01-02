@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,7 +37,7 @@ public class CamaraEntrenamiento extends JFrame {
 	public static void dirCarpeta(String dirCar) {
 		JOptionPane.showMessageDialog(null,
 				"Asegúrese de que la cámara pueda ver el objeto a identificar, la toma de captura de pantalla ocurre cada 1.25 segundos");
-		
+
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -62,19 +64,42 @@ public class CamaraEntrenamiento extends JFrame {
 		add(pantallaCamara);
 
 		btnCapturar = new JButton("Parar");
-		btnCapturar.setBounds(325, 480, 120, 40);
+		btnCapturar.setBounds(250, 480, 120, 40);
 		add(btnCapturar);
 
 		btnCapturar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clicked = true;
+				try {
+					capturaVideo.release();
+
+				} catch (Exception ere) {
+					// TODO: handle exception
+				}
+				dispose();
+				capturaVideo = null;
+				new PantallaInicial(0).setVisible(true);
+			}
+		});
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				try {
+					capturaVideo.release();	
+				}catch (Exception l) {
+					// TODO: handle exception
+				}
+				dispose();
+				capturaVideo = null;
+				new PantallaInicial(0).setVisible(true);
 			}
 		});
 
 		setSize(new Dimension(640, 560));
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}
 
@@ -86,6 +111,7 @@ public class CamaraEntrenamiento extends JFrame {
 		int c = 0;
 		ImageIcon icono = null;
 		while (true) {
+			try {
 			try {
 				Thread.sleep(1250);
 			} catch (InterruptedException e) {
@@ -107,10 +133,12 @@ public class CamaraEntrenamiento extends JFrame {
 
 			if (clicked) {
 				new PantallaInicial(0).setVisible(true);
-				dispose();
-
+				
 				break;
 
+			}
+			}catch (Exception e) {
+				// TODO: handle exception
 			}
 		}
 	}

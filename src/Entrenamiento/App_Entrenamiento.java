@@ -158,7 +158,7 @@ public class App_Entrenamiento extends JFrame {
 			textareainformativa.append("\nDirección del modelo> Nula");
 
 		}
-		textareainformativa.append("\nPre-modelo seleccionado > ");
+		textareainformativa.append("\nModelo seleccionado > ");
 
 		if (!premod) {
 			textareainformativa.append("Por defecto - Caras Humanas");
@@ -339,7 +339,7 @@ public class App_Entrenamiento extends JFrame {
 		bcrearsample.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT,1);
+				Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT, 1);
 				Metodos_app.cambiarAUsable(lcrearXML, bcrearXML);
 				Metodos_app.cambiarAUsable(lnumiter, spniteraciones);
 
@@ -363,19 +363,19 @@ public class App_Entrenamiento extends JFrame {
 					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
 					Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
 					Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
-					Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT,i+1);
-					
+					Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT, i + 1);
+
 					DetectorAnotations.cargarModelo(dirMod);
 					LecturaFotos.setModelo(dirMod);
 
 				}
 				System.out.println(dirMod);
 				File modelo = new File(dirMod);
-				
-				String nombreModelo = dirMod.substring(0,dirMod.lastIndexOf('/')) + "/" + JOptionPane.showInputDialog("Introduzca el nombre del modelo")
-						+ ".xml";
+
+				String nombreModelo = dirMod.substring(0, dirMod.lastIndexOf('/')) + "/"
+						+ JOptionPane.showInputDialog("Introduzca el nombre del modelo") + ".xml";
 				System.out.println(nombreModelo);
-				
+
 				if (modelo.renameTo(new File(nombreModelo))) {
 					JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombreModelo);
 				} else {
@@ -437,7 +437,7 @@ public class App_Entrenamiento extends JFrame {
 		btnCargar.setBounds(600, 233, 162, 34);
 		contentPane.add(btnCargar);
 
-		lcargamodelo = new JLabel("Cargar pre-modelo");
+		lcargamodelo = new JLabel("Cargar modelo");
 		lcargamodelo.setHorizontalAlignment(SwingConstants.CENTER);
 		lcargamodelo.setForeground(new Color(2, 0, 255));
 		lcargamodelo.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -450,6 +450,7 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				Camara camara = new Camara(dirMod);
 				camara.comenzarCamara();
+				dispose();
 			}
 		});
 		btnProbar.setFont(new Font("Dialog", Font.BOLD, 14));

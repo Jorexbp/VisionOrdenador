@@ -102,6 +102,8 @@ public class LecturaFotos extends JFrame {
 		setSize(new Dimension(640, 560));
 		setLocationRelativeTo(null);
 		setVisible(true);
+		
+	
 	}
 
 	public void iniciarCamara(String carpetaFotos, String carpetaPadre, String nombreSubCarpeta) throws IOException {

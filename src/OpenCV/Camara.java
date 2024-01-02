@@ -35,7 +35,7 @@ public class Camara extends JFrame {
 	private JButton btnCapturar, btnExtremos, btnCamara, btnCaras;
 	private VideoCapture capturaVideo;
 	private Mat imagen;
-	private boolean clicked, camara = true, soloCaras = false;
+	private boolean clicked, camara = true;
 
 	public Camara(String modelo) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -96,10 +96,10 @@ public class Camara extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				camara = false;
-				soloCaras = false;
+
 			}
 		});
-		btnCaras = new JButton("Ver Caras");
+		btnCaras = new JButton("Volver");
 		btnCaras.setBounds(0, 480, 120, 40);
 		getContentPane().add(btnCaras);
 
@@ -107,7 +107,16 @@ public class Camara extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				camara = false;
-				soloCaras = true;
+				dispose();
+				try {
+					capturaVideo.release();	
+				}catch (Exception pol) {
+					
+				}
+				
+				capturaVideo = null;
+				new PantallaInicial(0).setVisible(true);
+				
 			}
 		});
 
@@ -119,7 +128,7 @@ public class Camara extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				camara = true;
-				soloCaras = false;
+
 			}
 		});
 
@@ -163,15 +172,7 @@ public class Camara extends JFrame {
 
 					icono = new ImageIcon(DeteccionCara.mostrarInfoCara(imagen));
 
-				} else if (soloCaras) {
-					try {
-						ImageIcon ic = new ImageIcon(DeteccionCara.detecarSoloCara(imagen));
-						icono = ic;
-					} catch (Exception e) {
-
-					}
-
-				} else {
+				}  else {
 					icono = new ImageIcon(Extremos.detectarExtremos(imagen));
 
 				}
@@ -179,10 +180,10 @@ public class Camara extends JFrame {
 				if (clicked) {
 					String nombre = JOptionPane.showInputDialog(this, "Introduzca el nombre de la imagen");
 					if (nombre == null) {
-						nombre = new SimpleDateFormat("yyyy-mm-dd-hh-mm-ss").format(new Date());
+						nombre = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 					}
 
-					String dir = "Detecciones/" + nombre + ".jpg";
+					String dir = System.getProperty("user.home")+"Documents/" + nombre + ".jpg";
 					DeteccionCara.guardarImagen(imagen, dir);
 
 					clicked = false;

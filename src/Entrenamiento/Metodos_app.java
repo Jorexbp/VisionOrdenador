@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
+
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -206,7 +206,7 @@ public class Metodos_app {
 						BufferedImage originalImage = ImageIO.read(archivo);
 
 						Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
-						byte[] bytesMat = DeteccionCara.detectarCara(imageCara); // TODO NO FUNCIONA BIEN
+						byte[] bytesMat = DeteccionCara.detectarCara(imageCara);
 
 						imageCara = Imgcodecs.imdecode(new MatOfByte(bytesMat), Imgcodecs.IMREAD_UNCHANGED);
 						coords = DetectorAnotations.detectarCoordenadas(imageCara); // CON EL REC ROJO
@@ -277,7 +277,7 @@ public class Metodos_app {
 					escribirAnotation(archivo.getName(), coords, carpetaOriginal);
 
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 
@@ -388,8 +388,6 @@ public class Metodos_app {
 			if (new File(destino + "/modelos/cascade.xml").exists())
 				new File(destino + "/modelos/cascade.xml").delete();
 
-			// TODO A PARTIR DE LA SEGUNDA ITERACION NO PUEDE COPIARLO PORQUE ESTA SIENDO
-			// USADO, PUEDO RENOMBRARLO USANDO SU ID DE ITERACION Y USARLOS ASI
 			Path pathOrigen = Paths.get(destino + "/cascade.xml");
 			Path pathDestino = Paths.get(destino + "/modelos/cascade.xml");
 			Files.move(pathOrigen, pathDestino);
@@ -483,9 +481,6 @@ public class Metodos_app {
 		crearAnotaciones(nombreSubCarpeta, carpetaPadre, "fotos_denegadas.txt");
 
 		unirFicherosTXT(nombreSubCarpeta, "fotos_denegadas.txt", "fotos_confirmadas.txt");
-
-		// TODO MOVER LAS FOTOS Y EL POS.TXT DE LA SUBCARPETA DENEGADAS A LA ORIGINAL
-		// NORMAL Y QUITAR DIR ABSOLUTA
 
 		moverContenido(nombreSubCarpeta, carpetaOriginal);
 

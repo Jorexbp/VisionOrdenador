@@ -150,7 +150,7 @@ public class PantallaInicial extends JFrame {
 		lseguntit.setBounds(93, 82, 380, 39);
 		contentPane.add(lseguntit);
 
-		bentrenador = new JButton("Entrenar con un pre-modelo");
+		bentrenador = new JButton("Entrenar con un modelo");
 		bentrenador.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new App_Entrenamiento().setVisible(true);
@@ -176,7 +176,7 @@ public class PantallaInicial extends JFrame {
 		bgestorBBDDModelos.setBounds(300, 375, 236, 44);
 		contentPane.add(bgestorBBDDModelos);
 
-		bcrearpremodelo = new JButton("Crear un pre-modelo");
+		bcrearpremodelo = new JButton("Crear un modelo");
 		bcrearpremodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new App_Manual().setVisible(true);

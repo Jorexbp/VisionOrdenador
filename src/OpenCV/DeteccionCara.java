@@ -1,10 +1,7 @@
 package OpenCV;
 
-import java.net.URL;
-
 import javax.swing.ImageIcon;
 
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfRect;
@@ -67,7 +64,7 @@ public class DeteccionCara {
 		
 		// Dibujar rectángulos rojos en la imagen original
 		Rect[] caraArr = caras.toArray();
-		for (int i = 0; i < caraArr.length; i++) {// TODO PROBLEMA ES LENGTH == 0
+		for (int i = 0; i < caraArr.length; i++) {
 			// Dibujar
 			Imgproc.rectangle(imagen, caraArr[i].tl(), caraArr[i].br(), new Scalar(0, 0, 255), 5);
 			
@@ -164,26 +161,22 @@ public class DeteccionCara {
 		// Escribir a fichero
 		Rect[] caraArr = caras.toArray();
 		int numeroCaras = 0;
-		calcularDistancia cD = new calcularDistancia();
 		for (int i = 0; i < caraArr.length; i++) {
 			// Dibujar
 			Imgproc.rectangle(imagen, caraArr[i], new Scalar(0, 0, 255), 3);
 
 			// Texto al lado del rectangulo
 			String label = "Cara";
-			String labelDist = "Dist: " + cD.getDistancia();
 			numeroCaras++;
 			// Posicion debajo del rectangulo
 			Point puntoTexto = new Point(caraArr[i].tl().x, caraArr[i].br().y + 30);
-			Point puntoDist = new Point(caraArr[i].tl().x, caraArr[i].br().y + 60);
-
+		
 			// Dibujar el texto se puede personalizar mucho pero no se el fontFamily como
 			Imgproc.putText(imagen, label, puntoTexto, 2, 1.1, new Scalar(255, 255, 255), 2);
-			Imgproc.putText(imagen, labelDist, puntoDist, 2, 1.1, new Scalar(255, 255, 255), 2);
-
+		
 			// getDistancia
 		}
-		String nCaras = "Caras encontradas: " + Integer.toString(numeroCaras);
+		String nCaras = "Coincidenias encontradas: " + Integer.toString(numeroCaras);
 		Point puntoTexto = new Point(20, 50);
 		Imgproc.putText(imagen, nCaras, puntoTexto, 2, 1.1, new Scalar(0, 255, 255), 2);
 

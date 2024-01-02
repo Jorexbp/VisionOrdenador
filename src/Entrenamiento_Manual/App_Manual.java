@@ -82,7 +82,7 @@ public class App_Manual extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JLabel ltitulo = new JLabel("Creador de pre-Modelos");
+		JLabel ltitulo = new JLabel("Creador de Modelos");
 		ltitulo.setHorizontalAlignment(SwingConstants.CENTER);
 		ltitulo.setForeground(Color.BLUE);
 		ltitulo.setFont(new Font("Dialog", Font.BOLD, 26));
@@ -121,10 +121,10 @@ public class App_Manual extends JFrame {
 		belegircarpetaorigen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				direccionCarpetaFotos = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
-				System.out.println(direccionCarpetaFotos);
+				// System.out.println(direccionCarpetaFotos);
 				cSelecCarpetaFotos.setSelected(true);
 				Metodos_app.cambiarAUsable(lcarpetaFotosNegativas, bfotosnegativas);
-				// TODO CONTAR FOTOS DISPONIBLES Y/O RECORDATORIO DE IMPORTANCIA DE CANTIDAD
+
 			}
 		});
 		belegircarpetaorigen.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -153,7 +153,7 @@ public class App_Manual extends JFrame {
 		separator_2.setBounds(923, 352, 79, 281);
 		contentPane.add(separator_2);
 
-		JLabel lblParaUnMejor = new JLabel("Para un mejor pre-modelo");
+		JLabel lblParaUnMejor = new JLabel("Para un mejor modelo");
 		lblParaUnMejor.setHorizontalAlignment(SwingConstants.CENTER);
 		lblParaUnMejor.setForeground(new Color(0, 128, 0));
 		lblParaUnMejor.setFont(new Font("Dialog", Font.BOLD, 19));
@@ -178,7 +178,7 @@ public class App_Manual extends JFrame {
 		cCrearAnotaciones.setBounds(231, 546, 382, 24);
 		contentPane.add(cCrearAnotaciones);
 
-		cCrearModelo = new JCheckBox("Crear el pre-modelo");
+		cCrearModelo = new JCheckBox("Crear el modelo");
 		cCrearModelo.setFont(new Font("Dialog", Font.BOLD, 12));
 		cCrearModelo.setEnabled(false);
 		cCrearModelo.setBounds(231, 586, 382, 24);
@@ -222,13 +222,7 @@ public class App_Manual extends JFrame {
 		bidentificar.setEnabled(false);
 		bidentificar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO EJECUTAR ANOTACIONES...
-				// cCrearAnotaciones.setSelected(true);
-
-				// crearAnotaciones(String carpetaFotos, String carpetaFotosNeg, String
-				// carpetaDestino) {
-				// TODO CAMBIAR ANOTACIONES PARA PODER USARLO EN LECTURAFOTOS
-				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino,"pos.txt");
+				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt");
 				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
 				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
 				cCrearAnotaciones.setSelected(true);
@@ -250,8 +244,7 @@ public class App_Manual extends JFrame {
 		bcrearmodelo = new JButton("Comenzar");
 		bcrearmodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO CREAR SAMPLES Y MODELO
-				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino,"pos.txt",1);
+				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
 				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas);
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
@@ -264,7 +257,7 @@ public class App_Manual extends JFrame {
 		bcrearmodelo.setBounds(873, 181, 143, 32);
 		contentPane.add(bcrearmodelo);
 
-		lcrear = new JLabel("Entrenar pre-modelo");
+		lcrear = new JLabel("Entrenar modelo");
 		lcrear.setEnabled(false);
 		lcrear.setHorizontalAlignment(SwingConstants.CENTER);
 		lcrear.setForeground(new Color(2, 0, 255));
