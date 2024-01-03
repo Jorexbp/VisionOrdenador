@@ -246,11 +246,11 @@ public class App_Manual extends JFrame {
 		bcrearmodelo = new JButton("Comenzar");
 		bcrearmodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				direccionCarpetaFotos = "C:/Users/Alumno/Desktop/FotosEjemplo";
-				direccionCarpetaDestino = "C:/Users/Alumno/Desktop/DestinoEjemplo";
-				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
-				Metodos_app.carpetaPos = direccionCarpetaFotos;
-				Metodos_app.carpetaNeg = direccionFotosNegativas;
+//				direccionCarpetaFotos = "C:/Users/Alumno/Desktop/FotosEjemplo";
+//				direccionCarpetaDestino = "C:/Users/Alumno/Desktop/DestinoEjemplo";
+//				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
+//				Metodos_app.carpetaPos = direccionCarpetaFotos;
+//				Metodos_app.carpetaNeg = direccionFotosNegativas;
 // TODO Solucionando esta wea
 				
 				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
