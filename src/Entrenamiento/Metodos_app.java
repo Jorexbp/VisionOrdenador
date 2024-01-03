@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
-
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -277,7 +277,7 @@ public class Metodos_app {
 					escribirAnotation(archivo.getName(), coords, carpetaOriginal);
 
 				} catch (IOException e) {
-					
+
 					e.printStackTrace();
 				}
 
@@ -328,7 +328,7 @@ public class Metodos_app {
 		String comandoSamples = cmd + addrSample + " -info \"" + posTxt + "\" -w 24 -h 24 -num \"" + nSamples
 				+ "\" -vec \"" + posVec + "\"";
 		try {
-			
+
 			Process procesoSamples = Runtime.getRuntime().exec(comandoSamples);
 			while (new File(posVec).exists() && iter != 1) {
 				condicion.await();
@@ -351,7 +351,7 @@ public class Metodos_app {
 		return archivos.length;
 	}
 
-	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa) {
+	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa, int iter) {
 		bloqueo.lock();
 
 		int nStages = calcularNumSamples(carpetaPos) / 13;
@@ -363,21 +363,31 @@ public class Metodos_app {
 
 		String dirTxtNeg = carpetaOriginalNegativa + "\\neg.txt";
 		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
+		// TODO CD a el archivi bg
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
-				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages + " -mode ALL";
+				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages + " -mode ALL -maxFalseAlarmRate 0.3 -minHitRate 0.998";
 
-		String cmd = "cmd /c start cmd.exe /c ";
+		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + comTR;
 
 		try {
 
-			for (File fic : new File(destino).listFiles()) {
-				while ((fic.getAbsolutePath().contains("stage") && !fic.isDirectory())
-						|| fic.getAbsolutePath().contains("params")) {
-					Thread.sleep(500);
-					condicion.await();
-				}
+			if (iter != 1) {
+				for (File fic : new File(destino).listFiles()) {
+					while ((fic.getAbsolutePath().contains("stage") && !fic.isDirectory())
+							|| fic.getAbsolutePath().contains("params")) {
+						condicion.await();
 
+					}
+
+				}
+			}else {
+				for (File fic : new File(destino).listFiles()) {
+					if (!fic.isDirectory()) {
+						fic.delete();
+					}
+
+				}
 			}
 			Thread.sleep(1500);
 			Runtime.getRuntime().exec(comandoSamples);
@@ -449,7 +459,7 @@ public class Metodos_app {
 		return false;
 	}
 
-	private static void quitarDireccionAbsoluta(String dir) {
+	public static void quitarDireccionAbsoluta(String dir) {
 
 		BufferedReader br;
 		try {
@@ -457,7 +467,9 @@ public class Metodos_app {
 			String line;
 			String datos = "";
 			while ((line = br.readLine()) != null) {
-				datos += line.substring(line.lastIndexOf("\\") + 1) + "\n";
+
+				if (line.substring(line.indexOf(' ') + 1).toCharArray()[0] != '0')
+					datos += line.substring(line.lastIndexOf("\\") + 1) + "\n";
 			}
 			br.close();
 

@@ -359,15 +359,22 @@ public class App_Entrenamiento extends JFrame {
 				int nIteraciones = (int) spniteraciones.getValue();
 				// TODO ESTA MAL; HAY QUE HACER EL PROCESO DE ENTRENAR DE NUEVO, SE VUELVE A
 				// CREAR TODO Y YA
-				for (int i = 0; i < nIteraciones; i++) {
-					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa);
-					Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
-					Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
-					Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT, i + 1);
 
-					DetectorAnotations.cargarModelo(dirMod);
-					LecturaFotos.setModelo(dirMod);
+				if (nIteraciones == 1) {
+					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa,1);
 
+				} else {
+
+					for (int i = 0; i < nIteraciones; i++) {
+						dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa,i+1);
+						Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
+						Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
+						Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT, i + 1);
+
+						DetectorAnotations.cargarModelo(dirMod);
+						LecturaFotos.setModelo(dirMod);
+
+					}
 				}
 				System.out.println(dirMod);
 				File modelo = new File(dirMod);

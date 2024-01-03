@@ -120,6 +120,8 @@ public class App_Manual extends JFrame {
 		belegircarpetaorigen = new JButton("Seleccionar");
 		belegircarpetaorigen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(
+						"Si la carpeta no contiene un número significativo de imágenes (Ej: 100) no se creará correctamente");
 				direccionCarpetaFotos = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				// System.out.println(direccionCarpetaFotos);
 				cSelecCarpetaFotos.setSelected(true);
@@ -244,8 +246,16 @@ public class App_Manual extends JFrame {
 		bcrearmodelo = new JButton("Comenzar");
 		bcrearmodelo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				direccionCarpetaFotos = "C:/Users/Alumno/Desktop/FotosEjemplo";
+				direccionCarpetaDestino = "C:/Users/Alumno/Desktop/DestinoEjemplo";
+				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
+				Metodos_app.carpetaPos = direccionCarpetaFotos;
+				Metodos_app.carpetaNeg = direccionFotosNegativas;
+// TODO Solucionando esta wea
+				
+				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
 				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
-				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas);
+				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas,1);
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
 				cCrearModelo.setSelected(true);
@@ -257,7 +267,7 @@ public class App_Manual extends JFrame {
 		bcrearmodelo.setBounds(873, 181, 143, 32);
 		contentPane.add(bcrearmodelo);
 
-		lcrear = new JLabel("Entrenar modelo");
+		lcrear = new JLabel("Crear modelo");
 		lcrear.setEnabled(false);
 		lcrear.setHorizontalAlignment(SwingConstants.CENTER);
 		lcrear.setForeground(new Color(2, 0, 255));
@@ -277,7 +287,7 @@ public class App_Manual extends JFrame {
 		breentrenar.setBounds(1063, 181, 143, 32);
 		contentPane.add(breentrenar);
 
-		lreentrenar = new JLabel("Reentrenar ");
+		lreentrenar = new JLabel("Entrenar el modelo");
 		lreentrenar.setEnabled(false);
 		lreentrenar.setHorizontalAlignment(SwingConstants.CENTER);
 		lreentrenar.setForeground(new Color(2, 0, 255));
@@ -289,6 +299,8 @@ public class App_Manual extends JFrame {
 		bfotosnegativas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				direccionFotosNegativas = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
+				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
+				
 				Metodos_app.cambiarAUsable(lcarpetaDestino, bcarpetadestino);
 				cfotosnegaticas.setSelected(true);
 			}
