@@ -60,7 +60,6 @@ public class App_GestorBBDD extends JFrame {
 			super.fireTableDataChanged();
 		}
 	};
-	private JButton btndroptable;
 	private JButton btnBorrar;
 	private JButton btnInsertar;
 	private JLabel lmostrar;
@@ -144,24 +143,6 @@ public class App_GestorBBDD extends JFrame {
 		modelo = Metodos_BBDD.crearColumnas(modelo);
 		table.setModel(modelo);
 
-		btndroptable = new JButton("Borrar Tabla");
-		btndroptable.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				boolean borrado = false;
-				if (JOptionPane.showConfirmDialog(null,
-						"¿Quiere eliminar la tabla: Modelos?") == JOptionPane.OK_OPTION) {
-
-					borrado = Metodos_BBDD.borrarTabla("Modelos");
-				}
-				lmostrar.setText(borrado ? "Tabla eliminada" : "Tabla NO eliminada");
-
-			}
-		});
-		btndroptable.setForeground(new Color(255, 0, 0));
-		btndroptable.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btndroptable.setBounds(1005, 496, 125, 30);
-		contentPane.add(btndroptable);
-
 		Hashtable<String, String> columnasBBDD = new Hashtable<String, String>();
 		columnasBBDD.put("Nombre", "String"); // Ultimo en el orden
 		columnasBBDD.put("Tamaño_KiB", "Double");
@@ -200,7 +181,7 @@ public class App_GestorBBDD extends JFrame {
 		});
 		btnInsertar.setForeground(new Color(0, 0, 255));
 		btnInsertar.setFont(new Font("Dialog", Font.BOLD, 12));
-		btnInsertar.setBounds(30, 481, 150, 45);
+		btnInsertar.setBounds(130, 481, 150, 45);
 		contentPane.add(btnInsertar);
 
 		btnBorrar = new JButton("Borrar modelo");
@@ -212,8 +193,7 @@ public class App_GestorBBDD extends JFrame {
 					if (JOptionPane.showConfirmDialog(null, "¿Quiere eliminar el registro: "
 							+ table.getValueAt(table.getSelectedRow(), 0).toString() + "?") == JOptionPane.OK_OPTION) {
 
-						borrado = Metodos_BBDD.borrarRegistro("Modelos", "nombre",
-								table.getValueAt(table.getSelectedRow(), 0).toString());
+						borrado = Metodos_BBDD.borrarRegistro("Modelos", table.getSelectedRow());
 						Metodos_BBDD.repintarJTable(table, modelo);
 					}
 					lmostrar.setText(borrado ? "Registro eliminado" : "Registro NO eliminado");
@@ -226,7 +206,7 @@ public class App_GestorBBDD extends JFrame {
 		});
 		btnBorrar.setForeground(new Color(255, 0, 0));
 		btnBorrar.setFont(new Font("Dialog", Font.BOLD, 12));
-		btnBorrar.setBounds(550, 480, 150, 45);
+		btnBorrar.setBounds(650, 480, 150, 45);
 		contentPane.add(btnBorrar);
 
 		lmostrar = new JLabel("");
@@ -240,6 +220,7 @@ public class App_GestorBBDD extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				try {
+					lmostrar.setText("");
 					direccionXML = null;
 					nombreViejo = table.getValueAt(table.getSelectedRow(), 0).toString();
 					tnombrejif.setText(table.getValueAt(table.getSelectedRow(), 0).toString().substring(0,
@@ -248,7 +229,8 @@ public class App_GestorBBDD extends JFrame {
 					tfechajif.setText(table.getValueAt(table.getSelectedRow(), 2).toString());
 
 					jifActualizarRegistro.setVisible(true);
-					Metodos_inicio.visibilidad(false, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndroptable);
+					
+					Metodos_inicio.visibilidad(false, scrollPane, btnActualizar, btnBorrar, btnInsertar,btndescargar);
 
 					Metodos_BBDD.repintarJTable(table, modelo);
 				} catch (Exception s) {
@@ -260,14 +242,14 @@ public class App_GestorBBDD extends JFrame {
 		});
 		btnActualizar.setForeground(new Color(0, 128, 0));
 		btnActualizar.setFont(new Font("Dialog", Font.BOLD, 12));
-		btnActualizar.setBounds(290, 481, 150, 45);
+		btnActualizar.setBounds(390, 481, 150, 45);
 		contentPane.add(btnActualizar);
 
 		jifActualizarRegistro = new JInternalFrame("Actualizar registro");
 		jifActualizarRegistro.addInternalFrameListener(new InternalFrameAdapter() {
 			@Override
 			public void internalFrameClosing(InternalFrameEvent e) {
-				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndroptable);
+				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar,btndescargar);
 			}
 		});
 		jifActualizarRegistro.setVisible(false);
@@ -357,7 +339,7 @@ public class App_GestorBBDD extends JFrame {
 					actualizado = Metodos_BBDD.actualizarRegistro("Modelos", nombreViejo,
 							tnombrejif.getText().concat(".xml"), "nombre", "nombre");
 				} else {
-					actualizado = Metodos_BBDD.actualizarRegistroXML("Modelos", nombreViejo,
+					actualizado = Metodos_BBDD.actualizarRegistroXML("Modelos", table.getSelectedRow(),
 							tnombrejif.getText().concat(".xml"), direccionXML);
 				}
 
@@ -367,7 +349,7 @@ public class App_GestorBBDD extends JFrame {
 
 				jifActualizarRegistro.dispose();
 
-				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndroptable);
+				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar);
 
 			}
 		});
@@ -379,18 +361,24 @@ public class App_GestorBBDD extends JFrame {
 		btndescargar = new JButton("Descargar modelo");
 		btndescargar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					Metodos_BBDD.descargarModeloXML("xml", "Modelos", "nombre",
-							table.getValueAt(table.getSelectedRow(), 0).toString());
-				} catch (Exception a) {
+				if (table.getSelectedRow() != -1) {
+
+					try {
+						lmostrar.setText("");
+						Metodos_BBDD.descargarModeloXML("xml",table.getValueAt(table.getSelectedRow(), 0).toString(), "Modelos", table.getSelectedRow());
+						lmostrar.setText("Modelo descargado");
+					} catch (Exception a) {
+						lmostrar.setText("Debe seleccionar un registro");
+					}
+				} else
 					lmostrar.setText("Debe seleccionar un registro");
-				}
+
 			}
 
 		});
 		btndescargar.setForeground(new Color(0, 128, 128));
 		btndescargar.setFont(new Font("Dialog", Font.BOLD, 12));
-		btndescargar.setBounds(30, 559, 150, 45);
+		btndescargar.setBounds(900, 480, 150, 45);
 		contentPane.add(btndescargar);
 
 	}

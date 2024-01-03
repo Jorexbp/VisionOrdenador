@@ -3,6 +3,7 @@ package OperadorBBDD;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +11,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -18,6 +20,11 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import Entrenamiento.Metodos_app;
 
@@ -37,6 +44,7 @@ public class Metodos_BBDD {
 	private static Statement statement = null;
 	private static ResultSet rs = null;
 	private static DatabaseMetaData dbmd;
+	private static PreparedStatement preparedStatement;
 
 	public static boolean abrirConexion() {
 		try {
@@ -286,15 +294,17 @@ public class Metodos_BBDD {
 		}
 	}
 
-	public static String buscarRegistro(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
+	public static String buscarRegistro(String nombreTabla, int indice) {
 		abrirConexion();
 
 		String datosRegistro = "";
 		try {
-			String query = "select * from " + nombreTabla + " where " + campoPorElQueBuscar + "= '"
-					+ valorPorElQueBuscar + "'";
-			statement = con.createStatement();
-			rs = statement.executeQuery(query);
+			String query = "SELECT * FROM " + nombreTabla + " WHERE ctid = (SELECT ctid FROM " + nombreTabla
+					+ " ORDER BY ctid LIMIT 1 OFFSET ?)";
+			preparedStatement = con.prepareStatement(query);
+
+			preparedStatement.setInt(1, indice);
+			rs = preparedStatement.executeQuery();
 			while (rs.next()) {
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
 					datosRegistro += rs.getString(i) + ",";
@@ -317,16 +327,16 @@ public class Metodos_BBDD {
 		tabla = centrarRegistrosEnJTable(tabla);
 	}
 
-	public static boolean borrarRegistro(String nombreTabla, String campoPorElQueBuscar, String valorPorElQueBuscar) {
+	public static boolean borrarRegistro(String nombreTabla, int indice) {
 		abrirConexion();
 
 		try {
-			String query = "delete from " + nombreTabla + " where " + campoPorElQueBuscar + "= '" + valorPorElQueBuscar
-					+ "'";
+			String consulta = "DELETE FROM " + nombreTabla + " WHERE ctid = (SELECT ctid FROM " + nombreTabla
+					+ " ORDER BY ctid LIMIT 1 OFFSET ?)";
 
-			statement = con.createStatement();
-
-			int elim = statement.executeUpdate(query);
+			preparedStatement = con.prepareStatement(consulta);
+			preparedStatement.setInt(1, indice);
+			int elim = preparedStatement.executeUpdate();
 
 			return elim != 0 ? true : false;
 
@@ -359,7 +369,7 @@ public class Metodos_BBDD {
 		return false;
 	}
 
-	public static boolean actualizarRegistroXML(String nombreTabla, String nombreViejo, String nuevoNombre,
+	public static boolean actualizarRegistroXML(String nombreTabla, int indice, String nuevoNombre,
 			String direccionXML) {
 		abrirConexion();
 
@@ -368,9 +378,12 @@ public class Metodos_BBDD {
 
 			String query = "	UPDATE " + nombreTabla + " SET nombre = '" + nuevoNombre
 					+ "', xml = XMLPARSE(DOCUMENT CONVERT_FROM(pg_read_binary_file('" + archivoXML.getAbsolutePath()
-					+ "'), 'UTF8')) WHERE nombre = '" + nombreViejo + "';";
+					+ "'), 'UTF8')) WHERE  WHERE ctid = (SELECT ctid FROM " + nombreTabla
+					+ " ORDER BY ctid LIMIT 1 OFFSET ?)";
 			statement = con.createStatement();
-			int act = statement.executeUpdate(query);
+			preparedStatement = con.prepareStatement(query);
+			preparedStatement.setInt(1, indice);
+			int act = preparedStatement.executeUpdate(query);
 			if (act > 0) {
 				return true;
 			}
@@ -418,18 +431,22 @@ public class Metodos_BBDD {
 		return registro;
 	}
 
-	public static void descargarModeloXML(String nombreColumnaXML, String nombreTabla, String campoDiferenciador,
-			String valorDiferenciador) {
+	public static void descargarModeloXML(String nombreColumnaXML, String nombreArchivo, String nombreTabla,
+			int indice) {
 		abrirConexion();
 		try {
+			String query = "SELECT " + nombreColumnaXML + "  FROM " + nombreTabla + " WHERE ctid = (SELECT ctid FROM "
+					+ nombreTabla + " ORDER BY ctid LIMIT 1 OFFSET ?) ";
 			statement = con.createStatement();
-			rs = statement.executeQuery("SELECT " + nombreColumnaXML + " FROM " + nombreTabla + " WHERE "
-					+ campoDiferenciador + "='" + valorDiferenciador + "'");
+			preparedStatement = con.prepareStatement(query);
+			preparedStatement.setInt(1, indice);
+			rs = preparedStatement.executeQuery();
 
 			if (rs.next()) {
 				String xmlData = rs.getString(nombreColumnaXML);
+				JOptionPane.showMessageDialog(null, "Seleccione una carpeta donde guardar el archivo");
 				FileWriter fileWriter = new FileWriter(
-						Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY) + "/" + valorDiferenciador);
+						Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY) + "/" + nombreArchivo);
 
 				fileWriter.write(xmlData);
 				fileWriter.close();
@@ -479,10 +496,21 @@ public class Metodos_BBDD {
 
 			Object[] reg = new Object[rs.getMetaData().getColumnCount()];
 
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+
 			while (rs.next()) {
 				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
 					if (rs.getString(i) != null && i == rs.getMetaData().getColumnCount()) {
-						reg[i - 1] = "Correcto";
+						try {
+							@SuppressWarnings("unused")
+							Document document = builder.parse(new InputSource(new StringReader(rs.getString(i-3))));
+
+							reg[i - 1] = "XML válido";
+						} catch (Exception e) {
+							reg[i - 1] = "XML NO válido";
+						}
+
 					} else if (i == 1) {
 						reg[i - 1] = rs.getString(i + 3);
 					} else {

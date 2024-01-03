@@ -110,7 +110,7 @@ public class App_Manual extends JFrame {
 		separator.setBounds(0, 92, 1288, 24);
 		contentPane.add(separator);
 
-		lcarpetaorigen = new JLabel("Carpeta origen");
+		lcarpetaorigen = new JLabel("Carpeta positiva");
 		lcarpetaorigen.setHorizontalAlignment(SwingConstants.CENTER);
 		lcarpetaorigen.setForeground(new Color(2, 0, 255));
 		lcarpetaorigen.setFont(new Font("Dialog", Font.BOLD, 14));
