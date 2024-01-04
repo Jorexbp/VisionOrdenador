@@ -254,11 +254,7 @@ public class App_Manual extends JFrame {
 //				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
 //				Metodos_app.carpetaPos = direccionCarpetaFotos;
 //				Metodos_app.carpetaNeg = direccionFotosNegativas;
-<<<<<<< HEAD
-//
-=======
-// TODO Solucionando esta wea
->>>>>>> aaf374f22b2ad83e6ac70206ce9378dd1d4b2dde
+
 
 				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
 				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
