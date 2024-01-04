@@ -75,7 +75,9 @@ public class App_Manual extends JFrame {
 	public App_Manual() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1317, 670);
-		setExtendedState(MAXIMIZED_BOTH);
+		setBounds(100, 100, 1250, 665);
+		setAutoRequestFocus(true);
+		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -252,10 +254,10 @@ public class App_Manual extends JFrame {
 //				Metodos_app.carpetaPos = direccionCarpetaFotos;
 //				Metodos_app.carpetaNeg = direccionFotosNegativas;
 // TODO Solucionando esta wea
-				
+
 				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
 				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
-				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas,1);
+				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas, 1);
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
 				cCrearModelo.setSelected(true);
@@ -300,7 +302,7 @@ public class App_Manual extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				direccionFotosNegativas = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
-				
+
 				Metodos_app.cambiarAUsable(lcarpetaDestino, bcarpetadestino);
 				cfotosnegaticas.setSelected(true);
 			}
