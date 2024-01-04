@@ -76,7 +76,9 @@ public class App_Manual extends JFrame {
 	public App_Manual() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1317, 670);
-		setExtendedState(MAXIMIZED_BOTH);
+		setBounds(100, 100, 1250, 665);
+		setAutoRequestFocus(true);
+		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -252,7 +254,11 @@ public class App_Manual extends JFrame {
 //				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
 //				Metodos_app.carpetaPos = direccionCarpetaFotos;
 //				Metodos_app.carpetaNeg = direccionFotosNegativas;
+<<<<<<< HEAD
 //
+=======
+// TODO Solucionando esta wea
+>>>>>>> aaf374f22b2ad83e6ac70206ce9378dd1d4b2dde
 
 				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
 				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
