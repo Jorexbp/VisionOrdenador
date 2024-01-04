@@ -11,6 +11,7 @@ import Entrenamiento.Metodos_app;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -120,7 +121,7 @@ public class App_Manual extends JFrame {
 		belegircarpetaorigen = new JButton("Seleccionar");
 		belegircarpetaorigen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(
+				JOptionPane.showMessageDialog(null,
 						"Si la carpeta no contiene un número significativo de imágenes (Ej: 100) no se creará correctamente");
 				direccionCarpetaFotos = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				// System.out.println(direccionCarpetaFotos);
@@ -251,11 +252,11 @@ public class App_Manual extends JFrame {
 //				direccionFotosNegativas = "C:/Users/Alumno/Desktop/MuchasFotos/Neg";
 //				Metodos_app.carpetaPos = direccionCarpetaFotos;
 //				Metodos_app.carpetaNeg = direccionFotosNegativas;
-// TODO Solucionando esta wea
-				
+//
+
 				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
 				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
-				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas,1);
+				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas, 1);
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
 				cCrearModelo.setSelected(true);
@@ -300,7 +301,7 @@ public class App_Manual extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				direccionFotosNegativas = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
-				
+
 				Metodos_app.cambiarAUsable(lcarpetaDestino, bcarpetadestino);
 				cfotosnegaticas.setSelected(true);
 			}
