@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
-
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -47,9 +47,16 @@ public class Metodos_app {
 		carpetaNeg = carpetaOriginalNegativa;
 	}
 
-	public static void cambiarAUsable(javax.swing.JComponent lcargafotospos2, javax.swing.JComponent befotospos2) {
-		lcargafotospos2.setEnabled(true);
-		befotospos2.setEnabled(true);
+	public static void cambiarAUsable(javax.swing.JComponent... lcargafotospos2) {
+		for (JComponent jComponent : lcargafotospos2) {
+			jComponent.setEnabled(true);
+		}
+	}
+
+	public static void cambiarANoUsable(javax.swing.JComponent... lcargafotospos2) {
+		for (JComponent jComponent : lcargafotospos2) {
+			jComponent.setEnabled(false);
+		}
 	}
 
 	public static boolean esArchivoDeImagen(File archivo) {
@@ -373,24 +380,14 @@ public class Metodos_app {
 		try {
 
 			if (iter != 1) {
-				for (File fic : new File(destino).listFiles()) {
-					while ((fic.getAbsolutePath().contains("stage") && !fic.isDirectory())
-							|| fic.getAbsolutePath().contains("params")) {
-						condicion.await();
+				Thread.sleep(1500);
+				Runtime.getRuntime().exec(comandoSamples);
 
-					}
-
-				}
 			} else {
-				for (File fic : new File(destino).listFiles()) {
-					if (!fic.isDirectory()) {
-						fic.delete();
-					}
+				Runtime.getRuntime().exec(comandoSamples);
 
-				}
 			}
-			Thread.sleep(1500);
-			Runtime.getRuntime().exec(comandoSamples);
+
 			while (!new File(destino + "/cascade.xml").exists()) {
 				Thread.sleep(500);
 			}
@@ -411,8 +408,7 @@ public class Metodos_app {
 				}
 
 			}
-
-			condicion.signal();
+			System.out.println("Señal");
 			bloqueo.unlock();
 
 			return destino + "/modelos/cascade.xml";

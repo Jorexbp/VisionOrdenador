@@ -42,21 +42,18 @@ public class App_Entrenamiento extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextArea textareainformativa;
-	private String dirMod;
 	private JButton belegircarpetadestino;
 	private JButton btncarpetadefecto;
-	private String carpetaPadre;
 	private JLabel lcargafotospos;
 	private JButton befotospos;
 	private JLabel lcargafotosneg;
 	private JButton bfotosneg;
 	private boolean neg, pos, sam, mod, premod;
-	private String posTXT;
 	private JLabel lcrearsample;
 	private JButton bcrearsample;
 	private JLabel lcrearXML;
 	private JButton bcrearXML;
-	private String carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod;
+	private String carpetaOriginalPositiva, carpetaOriginalNegativa, dirPreMod, dirMod, carpetaPadre, posTXT;
 	private JButton bvolver;
 	private JLabel lcargamodelo;
 	private JLabel lprobarmodelo;
@@ -277,7 +274,6 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
 
-				// TODO REINVENTAR LA RUEDA TXT
 				posTXT = "pos.txt";
 				if (ccomprobarimagen.isSelected()) {
 					LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO
@@ -285,7 +281,7 @@ public class App_Entrenamiento extends JFrame {
 
 					Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
 				} else {
-					// TODO HACER LAS ANOTACIONES SIN LA COMPROBACION
+
 					Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre);
 
 				}
@@ -358,15 +354,13 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				int nIteraciones = (int) spniteraciones.getValue();
-				// TODO ESTA MAL; HAY QUE HACER EL PROCESO DE ENTRENAR DE NUEVO, SE VUELVE A
-				// CREAR TODO Y YA
 
 				if (nIteraciones == 1) {
 					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa, 1);
 
 				} else {
 
-					for (int i = 0; i < nIteraciones; i++) {
+					for (int i = 0; i <= nIteraciones; i++) {
 						dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa, i + 1);
 						Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
 						Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
@@ -477,13 +471,10 @@ public class App_Entrenamiento extends JFrame {
 		breinicio.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-//				reiniciarStrings(carpetaOrigen, carpetaDestino, carpetaOriginal, dirMod, carpetaOriginalPositiva,
-//						carpetaOriginalNegativa, dirPreMod);
-//
-//				reiniciarComponentes(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample, bcrearsample,
-//						lcrearXML, bcrearXML, btnProbar, lprobarmodelo);
-//
-//				reiniciarBooleanos(neg, pos, sam, mod, premod);
+				Metodos_app.cambiarANoUsable(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample,
+						bcrearsample, btnProbar, lprobarmodelo, lcrearXML, bcrearXML, lnumiter, spniteraciones);
+				carpetaOriginalPositiva = carpetaOriginalNegativa = dirPreMod = dirMod = carpetaPadre = posTXT = "";
+
 				rellenarTextArea();
 				// TODO NO REINICIA SABE DIOS
 
