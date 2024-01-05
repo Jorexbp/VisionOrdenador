@@ -187,7 +187,6 @@ public class App_Entrenamiento extends JFrame {
 		setTitle("Entrenamiento de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1250, 665);
-		setExtendedState(MAXIMIZED_BOTH);
 		setLocationRelativeTo(null);
 		setAutoRequestFocus(true);
 		setResizable(false);
