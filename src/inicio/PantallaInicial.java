@@ -92,6 +92,8 @@ public class PantallaInicial extends JFrame {
 		setTitle("Entrenador de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(350, 100, 614, 536);
+		
+		 setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setResizable(false);

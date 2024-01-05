@@ -1,6 +1,5 @@
 package Entrenamiento;
 
-
 import java.io.File;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -16,6 +15,7 @@ import org.opencv.objdetect.Objdetect;
 
 public class DetectorAnotations {
 	private static String modelo;
+
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
@@ -30,7 +30,7 @@ public class DetectorAnotations {
 
 		}
 	}
-	
+
 	public static void cargarModelo(String dirModelo) {
 		modelo = dirModelo;
 	}
@@ -55,14 +55,14 @@ public class DetectorAnotations {
 		CascadeClassifier cascadaCara = new CascadeClassifier();
 
 		// Cargar el XML de dataset de caras
-		if(modelo == null){
+		if (modelo == null) {
 			cascadaCara.load("Datasets/haarcascade_frontalface_alt2.xml");
-			
-		}else {
+
+		} else {
 			cascadaCara.load(modelo);
-			
+
 		}
-			
+
 		cascadaCara.detectMultiScale(frameGris, caras, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(tamañoCara, tamañoCara), new Size());
 
@@ -91,13 +91,13 @@ public class DetectorAnotations {
 		int yInicial = -1;
 		int anchoRectangulo = 0;
 		int altoRectangulo = 0;
-		Scalar colorRojo = new Scalar(0, 0, 255); 
+		Scalar colorRojo = new Scalar(0, 0, 255);
 
 		for (int y = 0; y < alto; y++) {
 			for (int x = 0; x < ancho; x++) {
-				double[] pixelValue = imagen.get(y, x); 
+				double[] pixelValue = imagen.get(y, x);
 				Scalar colorPixel = new Scalar(pixelValue);
-				
+
 				if (esColorRojo(colorPixel, colorRojo)) {
 
 					if (xInicial == -1) {
@@ -119,6 +119,14 @@ public class DetectorAnotations {
 //		System.out.println("Rectángulo Rojo encontrado en coordenadas: (" + xInicial + ", " + yInicial + ")");
 //		System.out.println("Ancho del rectángulo: " + anchoRectangulo);
 //		System.out.println("Alto del rectángulo: " + altoRectangulo);
+
+		return coords;
+	}
+
+	public static int[] coordenadasFoto(Mat imagen) {
+		int ancho = imagen.cols();
+		int alto = imagen.rows();
+		int[] coords = { 0, 0, ancho, alto };
 
 		return coords;
 	}

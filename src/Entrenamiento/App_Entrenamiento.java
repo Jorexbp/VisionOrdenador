@@ -186,8 +186,9 @@ public class App_Entrenamiento extends JFrame {
 
 		setTitle("Entrenamiento de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1250, 665
-				);
+		setBounds(100, 100, 1250, 665);
+		setExtendedState(MAXIMIZED_BOTH);
+		setLocationRelativeTo(null);
 		setAutoRequestFocus(true);
 		setResizable(false);
 		contentPane = new JPanel();
@@ -362,12 +363,12 @@ public class App_Entrenamiento extends JFrame {
 				// CREAR TODO Y YA
 
 				if (nIteraciones == 1) {
-					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa,1);
+					dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa, 1);
 
 				} else {
 
 					for (int i = 0; i < nIteraciones; i++) {
-						dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa,i+1);
+						dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa, i + 1);
 						Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
 						Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
 						Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT, i + 1);

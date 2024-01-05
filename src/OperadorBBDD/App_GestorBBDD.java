@@ -95,7 +95,9 @@ public class App_GestorBBDD extends JFrame {
 		setTitle("Entrenamiento de modelos - Jorge Barba Polán");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1221, 652);
+
 		setExtendedState(MAXIMIZED_BOTH);
+		setLocationRelativeTo(null);
 		setAutoRequestFocus(true);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -229,8 +231,8 @@ public class App_GestorBBDD extends JFrame {
 					tfechajif.setText(table.getValueAt(table.getSelectedRow(), 2).toString());
 
 					jifActualizarRegistro.setVisible(true);
-					
-					Metodos_inicio.visibilidad(false, scrollPane, btnActualizar, btnBorrar, btnInsertar,btndescargar);
+
+					Metodos_inicio.visibilidad(false, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndescargar);
 
 					Metodos_BBDD.repintarJTable(table, modelo);
 				} catch (Exception s) {
@@ -249,7 +251,7 @@ public class App_GestorBBDD extends JFrame {
 		jifActualizarRegistro.addInternalFrameListener(new InternalFrameAdapter() {
 			@Override
 			public void internalFrameClosing(InternalFrameEvent e) {
-				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar,btndescargar);
+				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar, btndescargar);
 			}
 		});
 		jifActualizarRegistro.setVisible(false);
@@ -365,7 +367,8 @@ public class App_GestorBBDD extends JFrame {
 
 					try {
 						lmostrar.setText("");
-						Metodos_BBDD.descargarModeloXML("xml",table.getValueAt(table.getSelectedRow(), 0).toString(), "Modelos", table.getSelectedRow());
+						Metodos_BBDD.descargarModeloXML("xml", table.getValueAt(table.getSelectedRow(), 0).toString(),
+								"Modelos", table.getSelectedRow());
 						lmostrar.setText("Modelo descargado");
 					} catch (Exception a) {
 						lmostrar.setText("Debe seleccionar un registro");

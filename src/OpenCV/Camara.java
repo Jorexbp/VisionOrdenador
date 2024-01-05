@@ -72,7 +72,7 @@ public class Camara extends JFrame {
 	private void iniciarComponentes() {
 		// GUI
 		getContentPane().setLayout(null);
-
+		 setLocationRelativeTo(null);
 		pantallaCamara = new JLabel();
 		pantallaCamara.setBounds(0, 0, 640, 480);
 		getContentPane().add(pantallaCamara);

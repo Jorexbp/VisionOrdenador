@@ -53,6 +53,7 @@ public class App_Manual extends JFrame {
 	private JLabel lcarpetaFotosNegativas;
 	private JCheckBox cfotosnegaticas;
 	private JCheckBox cfotosnegativas;
+	private JCheckBox cfotosposi;
 
 	/**
 	 * Launch the application.
@@ -76,7 +77,7 @@ public class App_Manual extends JFrame {
 	public App_Manual() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1317, 670);
-		setBounds(100, 100, 1250, 665);
+		setLocationRelativeTo(null);
 		setAutoRequestFocus(true);
 		setResizable(false);
 		contentPane = new JPanel();
@@ -227,7 +228,17 @@ public class App_Manual extends JFrame {
 		bidentificar.setEnabled(false);
 		bidentificar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt");
+				// TODO Funcion que recoja toda la imagen como muestra
+				if(cfotosposi.isSelected()) {
+					// Se usa toda la foto
+					Metodos_app.crearAnotacionConTodaLaFoto(direccionCarpetaFotos, direccionCarpetaDestino);
+					
+				}else {
+					// Ejecución normal
+					Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt");
+					
+				}
+				
 				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
 				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
 				cCrearAnotaciones.setSelected(true);
@@ -262,6 +273,8 @@ public class App_Manual extends JFrame {
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
 				cCrearModelo.setSelected(true);
+				
+				JOptionPane.showMessageDialog(null, "Modelo creado");
 
 			}
 		});
@@ -323,7 +336,7 @@ public class App_Manual extends JFrame {
 
 		cfotosnegaticas = new JCheckBox("Seleccionar una carpeta con fotos de lo que NO se quiere identificar");
 		cfotosnegaticas.setFont(new Font("Dialog", Font.BOLD, 12));
-		cfotosnegaticas.setEnabled(false);
+		cfotosnegaticas.setEnabled(false); setLocationRelativeTo(null);
 		cfotosnegaticas.setBounds(231, 452, 428, 24);
 		contentPane.add(cfotosnegaticas);
 
@@ -332,5 +345,11 @@ public class App_Manual extends JFrame {
 		cfotosnegativas.setEnabled(false);
 		cfotosnegativas.setBounds(1008, 454, 254, 24);
 		contentPane.add(cfotosnegativas);
+		
+		cfotosposi = new JCheckBox("Usar las imágenes al completo sin especificaciones (+Rápido +Consumo)");
+		cfotosposi.setForeground(new Color(0, 0, 255));
+		cfotosposi.setFont(new Font("Dialog", Font.BOLD, 11));
+		cfotosposi.setBounds(90, 288, 443, 24);
+		contentPane.add(cfotosposi);
 	}
 }

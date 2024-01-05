@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -296,7 +295,7 @@ public class Metodos_app {
 			fw = new FileWriter(new File(carpetaOriginal + "\\pos.txt"), true);
 
 			String datos = dir + "  1  " + coords[0] + " " + coords[1] + " " + coords[2] + " " + coords[3] + "\n";
-			System.out.println(datos);
+			// System.out.println(datos);
 			fw.write(datos);
 			fw.close();
 		} catch (IOException e) {
@@ -363,9 +362,10 @@ public class Metodos_app {
 
 		String dirTxtNeg = carpetaOriginalNegativa + "\\neg.txt";
 		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
-		// TODO CD a el archivi bg
+
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
-				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages + " -mode ALL -maxFalseAlarmRate 0.3 -minHitRate 0.998";
+				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages
+				+ " -mode ALL -maxFalseAlarmRate 0.3 -minHitRate 0.998";
 
 		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + comTR;
@@ -381,7 +381,7 @@ public class Metodos_app {
 					}
 
 				}
-			}else {
+			} else {
 				for (File fic : new File(destino).listFiles()) {
 					if (!fic.isDirectory()) {
 						fic.delete();
@@ -394,6 +394,9 @@ public class Metodos_app {
 			while (!new File(destino + "/cascade.xml").exists()) {
 				Thread.sleep(500);
 			}
+
+			if (!new File(destino + "/modelos").exists())
+				new File(destino + "/modelos").mkdir();
 
 			if (new File(destino + "/modelos/cascade.xml").exists())
 				new File(destino + "/modelos/cascade.xml").delete();
@@ -457,6 +460,95 @@ public class Metodos_app {
 		}
 
 		return false;
+	}
+
+	public static boolean crearAnotacionConTodaLaFoto(String carpetaOriginal, String carpetaDestino) {
+		JFrame frame = new JFrame("Cargando fotos...");
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setBounds(425, 250, 450, 150);
+		frame.setUndecorated(true);
+		frame.setResizable(false);
+		frame.setLayout(new BorderLayout());
+
+		JLabel titleLabel = new JLabel("<html>Cargando fotos:<br><i>" + carpetaOriginal + "</i> </html>");
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		titleLabel.setForeground(new Color(2, 0, 255));
+		titleLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		frame.add(titleLabel, BorderLayout.NORTH);
+
+		JProgressBar progressBar = new JProgressBar();
+		// progressBar.setIndeterminate(true);
+		progressBar.setStringPainted(true);
+		frame.add(progressBar, BorderLayout.CENTER);
+
+		cambiarNombres(carpetaOriginal, carpetaDestino);
+
+		if (new File(carpetaOriginal + "\\pos.txt").exists()) {
+			new File(carpetaOriginal + "\\pos.txt").delete();
+
+		}
+		File origen = new File(carpetaOriginal);
+		File[] archivos = origen.listFiles();
+
+		SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
+			@Override
+			protected Void doInBackground() throws Exception {
+
+				int[] coords = new int[4];
+				int i = 0;
+
+				for (File archivo : archivos) {
+					if (esArchivoDeImagen(archivo)) {
+
+						BufferedImage originalImage = ImageIO.read(archivo);
+
+						Mat imageCara = Redimensionador.bufferedImageToMat(originalImage);
+						MatOfByte matOfByte = new MatOfByte();
+						Imgcodecs.imencode(".png", imageCara, matOfByte);
+
+						imageCara = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_UNCHANGED);
+						coords = DetectorAnotations.coordenadasFoto(imageCara); // CON TODA LA FOTO
+
+						escribirAnotation(archivo.getName(), coords, carpetaOriginal);
+
+						frame.toFront();
+						i++;
+						publish(i);
+
+					}
+				}
+
+				frame.dispose();
+				JFrame completionFrame = new JFrame("Carga completada");
+				JLabel completionLabel = new JLabel("La carga ha sido completada exitosamente");
+				completionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+				completionFrame.add(completionLabel);
+				completionFrame.setSize(300, 100);
+				completionFrame.setLocationRelativeTo(null);
+				completionFrame.setVisible(true);
+				completionFrame.setResizable(false);
+				completionFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				Thread.sleep(2500);
+				completionFrame.dispose();
+				return null;
+			}
+
+			@Override
+			protected void process(java.util.List<Integer> chunks) {
+				for (int value : chunks) {
+					progressBar.setValue(value);
+				}
+			}
+		};
+//		if (new File(carpetaOriginal).exists()) {
+//			new File(carpetaOriginal).delete();
+//		}
+
+		worker.execute();
+
+		frame.setVisible(true);
+		return true;
+
 	}
 
 	public static void quitarDireccionAbsoluta(String dir) {
