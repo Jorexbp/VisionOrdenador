@@ -378,12 +378,12 @@ public class Metodos_app {
 		String comandoSamples = cmd + comTR;
 
 		try {
-
+			Thread.sleep(1500);
 			if (iter != 1) {
-				Thread.sleep(1500);
 				Runtime.getRuntime().exec(comandoSamples);
 
 			} else {
+
 				Runtime.getRuntime().exec(comandoSamples);
 
 			}
@@ -408,7 +408,6 @@ public class Metodos_app {
 				}
 
 			}
-			System.out.println("Señal");
 			bloqueo.unlock();
 
 			return destino + "/modelos/cascade.xml";

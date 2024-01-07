@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import Entrenamiento.App_Entrenamiento;
 import Entrenamiento.Metodos_app;
+import OperadorBBDD.Metodos_BBDD;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
@@ -22,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JSeparator;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.net.URL;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
@@ -229,16 +231,16 @@ public class App_Manual extends JFrame {
 		bidentificar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Funcion que recoja toda la imagen como muestra
-				if(cfotosposi.isSelected()) {
+				if (cfotosposi.isSelected()) {
 					// Se usa toda la foto
 					Metodos_app.crearAnotacionConTodaLaFoto(direccionCarpetaFotos, direccionCarpetaDestino);
-					
-				}else {
+
+				} else {
 					// Ejecución normal
 					Metodos_app.crearAnotaciones(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt");
-					
+
 				}
-				
+
 				Metodos_app.crearAnotacionNegativa(direccionFotosNegativas);
 				Metodos_app.cambiarAUsable(lcrear, bcrearmodelo);
 				cCrearAnotaciones.setSelected(true);
@@ -266,15 +268,32 @@ public class App_Manual extends JFrame {
 //				Metodos_app.carpetaPos = direccionCarpetaFotos;
 //				Metodos_app.carpetaNeg = direccionFotosNegativas;
 
-
 				Metodos_app.quitarDireccionAbsoluta(direccionCarpetaFotos + "/pos.txt");
 				Metodos_app.crearSamples(direccionCarpetaFotos, direccionCarpetaDestino, "pos.txt", 1);
-				Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas, 1);
+				String direcionXML = Metodos_app.crearXML(direccionCarpetaDestino, direccionFotosNegativas, 1);
 
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
 				cCrearModelo.setSelected(true);
-				
+
 				JOptionPane.showMessageDialog(null, "Modelo creado");
+
+				if (JOptionPane.showConfirmDialog(null,
+						"¿Desea insertar este modelo a la base de datos?") == JOptionPane.OK_OPTION) {
+					String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
+					String fichero = direcionXML.replace(new File(direcionXML).getName(), nombre)+".xml";
+
+					boolean cambioNombre = new File(direcionXML).renameTo(new File(fichero));
+					if (cambioNombre)
+						direcionXML = fichero;
+
+					System.out.println(fichero);
+					Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
+							new File(direcionXML).getName());
+					boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
+
+					JOptionPane.showMessageDialog(null,
+							insertado ? "Registro insertado" : "Error al insertar el registro");
+				}
 
 			}
 		});
@@ -336,7 +355,8 @@ public class App_Manual extends JFrame {
 
 		cfotosnegaticas = new JCheckBox("Seleccionar una carpeta con fotos de lo que NO se quiere identificar");
 		cfotosnegaticas.setFont(new Font("Dialog", Font.BOLD, 12));
-		cfotosnegaticas.setEnabled(false); setLocationRelativeTo(null);
+		cfotosnegaticas.setEnabled(false);
+		setLocationRelativeTo(null);
 		cfotosnegaticas.setBounds(231, 452, 428, 24);
 		contentPane.add(cfotosnegaticas);
 
@@ -345,7 +365,7 @@ public class App_Manual extends JFrame {
 		cfotosnegativas.setEnabled(false);
 		cfotosnegativas.setBounds(1008, 454, 254, 24);
 		contentPane.add(cfotosnegativas);
-		
+
 		cfotosposi = new JCheckBox("Usar las imágenes al completo sin especificaciones (+Rápido +Consumo)");
 		cfotosposi.setForeground(new Color(0, 0, 255));
 		cfotosposi.setFont(new Font("Dialog", Font.BOLD, 11));
