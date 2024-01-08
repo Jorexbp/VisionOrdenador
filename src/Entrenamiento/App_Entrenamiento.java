@@ -8,7 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import Entrenamiento_Manual.LecturaFotos;
 import OpenCV.Camara;
-
+import OperadorBBDD.Metodos_BBDD;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
@@ -360,7 +360,7 @@ public class App_Entrenamiento extends JFrame {
 
 				} else {
 
-					for (int i = 0; i <= nIteraciones; i++) {
+					for (int i = 0; i < nIteraciones; i++) {
 						dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa, i + 1);
 						Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
 						Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
@@ -374,19 +374,42 @@ public class App_Entrenamiento extends JFrame {
 				System.out.println(dirMod);
 				File modelo = new File(dirMod);
 
-				String nombreModelo = dirMod.substring(0, dirMod.lastIndexOf('/')) + "/"
-						+ JOptionPane.showInputDialog("Introduzca el nombre del modelo") + ".xml";
-				System.out.println(nombreModelo);
+				String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
 
-				if (modelo.renameTo(new File(nombreModelo))) {
-					JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombreModelo);
+				// TODO Hacer que pregunte insertar el regisro como esta en @App_Manual
+				// cambiando
+				// El acceso a todos
+
+				if (JOptionPane.showConfirmDialog(null,
+						"¿Desea insertar este modelo a la base de datos?") == JOptionPane.OK_OPTION) {
+
+					String fichero = dirMod.replace(new File(dirMod).getName(), nombre) + ".xml";
+
+					boolean cambioNombre = new File(dirMod).renameTo(new File(fichero));
+					if (cambioNombre)
+						dirMod = fichero;
+System.out.println(dirMod);
+					boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(dirMod);
+					if (!todos) {
+						JOptionPane.showMessageDialog(null,
+								"No se ha podido añadir 'Todos' al archivo\nNo se puede insertar\n\nArchivo guardado en: "
+										+ dirMod);
+						return;
+					}
+
+					Object[] registro = Metodos_BBDD.parsearARegistro(new File(dirMod), new File(dirMod).getName());
+					boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
+
+					JOptionPane.showMessageDialog(null,
+							insertado ? "Registro insertado" : "Error al insertar el registro");
+				}
+				if (modelo.renameTo(new File(nombre))) {
+					// JOptionPane.showMessageDialog(null, "Nombre del modelo creado:\n" + nombre);
 				} else {
-					JOptionPane.showMessageDialog(null, "No se ha podido cambiar el nombre del modelo");
+					// JOptionPane.showMessageDialog(null, "No se ha podido cambiar el nombre del
+					// modelo");
 
 				}
-				
-				// TODO Hacer que pregunte insertar el regisro como esta en @App_Manual cambiando
-				// El acceso a todos
 
 				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos/");
 				mod = true;
@@ -475,8 +498,10 @@ public class App_Entrenamiento extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 
 				Metodos_app.cambiarANoUsable(lcargafotospos, befotospos, lcargafotosneg, bfotosneg, lcrearsample,
-						bcrearsample, btnProbar, lprobarmodelo, lcrearXML, bcrearXML, lnumiter, spniteraciones);
+						bcrearsample, btnProbar, lprobarmodelo, lcrearXML, bcrearXML, lnumiter, spniteraciones,
+						lcargafotosneg, lcargafotospos);
 				carpetaOriginalPositiva = carpetaOriginalNegativa = dirPreMod = dirMod = carpetaPadre = posTXT = "";
+				spniteraciones.setValue(1);
 
 				rellenarTextArea();
 				// TODO NO REINICIA SABE DIOS

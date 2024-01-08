@@ -367,7 +367,7 @@ public class Metodos_app {
 	public static String crearXML(String carpetaPadre, String carpetaOriginalNegativa, int iter) {
 		bloqueo.lock();
 
-		int nStages = calcularNumSamples(carpetaPos) / 13;
+		int nStages = calcularNumSamples(carpetaPos) / 15;
 		int numPos = (int) (calcularNumSamples(carpetaPos) / 1.5);
 		int numNeg = calcularNumSamples(carpetaNeg);
 		String destino = carpetaPadre;
@@ -379,7 +379,7 @@ public class Metodos_app {
 
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
 				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages
-				+ " -mode ALL -maxFalseAlarmRate 0.3 -minHitRate 0.998";
+				+ " -mode ALL -maxFalseAlarmRate 0.3";
 
 		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + comTR;
