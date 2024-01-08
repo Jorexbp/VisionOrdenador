@@ -10,9 +10,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.AclEntry;
+import java.nio.file.attribute.AclEntryPermission;
+import java.nio.file.attribute.AclEntryType;
+import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -673,6 +680,36 @@ public class Metodos_app {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static boolean añadirUsuarioTodosAArchivo(String direccionArhivos) {
+		// Este método hace magia para añadir el usuario Todos a el archivo que se haya
+		// especificado incluyendo su extensión.
+		Path archivo = Paths.get(direccionArhivos);
+
+		String nombreUsuario = "Todos";
+
+		try {
+			AclFileAttributeView aclView = Files.getFileAttributeView(archivo, AclFileAttributeView.class);
+
+			UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+			UserPrincipal userPrincipal = lookupService.lookupPrincipalByName(nombreUsuario);
+
+			AclEntry entry = AclEntry.newBuilder().setType(AclEntryType.ALLOW).setPrincipal(userPrincipal)
+					.setPermissions(AclEntryPermission.READ_DATA, AclEntryPermission.WRITE_DATA).build();
+
+			java.util.List<AclEntry> aclEntries = aclView.getAcl();
+
+			aclEntries.add(entry);
+
+			aclView.setAcl(aclEntries);
+
+			return true;
+		} catch (Exception e) {
+			System.err.println("Error al agregar usuario: " + e.getMessage());
+		}
+
+		return false;
 	}
 
 }

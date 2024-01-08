@@ -384,6 +384,9 @@ public class App_Entrenamiento extends JFrame {
 					JOptionPane.showMessageDialog(null, "No se ha podido cambiar el nombre del modelo");
 
 				}
+				
+				// TODO Hacer que pregunte insertar el regisro como esta en @App_Manual cambiando
+				// El acceso a todos
 
 				dirMod = Metodos_app.copiarFichero(new File(dirMod), carpetaPadre + "/modelos/");
 				mod = true;

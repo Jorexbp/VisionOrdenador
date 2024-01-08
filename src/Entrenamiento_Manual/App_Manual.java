@@ -230,7 +230,7 @@ public class App_Manual extends JFrame {
 		bidentificar.setEnabled(false);
 		bidentificar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO Funcion que recoja toda la imagen como muestra
+
 				if (cfotosposi.isSelected()) {
 					// Se usa toda la foto
 					Metodos_app.crearAnotacionConTodaLaFoto(direccionCarpetaFotos, direccionCarpetaDestino);
@@ -279,14 +279,22 @@ public class App_Manual extends JFrame {
 
 				if (JOptionPane.showConfirmDialog(null,
 						"¿Desea insertar este modelo a la base de datos?") == JOptionPane.OK_OPTION) {
+
 					String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
-					String fichero = direcionXML.replace(new File(direcionXML).getName(), nombre)+".xml";
+					String fichero = direcionXML.replace(new File(direcionXML).getName(), nombre) + ".xml";
 
 					boolean cambioNombre = new File(direcionXML).renameTo(new File(fichero));
 					if (cambioNombre)
 						direcionXML = fichero;
 
-					System.out.println(fichero);
+					boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(direcionXML);
+					if (!todos) {
+						JOptionPane.showMessageDialog(null,
+								"No se ha podido añadir 'Todos' al archivo\nNo se puede insertar\n\nArchivo guardado en: "
+										+ direcionXML);
+						return;
+					}
+
 					Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
 							new File(direcionXML).getName());
 					boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
