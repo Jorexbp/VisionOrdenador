@@ -62,6 +62,7 @@ public class App_Entrenamiento extends JFrame {
 	private JCheckBox ccomprobarimagen;
 	private JSpinner spniteraciones;
 	private JLabel lnumiter;
+	private JCheckBox cfotosposi;
 
 	/**
 	 * Launch the application.
@@ -275,17 +276,24 @@ public class App_Entrenamiento extends JFrame {
 				carpetaOriginalPositiva = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_AND_DIRECTORIES);
 
 				posTXT = "pos.txt";
-				if (ccomprobarimagen.isSelected()) {
-					LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE ESTO
-																						// ACABE DE EJECUTARSE
 
-					Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
+				if (cfotosposi.isSelected()) {
+					Metodos_app.crearAnotacionConTodaLaFoto(carpetaOriginalPositiva, carpetaPadre);
+
 				} else {
 
-					Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre);
+					if (ccomprobarimagen.isSelected()) {
+						LecturaFotos.comenzarCamara(carpetaOriginalPositiva, carpetaPadre); // HAY QUE ESPERAR A QUE
+																							// ESTO
+																							// ACABE DE EJECUTARSE
 
+						Metodos_app.setCarpetaPositiva(carpetaOriginalPositiva);
+					} else {
+
+						Metodos_app.detectarRectangulos(carpetaOriginalPositiva, carpetaPadre);
+
+					}
 				}
-
 				pos = true;
 				if (pos && neg) {
 					Metodos_app.cambiarAUsable(lcrearsample, bcrearsample);
@@ -362,12 +370,12 @@ public class App_Entrenamiento extends JFrame {
 
 					for (int i = 0; i < nIteraciones; i++) {
 						dirMod = Metodos_app.crearXML(carpetaPadre, carpetaOriginalNegativa, i + 1);
+						DetectorAnotations.cargarModelo(dirMod);
+						LecturaFotos.setModelo(dirMod);
+
 						Metodos_app.crearPositivos(carpetaOriginalPositiva, carpetaPadre);
 						Metodos_app.crearAnotacionNegativa(carpetaOriginalNegativa);
 						Metodos_app.crearSamples(carpetaOriginalPositiva, carpetaPadre, posTXT, i + 1);
-
-						DetectorAnotations.cargarModelo(dirMod);
-						LecturaFotos.setModelo(dirMod);
 
 					}
 				}
@@ -388,7 +396,7 @@ public class App_Entrenamiento extends JFrame {
 					boolean cambioNombre = new File(dirMod).renameTo(new File(fichero));
 					if (cambioNombre)
 						dirMod = fichero;
-System.out.println(dirMod);
+					System.out.println(dirMod);
 					boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(dirMod);
 					if (!todos) {
 						JOptionPane.showMessageDialog(null,
@@ -541,6 +549,12 @@ System.out.println(dirMod);
 		lnumiter.setEnabled(false);
 		lnumiter.setBounds(961, 197, 246, 24);
 		contentPane.add(lnumiter);
+
+		cfotosposi = new JCheckBox("Usar las imágenes al completo sin especificaciones (+Rápido +Consumo)");
+		cfotosposi.setForeground(Color.BLUE);
+		cfotosposi.setFont(new Font("Dialog", Font.BOLD, 11));
+		cfotosposi.setBounds(76, 289, 443, 24);
+		contentPane.add(cfotosposi);
 
 		rellenarTextArea();
 	}

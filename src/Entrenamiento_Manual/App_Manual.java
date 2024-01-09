@@ -276,31 +276,31 @@ public class App_Manual extends JFrame {
 				cCrearModelo.setSelected(true);
 
 				JOptionPane.showMessageDialog(null, "Modelo creado");
-
+				String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
+				
+				String fichero = direcionXML.replace(new File(direcionXML).getName(), nombre) + ".xml";
+				boolean cambioNombre = new File(direcionXML).renameTo(new File(fichero));
+				if (cambioNombre)
+					direcionXML = fichero;
+				
 				if (JOptionPane.showConfirmDialog(null,
 						"¿Desea insertar este modelo a la base de datos?") == JOptionPane.OK_OPTION) {
-
-					String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
-					String fichero = direcionXML.replace(new File(direcionXML).getName(), nombre) + ".xml";
-
-					boolean cambioNombre = new File(direcionXML).renameTo(new File(fichero));
-					if (cambioNombre)
-						direcionXML = fichero;
 
 					boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(direcionXML);
 					if (!todos) {
 						JOptionPane.showMessageDialog(null,
 								"No se ha podido añadir 'Todos' al archivo\nNo se puede insertar\n\nArchivo guardado en: "
 										+ direcionXML);
-						return;
+
+					} else {
+
+						Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
+								new File(direcionXML).getName());
+						boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
+
+						JOptionPane.showMessageDialog(null,
+								insertado ? "Registro insertado" : "Error al insertar el registro");
 					}
-
-					Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
-							new File(direcionXML).getName());
-					boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
-
-					JOptionPane.showMessageDialog(null,
-							insertado ? "Registro insertado" : "Error al insertar el registro");
 				}
 
 			}

@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import Entrenamiento.App_Entrenamiento;
+import Entrenamiento.Metodos_app;
 import inicio.Metodos_inicio;
 import inicio.PantallaInicial;
 
@@ -168,7 +169,7 @@ public class App_GestorBBDD extends JFrame {
 				if (!direcionXML.trim().toLowerCase().endsWith(".xml")) {
 					lmostrar.setText("El archivo seleccionado debe ser un XML");
 				} else {
-
+					Metodos_app.añadirUsuarioTodosAArchivo(direcionXML);
 					Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
 							new File(direcionXML).getName());
 					boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);

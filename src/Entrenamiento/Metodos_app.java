@@ -1,6 +1,10 @@
 package Entrenamiento;
 
 import java.awt.BorderLayout;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinNT;
+
+import java.io.File;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
@@ -18,8 +22,14 @@ import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
 import java.nio.file.attribute.AclFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -378,8 +388,7 @@ public class Metodos_app {
 		String dirExe = "lib\\traincascade\\opencv_traincascade.exe";
 
 		String comTR = dirExe + " -data " + destino + " -vec " + dirVec + " -bg " + dirTxtNeg + " -w 24 -h 24 -numPos "
-				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages
-				+ " -mode ALL -maxFalseAlarmRate 0.3";
+				+ numPos + " -numNeg " + numNeg + " -numStages " + nStages + " -mode ALL ";
 
 		String cmd = "cmd /c start cmd.exe /k ";
 		String comandoSamples = cmd + comTR;
@@ -682,34 +691,19 @@ public class Metodos_app {
 		}
 	}
 
-	public static boolean añadirUsuarioTodosAArchivo(String direccionArhivos) {
-		// Este método hace magia para añadir el usuario Todos a el archivo que se haya
-		// especificado incluyendo su extensión.
-		Path archivo = Paths.get(direccionArhivos);
+	public static boolean añadirUsuarioTodosAArchivo(String ruta) {
+	    String comando = "cmd /c start cmd.exe /k icacls \"" + ruta + "\" /grant Todos:(OI)(CI)F /T";
+System.out.println(comando);
+	    try {
+	        Process proceso = Runtime.getRuntime().exec(comando);
+	        int resultado = proceso.waitFor();
 
-		String nombreUsuario = "Todos";
-
-		try {
-			AclFileAttributeView aclView = Files.getFileAttributeView(archivo, AclFileAttributeView.class);
-
-			UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
-			UserPrincipal userPrincipal = lookupService.lookupPrincipalByName(nombreUsuario);
-
-			AclEntry entry = AclEntry.newBuilder().setType(AclEntryType.ALLOW).setPrincipal(userPrincipal)
-					.setPermissions(AclEntryPermission.READ_DATA, AclEntryPermission.WRITE_DATA).build();
-
-			java.util.List<AclEntry> aclEntries = aclView.getAcl();
-
-			aclEntries.add(entry);
-
-			aclView.setAcl(aclEntries);
-
-			return true;
-		} catch (Exception e) {
-			System.err.println("Error al agregar usuario: " + e.getMessage());
-		}
-
-		return false;
+	        // Verificar si el comando se ejecutó correctamente (resultado 0)
+	        return resultado == 0;
+	    } catch (IOException | InterruptedException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
 	}
 
 }
