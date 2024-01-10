@@ -59,6 +59,7 @@ public class PantallaInicial extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					
 					PantallaInicial frame = new PantallaInicial();
 					frame.setVisible(true);
 				} catch (Exception e) {

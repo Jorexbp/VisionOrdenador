@@ -436,7 +436,7 @@ public class Metodos_app {
 	public static boolean crearAnotaciones(String carpetaFotos, String carpetaDestino, String nombreFicheroTXT) {
 
 		JOptionPane.showMessageDialog(null,
-				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva\n el ratón hasta la esquina inferior derecha, para confirmar la selección pulse c, para pasar a la\n siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience\n otra selección y si está confirmado pulse d.");
+				"Para identificar el objeto en las fotos pinche en la esquina superior izquierda del objeto y mueva el ratón hasta la esquina inferior derecha, para\nconfirmar la selección pulse c, para pasar a la siguiente foto pulse n, para eliminar una selección insatisfactoria sin confirmar comience otra selección\n y si está confirmado pulse d.");
 
 		String ejecutableAnotacion = "lib\\annotation\\opencv_annotation.exe";
 
@@ -677,7 +677,7 @@ public class Metodos_app {
 	}
 
 	public static boolean añadirUsuarioTodosAArchivo(String ruta) {
-		String filePath = ruta; 
+		String filePath = ruta;
 		ProcessBuilder processBuilder = new ProcessBuilder("icacls", filePath, "/grant", "*S-1-1-0:(R)");
 		try {
 			Process process = processBuilder.start();
@@ -692,6 +692,7 @@ public class Metodos_app {
 		}
 		return false;
 	}
+
 	public static String insertarModelo(String dirMod) {
 		File modelo = new File(dirMod);
 
@@ -705,7 +706,7 @@ public class Metodos_app {
 			boolean cambioNombre = new File(dirMod).renameTo(new File(fichero));
 			if (cambioNombre)
 				dirMod = fichero;
-		
+
 			boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(dirMod);
 			if (!todos) {
 				JOptionPane.showMessageDialog(null,
@@ -717,8 +718,7 @@ public class Metodos_app {
 			Object[] registro = Metodos_BBDD.parsearARegistro(new File(dirMod), new File(dirMod).getName());
 			boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
 
-			JOptionPane.showMessageDialog(null,
-					insertado ? "Registro insertado" : "Error al insertar el registro");
+			JOptionPane.showMessageDialog(null, insertado ? "Registro insertado" : "Error al insertar el registro");
 		}
 		if (modelo.renameTo(new File(nombre))) {
 			return nombre;
