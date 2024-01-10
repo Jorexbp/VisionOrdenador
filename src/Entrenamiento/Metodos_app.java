@@ -1,8 +1,6 @@
 package Entrenamiento;
 
 import java.awt.BorderLayout;
-import com.sun.jna.platform.win32.Advapi32Util;
-import com.sun.jna.platform.win32.WinNT;
 
 import java.io.File;
 import java.awt.Color;
@@ -10,26 +8,12 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.AclEntry;
-import java.nio.file.attribute.AclEntryPermission;
-import java.nio.file.attribute.AclEntryType;
-import java.nio.file.attribute.AclFileAttributeView;
-import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.UserPrincipal;
-import java.nio.file.attribute.UserPrincipalLookupService;
-import java.nio.file.attribute.UserPrincipalNotFoundException;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Set;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -49,6 +33,7 @@ import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
 
 import OpenCV.DeteccionCara;
+import OperadorBBDD.Metodos_BBDD;
 
 public class Metodos_app {
 	public static String carpetaPos;
@@ -692,18 +677,54 @@ public class Metodos_app {
 	}
 
 	public static boolean añadirUsuarioTodosAArchivo(String ruta) {
-	    String comando = "cmd /c start cmd.exe /k icacls \"" + ruta + "\" /grant Todos:(OI)(CI)F /T";
-System.out.println(comando);
-	    try {
-	        Process proceso = Runtime.getRuntime().exec(comando);
-	        int resultado = proceso.waitFor();
+		String filePath = ruta; 
+		ProcessBuilder processBuilder = new ProcessBuilder("icacls", filePath, "/grant", "*S-1-1-0:(R)");
+		try {
+			Process process = processBuilder.start();
+			int exitCode = process.waitFor();
+			if (exitCode == 0) {
+				return true;
 
-	        // Verificar si el comando se ejecutó correctamente (resultado 0)
-	        return resultado == 0;
-	    } catch (IOException | InterruptedException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
+			}
+
+		} catch (IOException | InterruptedException e) {
+			System.err.println("Error al ejecutar el comando icacls: " + e.getMessage());
+		}
+		return false;
+	}
+	public static String insertarModelo(String dirMod) {
+		File modelo = new File(dirMod);
+
+		String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
+
+		if (JOptionPane.showConfirmDialog(null,
+				"¿Desea insertar este modelo a la base de datos?") == JOptionPane.OK_OPTION) {
+
+			String fichero = dirMod.replace(new File(dirMod).getName(), nombre) + ".xml";
+
+			boolean cambioNombre = new File(dirMod).renameTo(new File(fichero));
+			if (cambioNombre)
+				dirMod = fichero;
+		
+			boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(dirMod);
+			if (!todos) {
+				JOptionPane.showMessageDialog(null,
+						"No se ha podido añadir 'Todos' al archivo\nNo se puede insertar\n\nArchivo guardado en: "
+								+ dirMod);
+				return dirMod;
+			}
+
+			Object[] registro = Metodos_BBDD.parsearARegistro(new File(dirMod), new File(dirMod).getName());
+			boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
+
+			JOptionPane.showMessageDialog(null,
+					insertado ? "Registro insertado" : "Error al insertar el registro");
+		}
+		if (modelo.renameTo(new File(nombre))) {
+			return nombre;
+		}
+		return modelo.getAbsolutePath();
+
 	}
 
 }

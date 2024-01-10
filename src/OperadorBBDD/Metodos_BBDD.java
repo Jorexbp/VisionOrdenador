@@ -67,17 +67,31 @@ public class Metodos_BBDD {
 		try {
 			con.close();
 			statement.close();
-			rs.close();
+			rs.close();	
 			dbmd = null;
 
 			return true;
 		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se ha podido cerrar la conexión a la BBDD");
+		}
+		return false;
+	}
+	public static boolean cerrarConexionSinRs(){
+		try {
+			con.close();
+			statement.close();
+			dbmd = null;
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "No se ha podido cerrar la conexión a la BBDD");
 		}
 		return false;
 	}
 
-	public boolean getEstadoConexion() {
+	public static boolean getEstadoConexion() {
 		if (con == null)
 			return false;
 		else
@@ -213,6 +227,13 @@ public class Metodos_BBDD {
 
 	}
 
+	public static String estadoConexion() {
+		if (con != null)
+			return "Abierta";
+		else
+			return "Cerrada";
+	}
+
 	public static boolean insertarRegistroCompleto(String nombreTabla, Object[] valores) {
 		abrirConexion();
 
@@ -222,7 +243,6 @@ public class Metodos_BBDD {
 			String query = "insert into " + nombreTabla + " values(" + val + ");";
 
 			statement = con.createStatement();
-
 			int salida = statement.executeUpdate(query);
 
 			return salida != 0;
@@ -237,7 +257,7 @@ public class Metodos_BBDD {
 			}
 
 		} finally {
-			cerrarConexion();
+			cerrarConexionSinRs();
 		}
 		return false;
 	}
@@ -268,57 +288,6 @@ public class Metodos_BBDD {
 			cerrarConexion();
 		}
 		return false;
-	}
-
-	public static void leerDatos(String nombreTabla) {
-		abrirConexion();
-
-		try {
-			String query = String.format("select * from " + nombreTabla);
-			statement = con.createStatement();
-			rs = statement.executeQuery(query);
-			int creg = 1;
-			while (rs.next()) {
-				System.out.println("Registro " + creg + ": ");
-				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
-					System.out.println(rs.getString(i));
-
-				}
-
-			}
-
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			cerrarConexion();
-		}
-	}
-
-	public static String buscarRegistro(String nombreTabla, int indice) {
-		abrirConexion();
-
-		String datosRegistro = "";
-		try {
-			String query = "SELECT * FROM " + nombreTabla + " WHERE ctid = (SELECT ctid FROM " + nombreTabla
-					+ " ORDER BY ctid LIMIT 1 OFFSET ?)";
-			preparedStatement = con.prepareStatement(query);
-
-			preparedStatement.setInt(1, indice);
-			rs = preparedStatement.executeQuery();
-			while (rs.next()) {
-				for (int i = 1; i < rs.getMetaData().getColumnCount() + 1; i++) {
-					datosRegistro += rs.getString(i) + ",";
-				}
-
-			}
-			datosRegistro = datosRegistro.substring(0, datosRegistro.lastIndexOf(','));
-
-		} catch (Exception e) {
-			System.out.println(e);
-		} finally {
-			cerrarConexion();
-		}
-		return datosRegistro;
 	}
 
 	public static void repintarJTable(JTable tabla, DefaultTableModel modelo) {
@@ -504,7 +473,7 @@ public class Metodos_BBDD {
 					if (rs.getString(i) != null && i == rs.getMetaData().getColumnCount()) {
 						try {
 							@SuppressWarnings("unused")
-							Document document = builder.parse(new InputSource(new StringReader(rs.getString(i-3))));
+							Document document = builder.parse(new InputSource(new StringReader(rs.getString(i - 3))));
 
 							reg[i - 1] = "XML válido";
 						} catch (Exception e) {

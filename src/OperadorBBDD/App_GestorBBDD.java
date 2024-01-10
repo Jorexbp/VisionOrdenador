@@ -352,7 +352,7 @@ public class App_GestorBBDD extends JFrame {
 
 				jifActualizarRegistro.dispose();
 
-				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar);
+				Metodos_inicio.visibilidad(true, scrollPane, btnActualizar, btnBorrar, btnInsertar,btndescargar);
 
 			}
 		});

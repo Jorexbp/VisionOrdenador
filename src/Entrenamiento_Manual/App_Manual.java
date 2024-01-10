@@ -8,7 +8,6 @@ import javax.swing.border.EmptyBorder;
 
 import Entrenamiento.App_Entrenamiento;
 import Entrenamiento.Metodos_app;
-import OperadorBBDD.Metodos_BBDD;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
@@ -23,7 +22,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JSeparator;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.net.URL;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
@@ -275,33 +273,9 @@ public class App_Manual extends JFrame {
 				Metodos_app.cambiarAUsable(lreentrenar, breentrenar);
 				cCrearModelo.setSelected(true);
 
-				JOptionPane.showMessageDialog(null, "Modelo creado");
-				String nombre = JOptionPane.showInputDialog("Introduzca un nombre para el modelo identificativo");
+				direcionXML = Metodos_app.insertarModelo(direcionXML);
 				
-				String fichero = direcionXML.replace(new File(direcionXML).getName(), nombre) + ".xml";
-				boolean cambioNombre = new File(direcionXML).renameTo(new File(fichero));
-				if (cambioNombre)
-					direcionXML = fichero;
-				
-				if (JOptionPane.showConfirmDialog(null,
-						"¿Desea insertar este modelo a la base de datos?") == JOptionPane.OK_OPTION) {
-
-					boolean todos = Metodos_app.añadirUsuarioTodosAArchivo(direcionXML);
-					if (!todos) {
-						JOptionPane.showMessageDialog(null,
-								"No se ha podido añadir 'Todos' al archivo\nNo se puede insertar\n\nArchivo guardado en: "
-										+ direcionXML);
-
-					} else {
-
-						Object[] registro = Metodos_BBDD.parsearARegistro(new File(direcionXML),
-								new File(direcionXML).getName());
-						boolean insertado = Metodos_BBDD.insertarRegistroCompleto("Modelos", registro);
-
-						JOptionPane.showMessageDialog(null,
-								insertado ? "Registro insertado" : "Error al insertar el registro");
-					}
-				}
+//				System.out.println(Metodos_BBDD.getEstadoConexion());
 
 			}
 		});
