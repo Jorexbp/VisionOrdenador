@@ -26,8 +26,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import Entrenamiento.App_Entrenamiento;
 import Entrenamiento.Metodos_app;
 import Entrenamiento_Manual.App_Manual;
-import Entrenamiento_Manual.CamaraEntrenamiento;
-import OpenCV.Camara;
+import OpenCV.SeleccionCamara;
 import OperadorBBDD.App_GestorBBDD;
 
 public class PantallaInicial extends JFrame {
@@ -198,7 +197,8 @@ public class PantallaInicial extends JFrame {
 				String dirCarpeta = Metodos_app.seleccionarCarpeta(JFileChooser.DIRECTORIES_ONLY);
 				if (dirCarpeta == null)
 					dirCarpeta = System.getProperty("user.home") + "\\Documents";
-				CamaraEntrenamiento.dirCarpeta(dirCarpeta);
+				SeleccionCamara.dirMod = dirCarpeta;
+				new SeleccionCamara().setVisible(true);
 				dispose();
 			}
 		});
@@ -214,8 +214,8 @@ public class PantallaInicial extends JFrame {
 				String modelo = Metodos_app.seleccionarCarpeta(JFileChooser.FILES_ONLY);
 				if (modelo == null)
 					return;
-				Camara camara = new Camara();
-				camara.comenzarCamara();
+				new SeleccionCamara().setVisible(true);
+				
 				dispose();
 			}
 		});

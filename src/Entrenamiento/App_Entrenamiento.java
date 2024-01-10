@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import Entrenamiento_Manual.LecturaFotos;
-import OpenCV.Camara;
+import OpenCV.SeleccionCamara;
 import inicio.PantallaInicial;
 
 import javax.swing.JLabel;
@@ -445,8 +445,7 @@ public class App_Entrenamiento extends JFrame {
 		btnProbar.setEnabled(false);
 		btnProbar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Camara camara = new Camara(dirMod);
-				camara.comenzarCamara();
+				new SeleccionCamara().setVisible(true);
 				dispose();
 			}
 		});

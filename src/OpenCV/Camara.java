@@ -6,13 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -35,6 +33,12 @@ public class Camara extends JFrame {
 	private JButton btnCapturar, btnExtremos, btnCamara, btnCaras;
 	private VideoCapture capturaVideo;
 	private Mat imagen;
+	private int idCamara;
+	
+	public void setIdCamara(int idCamara) {
+		this.idCamara=idCamara;
+	}
+
 	private boolean clicked, camara = true;
 
 	public Camara(String modelo) {
@@ -52,6 +56,7 @@ public class Camara extends JFrame {
 			@Override
 			public void run() {
 				Camara camara = new Camara();
+
 				camara.iniciarComponentes();
 				// Empezar la camara en nuevo Thread
 
@@ -70,9 +75,11 @@ public class Camara extends JFrame {
 	}
 
 	private void iniciarComponentes() {
+
 		// GUI
+
 		getContentPane().setLayout(null);
-		 setLocationRelativeTo(null);
+		setLocationRelativeTo(null);
 		pantallaCamara = new JLabel();
 		pantallaCamara.setBounds(0, 0, 640, 480);
 		getContentPane().add(pantallaCamara);
@@ -109,14 +116,14 @@ public class Camara extends JFrame {
 				camara = false;
 				dispose();
 				try {
-					capturaVideo.release();	
-				}catch (Exception pol) {
-					
+					capturaVideo.release();
+				} catch (Exception pol) {
+
 				}
-				
+
 				capturaVideo = null;
 				new PantallaInicial(0).setVisible(true);
-				
+
 			}
 		});
 
@@ -140,17 +147,28 @@ public class Camara extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				capturaVideo.release();
+				try {
+					capturaVideo.release();
+				} catch (Exception le) {
+
+				}
 				capturaVideo = null;
 				new PantallaInicial(0).setVisible(true);
 			}
 		});
 	}
 
+	public int seleccionarCamara() {
+
+		
+		return 0;
+	}
+
 	public void iniciarCamara() {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-		capturaVideo = new VideoCapture(0);
+		// TODO preguntar que camara quiere usar
+		capturaVideo = new VideoCapture(idCamara);
 		imagen = new Mat();
 		@SuppressWarnings("unused")
 		byte[] datosImagen;
@@ -172,7 +190,7 @@ public class Camara extends JFrame {
 
 					icono = new ImageIcon(DeteccionCara.mostrarInfoCara(imagen));
 
-				}  else {
+				} else {
 					icono = new ImageIcon(Extremos.detectarExtremos(imagen));
 
 				}
@@ -183,7 +201,7 @@ public class Camara extends JFrame {
 						nombre = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 					}
 
-					String dir = System.getProperty("user.home")+"Documents/" + nombre + ".jpg";
+					String dir = System.getProperty("user.home") + "Documents/" + nombre + ".jpg";
 					DeteccionCara.guardarImagen(imagen, dir);
 
 					clicked = false;
@@ -194,6 +212,11 @@ public class Camara extends JFrame {
 			}
 		}
 		// capturaVideo = null;
+	}
+
+	public static void main(String[] args) {
+		Camara camara = new Camara();
+		camara.comenzarCamara();
 	}
 
 }
