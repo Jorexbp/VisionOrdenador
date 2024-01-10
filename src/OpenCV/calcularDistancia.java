@@ -10,7 +10,11 @@ public class calcularDistancia {
 		sp.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 	}
 	public  int getDistancia() {
-		
+	/* TODO ESTO ESTÁ SIN IMPLEMENTAR, FUNCIONA A TRAVÉS DE ARDUINO PARA DETECTAR
+	 * LA DISTANCIA DE LOS OBJETOS, FUNCIONA PERO NECESITARÍA SUBIRLO A UN ARDUINO
+	 * CON UNA CÁMARA PROPIA 
+	 */
+	
 
 //		if (!sp.openPort()) {
 //			return -1;
@@ -18,7 +22,6 @@ public class calcularDistancia {
 //		try {
 //			Thread.sleep(2000);
 //		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //		Scanner sc = null;
