@@ -19,5 +19,7 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-2.0.11.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-nop-2.0.11.jar"/>
 	<classpathentry kind="lib" path="lib/webcam-capture-0.3.12.jar"/>
+	<classpathentry kind="lib" path="lib/jssc-2.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/native-lib-loader-2.3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

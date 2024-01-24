@@ -158,11 +158,6 @@ public class Camara extends JFrame {
 		});
 	}
 
-	public int seleccionarCamara() {
-
-		
-		return 0;
-	}
 
 	public void iniciarCamara() {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
