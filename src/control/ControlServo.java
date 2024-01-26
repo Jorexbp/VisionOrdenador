@@ -1,7 +1,6 @@
 package control;
 
-import java.util.Iterator;
-import java.util.Scanner;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 import jssc.SerialPort;
@@ -38,7 +37,7 @@ public class ControlServo {
 				
 			}
 			try {
-				Thread.sleep(250);
+				Thread.sleep(500);
 				
 			}catch (Exception e) {
 				// TODO: handle exception
